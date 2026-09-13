@@ -1,0 +1,239 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="ZxAXzn9TXPumFSkHVtzu">
+    <mxGraphModel dx="2060" dy="1252" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="JWc5hpcTaLOexlLJskKX-1" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" target="JWc5hpcTaLOexlLJskKX-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-2" parent="1" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;" value="Start" vertex="1">
+          <mxGeometry height="60" width="100" x="400" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Launch Application" vertex="1">
+          <mxGeometry height="40" width="220" x="340" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-4" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-5" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-6" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-7" parent="1" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" value="Already have&amp;nbsp;&lt;div&gt;an account?&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="120" x="390" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-8" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;curved=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="655" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Register&lt;div&gt;(Create account)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="130" x="590" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-10" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;curved=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Login&lt;div&gt;(Enter username and password)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="140" x="190" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-12" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=0;" target="JWc5hpcTaLOexlLJskKX-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-13" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Select Role&lt;div&gt;(Student / Employer / Administrator)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="270" x="315" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-14" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;curved=0;" target="JWc5hpcTaLOexlLJskKX-62">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-15" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Student / Job seeker" vertex="1">
+          <mxGeometry height="610" width="270" x="20" y="480" as="geometry">
+            <mxRectangle height="30" width="150" x="20" y="480" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-16" edge="1" parent="JWc5hpcTaLOexlLJskKX-15" source="JWc5hpcTaLOexlLJskKX-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-17" parent="JWc5hpcTaLOexlLJskKX-15" style="rounded=0;whiteSpace=wrap;html=1;" value="Dashboard" vertex="1">
+          <mxGeometry height="40" width="175" x="47.5" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-18" edge="1" parent="JWc5hpcTaLOexlLJskKX-15" source="JWc5hpcTaLOexlLJskKX-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="JWc5hpcTaLOexlLJskKX-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-19" parent="JWc5hpcTaLOexlLJskKX-15" style="rounded=0;whiteSpace=wrap;html=1;" value="Manage Profile&lt;div&gt;(update details, upload CV)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-20" edge="1" parent="JWc5hpcTaLOexlLJskKX-15" source="JWc5hpcTaLOexlLJskKX-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-21" parent="JWc5hpcTaLOexlLJskKX-15" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;div&gt;Search opportunities&lt;/div&gt;&lt;div&gt;(Filter by location, field, type, etc.)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-22" edge="1" parent="JWc5hpcTaLOexlLJskKX-15" source="JWc5hpcTaLOexlLJskKX-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-23" parent="JWc5hpcTaLOexlLJskKX-15" style="rounded=0;whiteSpace=wrap;html=1;" value="View Opportunity Details" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-24" edge="1" parent="JWc5hpcTaLOexlLJskKX-15" source="JWc5hpcTaLOexlLJskKX-25" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;curved=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-23">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="10" y="350" />
+              <mxPoint x="10" y="260" />
+            </Array>
+            <mxPoint x="20" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-25" parent="JWc5hpcTaLOexlLJskKX-15" style="rhombus;whiteSpace=wrap;html=1;shapeInside=1;" value="Apply for opportunity?" vertex="1">
+          <mxGeometry height="80" width="110" x="80" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-26" edge="1" parent="JWc5hpcTaLOexlLJskKX-15" source="JWc5hpcTaLOexlLJskKX-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-27" parent="JWc5hpcTaLOexlLJskKX-15" style="rounded=0;whiteSpace=wrap;html=1;" value="Submit Application&lt;div&gt;(Attach CV, cover letter, etc.)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="56" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-28" edge="1" parent="JWc5hpcTaLOexlLJskKX-15" source="JWc5hpcTaLOexlLJskKX-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-29" parent="JWc5hpcTaLOexlLJskKX-15" style="rounded=0;whiteSpace=wrap;html=1;" value="Track Application Status&lt;div&gt;(view progress)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="56" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-30" parent="JWc5hpcTaLOexlLJskKX-15" style="rounded=1;whiteSpace=wrap;html=1;" value="Logout" vertex="1">
+          <mxGeometry height="40" width="120" x="83.5" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-31" edge="1" parent="JWc5hpcTaLOexlLJskKX-15" source="JWc5hpcTaLOexlLJskKX-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.45;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" target="JWc5hpcTaLOexlLJskKX-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-32" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Employer" vertex="1">
+          <mxGeometry height="610" width="270" x="330" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-33" edge="1" parent="JWc5hpcTaLOexlLJskKX-32" source="JWc5hpcTaLOexlLJskKX-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-36">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-34" parent="JWc5hpcTaLOexlLJskKX-32" style="rounded=0;whiteSpace=wrap;html=1;" value="Dashboard" vertex="1">
+          <mxGeometry height="40" width="175" x="47.5" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-35" edge="1" parent="JWc5hpcTaLOexlLJskKX-32" source="JWc5hpcTaLOexlLJskKX-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-36" parent="JWc5hpcTaLOexlLJskKX-32" style="rounded=0;whiteSpace=wrap;html=1;" value="Manage Company Profile&lt;div&gt;(Update company details)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-37" edge="1" parent="JWc5hpcTaLOexlLJskKX-32" source="JWc5hpcTaLOexlLJskKX-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-38" parent="JWc5hpcTaLOexlLJskKX-32" style="rounded=0;whiteSpace=wrap;html=1;" value="Post Opportunities&lt;div&gt;(job/Internship details)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-39" edge="1" parent="JWc5hpcTaLOexlLJskKX-32" source="JWc5hpcTaLOexlLJskKX-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-42">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-40" parent="JWc5hpcTaLOexlLJskKX-32" style="rounded=0;whiteSpace=wrap;html=1;" value="View Applicants&lt;div&gt;(Check applications and CVs)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-41" edge="1" parent="JWc5hpcTaLOexlLJskKX-32" source="JWc5hpcTaLOexlLJskKX-42" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-42" parent="JWc5hpcTaLOexlLJskKX-32" style="rounded=0;whiteSpace=wrap;html=1;" value="Review Applicant&lt;div&gt;(Shortlist / Reject)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="335" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-43" edge="1" parent="JWc5hpcTaLOexlLJskKX-32" source="JWc5hpcTaLOexlLJskKX-44" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-44" parent="JWc5hpcTaLOexlLJskKX-32" style="rounded=0;whiteSpace=wrap;html=1;" value="Update Application Status" vertex="1">
+          <mxGeometry height="40" width="175" x="47.5" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-45" parent="JWc5hpcTaLOexlLJskKX-32" style="rounded=1;whiteSpace=wrap;html=1;" value="Logout" vertex="1">
+          <mxGeometry height="40" width="120" x="75" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-46" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-47" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;curved=0;" target="JWc5hpcTaLOexlLJskKX-62">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-47" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Administrator" vertex="1">
+          <mxGeometry height="610" width="270" x="640" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-48" edge="1" parent="JWc5hpcTaLOexlLJskKX-47" source="JWc5hpcTaLOexlLJskKX-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-51">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-49" parent="JWc5hpcTaLOexlLJskKX-47" style="rounded=0;whiteSpace=wrap;html=1;" value="Dashboard" vertex="1">
+          <mxGeometry height="40" width="175" x="47.5" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-50" edge="1" parent="JWc5hpcTaLOexlLJskKX-47" source="JWc5hpcTaLOexlLJskKX-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-53">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-51" parent="JWc5hpcTaLOexlLJskKX-47" style="rounded=0;whiteSpace=wrap;html=1;" value="Manage Users&lt;div&gt;(Students and Employers)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-52" edge="1" parent="JWc5hpcTaLOexlLJskKX-47" source="JWc5hpcTaLOexlLJskKX-53" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="JWc5hpcTaLOexlLJskKX-55">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-53" parent="JWc5hpcTaLOexlLJskKX-47" style="rounded=0;whiteSpace=wrap;html=1;" value="Manage Opportunities&lt;div&gt;(Approve / Reject / Remove)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-54" edge="1" parent="JWc5hpcTaLOexlLJskKX-47" source="JWc5hpcTaLOexlLJskKX-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-57">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-55" parent="JWc5hpcTaLOexlLJskKX-47" style="rounded=0;whiteSpace=wrap;html=1;" value="Monitor Applications&lt;div&gt;(View all applications)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-56" edge="1" parent="JWc5hpcTaLOexlLJskKX-47" source="JWc5hpcTaLOexlLJskKX-57" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-59">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-57" parent="JWc5hpcTaLOexlLJskKX-47" style="rounded=0;whiteSpace=wrap;html=1;" value="View Reports and Statistics&lt;div&gt;(Users, postings, applications)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-58" edge="1" parent="JWc5hpcTaLOexlLJskKX-47" source="JWc5hpcTaLOexlLJskKX-59" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-59" parent="JWc5hpcTaLOexlLJskKX-47" style="rounded=0;whiteSpace=wrap;html=1;" value="Remove inappropriate Cotent&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="175" x="50" y="405" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-60" parent="JWc5hpcTaLOexlLJskKX-47" style="rounded=1;whiteSpace=wrap;html=1;" value="Logout" vertex="1">
+          <mxGeometry height="40" width="120" x="77.5" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-61" parent="1" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;" value="End" vertex="1">
+          <mxGeometry height="60" width="100" x="415" y="1220" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-62" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="End Session&lt;div&gt;(Return to login or close aplication)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="370" y="1120" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-63" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" target="JWc5hpcTaLOexlLJskKX-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-64" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="No" vertex="1">
+          <mxGeometry height="30" width="60" x="510" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-65" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Yes" vertex="1">
+          <mxGeometry height="30" width="60" x="330" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-66" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;curved=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="JWc5hpcTaLOexlLJskKX-47">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="453.25" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-67" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.463;entryY=0.004;entryDx=0;entryDy=0;entryPerimeter=0;" target="JWc5hpcTaLOexlLJskKX-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-68" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Yes&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="150" y="870" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-69" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="No" vertex="1">
+          <mxGeometry height="30" width="60" x="20" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-70" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.566;entryY=0.027;entryDx=0;entryDy=0;entryPerimeter=0;" target="JWc5hpcTaLOexlLJskKX-62">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JWc5hpcTaLOexlLJskKX-71" edge="1" parent="1" source="JWc5hpcTaLOexlLJskKX-62" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" target="JWc5hpcTaLOexlLJskKX-61">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

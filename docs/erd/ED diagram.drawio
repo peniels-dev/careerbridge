@@ -1,0 +1,112 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="wtAJ1N0GCvi9Tn3F7AWw">
+    <mxGraphModel dx="1030" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-27" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="USER" vertex="1">
+          <mxGeometry height="150" width="160" x="360" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-28" parent="zrIvPOkka3WoQwKUo2VZ-27" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="PK&amp;nbsp; &amp;nbsp; &amp;nbsp;UserID&lt;div&gt;FirstName&lt;/div&gt;&lt;div&gt;LastName&lt;/div&gt;&lt;div&gt;Email&lt;/div&gt;&lt;div&gt;Password&lt;/div&gt;&lt;div&gt;Role&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-29" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="JOB SEEKER" vertex="1">
+          <mxGeometry height="150" width="160" x="240" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-30" parent="zrIvPOkka3WoQwKUo2VZ-29" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="PK JobSeekerID&lt;div&gt;FK&amp;nbsp; UserID&lt;/div&gt;&lt;div&gt;Phone&lt;/div&gt;&lt;div&gt;Location&lt;/div&gt;&lt;div&gt;Skills&lt;/div&gt;&lt;div&gt;Education&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-31" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="ADMIN" vertex="1">
+          <mxGeometry height="140" width="160" x="480" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-32" parent="zrIvPOkka3WoQwKUo2VZ-31" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="PK&amp;nbsp; AdminID&lt;div&gt;FK&amp;nbsp; &amp;nbsp;UserID&lt;/div&gt;&lt;div&gt;AdminRole&lt;/div&gt;&lt;div&gt;CreatedDate&lt;/div&gt;&lt;div&gt;Status&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-34" edge="1" parent="1" source="zrIvPOkka3WoQwKUo2VZ-29" style="fontSize=12;html=1;endArrow=ERmandOne;startArrow=ERmandOne;rounded=0;exitX=0.858;exitY=0.027;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="376.48" y="300" as="sourcePoint" />
+            <mxPoint x="380" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-35" edge="1" parent="1" source="zrIvPOkka3WoQwKUo2VZ-28" style="fontSize=12;html=1;endArrow=ERmandOne;startArrow=ERmandOne;rounded=0;exitX=0.898;exitY=0.996;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.183;entryY=-0.003;entryDx=0;entryDy=0;entryPerimeter=0;" target="zrIvPOkka3WoQwKUo2VZ-31" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="530" y="90" as="sourcePoint" />
+            <mxPoint x="580" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-37" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="CV" vertex="1">
+          <mxGeometry height="150" width="160" x="150" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-38" parent="zrIvPOkka3WoQwKUo2VZ-37" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="PK&amp;nbsp; &amp;nbsp; CVID&lt;div&gt;FK&amp;nbsp; &amp;nbsp; &amp;nbsp;JobSeeker&lt;/div&gt;&lt;div&gt;CVTitle&lt;/div&gt;&lt;div&gt;FilePath&lt;/div&gt;&lt;div&gt;UploadDate&lt;/div&gt;&lt;div&gt;LastUpdated&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-39" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="APPLICATION" vertex="1">
+          <mxGeometry height="150" width="160" x="360" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-40" parent="zrIvPOkka3WoQwKUo2VZ-39" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="PK&amp;nbsp; &amp;nbsp; ApplicationID&lt;div&gt;FK&amp;nbsp; &amp;nbsp; JobSeekerID&lt;/div&gt;&lt;div&gt;FK&amp;nbsp; &amp;nbsp; JobID&lt;/div&gt;&lt;div&gt;ApplicationDate&lt;/div&gt;&lt;div&gt;Status&lt;/div&gt;&lt;div&gt;CV&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-41" edge="1" parent="1" source="zrIvPOkka3WoQwKUo2VZ-29" style="fontSize=12;html=1;endArrow=ERoneToMany;rounded=0;entryX=0.805;entryY=-0.019;entryDx=0;entryDy=0;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryPerimeter=0;" target="zrIvPOkka3WoQwKUo2VZ-37" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <Array as="points">
+              <mxPoint x="280" y="490" />
+            </Array>
+            <mxPoint x="280" y="530" as="sourcePoint" />
+            <mxPoint x="290" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-42" edge="1" parent="1" style="fontSize=12;html=1;endArrow=ERoneToMany;rounded=0;entryX=0.075;entryY=-0.019;entryDx=0;entryDy=0;entryPerimeter=0;" target="zrIvPOkka3WoQwKUo2VZ-39" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <Array as="points">
+              <mxPoint x="370" y="450" />
+              <mxPoint x="370" y="510" />
+              <mxPoint x="371" y="520" />
+              <mxPoint x="370" y="530" />
+            </Array>
+            <mxPoint x="370" y="500" as="sourcePoint" />
+            <mxPoint x="370" y="557" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-44" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="JOB" vertex="1">
+          <mxGeometry height="160" width="160" x="360" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-45" parent="zrIvPOkka3WoQwKUo2VZ-44" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="PK&amp;nbsp; &amp;nbsp; JobID&lt;div&gt;FK&amp;nbsp; &amp;nbsp; &amp;nbsp;CompanyID&lt;/div&gt;&lt;div&gt;FK&amp;nbsp; &amp;nbsp; CategoryID&lt;/div&gt;&lt;div&gt;JobTitle&lt;/div&gt;&lt;div&gt;Description&lt;/div&gt;&lt;div&gt;Location&lt;/div&gt;&lt;div&gt;ClosingDate&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-46" edge="1" parent="1" source="zrIvPOkka3WoQwKUo2VZ-44" style="fontSize=12;html=1;endArrow=ERoneToMany;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="zrIvPOkka3WoQwKUo2VZ-40" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <Array as="points">
+              <mxPoint x="440" y="720" />
+            </Array>
+            <mxPoint x="325" y="790" as="sourcePoint" />
+            <mxPoint x="425" y="690" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-47" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="COMPANY" vertex="1">
+          <mxGeometry height="150" width="160" x="265" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-48" parent="zrIvPOkka3WoQwKUo2VZ-47" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="PK&amp;nbsp; &amp;nbsp; CompanyID&lt;div&gt;CompanyName&lt;/div&gt;&lt;div&gt;Email&lt;/div&gt;&lt;div&gt;Phone&lt;/div&gt;&lt;div&gt;Address&lt;/div&gt;&lt;div&gt;Description&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-49" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="JOB CATEGORY" vertex="1">
+          <mxGeometry height="150" width="160" x="490" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-50" parent="zrIvPOkka3WoQwKUo2VZ-49" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="PK&amp;nbsp; &amp;nbsp; CategoryID&lt;div&gt;CategoryName&lt;/div&gt;&lt;div&gt;Description&lt;/div&gt;&lt;div&gt;Createddate&lt;/div&gt;&lt;div&gt;Status&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-51" edge="1" parent="1" source="zrIvPOkka3WoQwKUo2VZ-49" style="fontSize=12;html=1;endArrow=ERoneToMany;rounded=0;entryX=0.923;entryY=0.993;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.1;exitY=-0.027;exitDx=0;exitDy=0;exitPerimeter=0;" target="zrIvPOkka3WoQwKUo2VZ-45" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="600" y="930" as="sourcePoint" />
+            <mxPoint x="700" y="830" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zrIvPOkka3WoQwKUo2VZ-52" edge="1" parent="1" source="zrIvPOkka3WoQwKUo2VZ-47" style="fontSize=12;html=1;endArrow=ERoneToMany;rounded=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;exitX=0.836;exitY=0.021;exitDx=0;exitDy=0;exitPerimeter=0;" target="zrIvPOkka3WoQwKUo2VZ-44" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="40" y="1020" as="sourcePoint" />
+            <mxPoint x="140" y="920" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
