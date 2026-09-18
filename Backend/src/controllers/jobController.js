@@ -4,6 +4,7 @@ const { sql, connectDB } = require("../config/database");
 // GET ALL JOBS
 // ==========================================
 
+
 const getAllJobs = async (req, res) => {
     try {
         const pool = await connectDB();

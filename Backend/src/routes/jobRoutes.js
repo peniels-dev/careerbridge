@@ -18,6 +18,7 @@ const {
     closeJob
 } = require("../controllers/jobController");
 
+const { applyForJob } = require("../controllers/applicationController");
 const authMiddleware = require("../middleware/authMiddleware");
 const allowRoles = require("../middleware/roleMiddleware");
 
@@ -51,6 +52,8 @@ router.get("/paginate", paginateJobs);
 // GET JOB BY ID
 router.get("/:id", getJobById);
 
+router.post("/:jobId/apply", applyForJob);
+
 // CREATE JOB - EMPLOYER ONLY
 router.post(
     "/",
@@ -75,46 +78,6 @@ router.patch(
     closeJob
 );
 
-// GET EMPLOYER JOBS WITH APPLICATION COUNT
-const getEmployerJobs = async (req, res) => {
-    try {
-        const userId = req.user.userId;
 
-        const pool = await connectDB();
-
-        const result = await pool
-            .request()
-            .input("UserID", sql.Int, userId)
-            .query(`
-                SELECT
-                    j.JobID,
-                    j.JobTitle,
-                    COUNT(a.ApplicationID) AS applicationCount
-                FROM Job j
-                INNER JOIN Company c
-                    ON j.CompanyID = c.CompanyID
-                LEFT JOIN Application a
-                    ON j.JobID = a.JobID
-                WHERE c.UserID = @UserID
-                GROUP BY
-                    j.JobID,
-                    j.JobTitle
-                ORDER BY j.PostedDate DESC
-            `);
-
-        res.status(200).json({
-            success: true,
-            data: result.recordset
-        });
-
-    } catch (error) {
-        console.error("Get employer jobs error:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to retrieve employer jobs"
-        });
-    }
-};
 
 module.exports = router;
