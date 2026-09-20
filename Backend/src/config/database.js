@@ -17,17 +17,17 @@ const config = {
     pool: { min: 0, max: 10, idleTimeoutMillis: 30000 }
 };
 
-
-
 const connectDB = async () => {
-    try {
-        const pool = await sql.connect(config);
-        return pool;
-    } catch (error) {
-        console.error("Database connection error:", error);
-        throw error;
-    }
+  try {
+   const pool = await sql.connect(config); // assigns to the module-level variable
+    console.log("Connected to SQL Server");
+    return pool;
+  } catch (error) {
+    console.error("Database connection failed:", error.message);
+    throw error;
+  }
 };
+
 
 
 module.exports = {

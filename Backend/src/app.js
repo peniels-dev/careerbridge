@@ -4,13 +4,19 @@ const { connectDB } = require("./config/database");
 const app = express();
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5138;
 
 const authRoutes = require("./routes/authRoutes");
 
 const jobRoutes = require("./routes/jobRoutes");
 
+const applicationRoutes = require("./routes/applicationRoutes");
+
 app.use(express.json());
+
+app.use("/api", applicationRoutes);
+
+app.use("/api/applications", applicationRoutes);
 
 app.use("/api/jobs", jobRoutes);
 

@@ -11,25 +11,28 @@ const authMiddleware = (req, res, next) => {
             });
         }
 
-        if (!authHeader.startsWith("Bearer ")) {
+        const token = authHeader.split(" ")[1];
+
+        if (!token) {
             return res.status(401).json({
                 success: false,
                 message: "Invalid authorization format"
             });
         }
 
-        const token = authHeader.split(" ")[1];
-
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET
         );
 
+        // Store the decoded JWT information
         req.user = decoded;
 
         next();
 
     } catch (error) {
+        console.error("Authentication error:", error);
+
         return res.status(401).json({
             success: false,
             message: "Invalid or expired token"
