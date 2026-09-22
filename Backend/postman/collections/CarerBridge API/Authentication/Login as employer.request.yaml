@@ -1,0 +1,27 @@
+$kind: http-request
+url: http://localhost:5138/api/auth/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\":\"daniel.mensah@example.com\",\r
+
+    \    \"password\":\"Daniel123!\"\r
+
+    }"
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: "const responseData = pm.response.json();\r
+
+      \r
+
+      console.log(\"MY LOGIN RESPONSE IS:\", responseData)\r
+
+      \r
+
+      pm.environment.set(\"employerToken\", responseData.token);\r\n"
+    language: text/javascript
+order: 4349792785047874

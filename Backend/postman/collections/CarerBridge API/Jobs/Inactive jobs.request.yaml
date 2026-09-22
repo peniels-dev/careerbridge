@@ -1,0 +1,13 @@
+$kind: http-request
+url: http://localhost:5000/api/jobs/15/apply
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"JobSeekerID\": 1,\r
+
+    \    \"CVID\": 1\r
+
+    }"
+order: 3974251666814153

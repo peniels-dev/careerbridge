@@ -1,0 +1,8 @@
+$kind: http-request
+url: http://localhost:5138/api/jobs/26/applicants
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{employerToken}}"
+order: 3656033153289779

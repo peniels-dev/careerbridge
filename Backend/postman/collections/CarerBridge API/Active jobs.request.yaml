@@ -1,4 +1,0 @@
-$kind: http-request
-url: http://localhost:5000/api/jobs/active
-method: GET
-order: 2632764554155570

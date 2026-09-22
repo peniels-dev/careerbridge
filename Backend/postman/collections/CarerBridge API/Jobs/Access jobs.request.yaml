@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:5138/api/jobs
+method: GET
+auth:
+  type: noauth
+order: 1789920414275

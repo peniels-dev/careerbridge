@@ -1,0 +1,8 @@
+name: CareerBridge
+values:
+  - key: baseUrl
+    value: ''
+  - key: employerToken
+    value: ''
+  - key: jobSeekerToken
+    value: ''

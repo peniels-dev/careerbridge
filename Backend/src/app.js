@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const { connectDB } = require("./config/database");
 
 const app = express();
@@ -12,20 +13,29 @@ const jobRoutes = require("./routes/jobRoutes");
 
 const applicationRoutes = require("./routes/applicationRoutes");
 
+app.use(cors());
 app.use(express.json());
+
+
+app.get("/api/health", (req, res) => {
+    res.json({
+        success: true,
+        message: "CareerBridge API is healthy"
+    });
+});
+
+app.use("/api/auth",authRoutes);
+
+app.use("/api/jobs", jobRoutes);
 
 app.use("/api", applicationRoutes);
 
 app.use("/api/applications", applicationRoutes);
 
-app.use("/api/jobs", jobRoutes);
 
 
-// Middleware
 
 
-// Authentication routes
-app.use("/api/auth", authRoutes);
 
 // Home route
 app.get("/", (req, res) => {
@@ -35,13 +45,6 @@ app.get("/", (req, res) => {
 });
 
 // Health check
-app.get("/api/health", (req, res) => {
-    res.json({
-        success: true,
-        message: "CareerBridge API is healthy"
-    });
-});
-
 
 
 

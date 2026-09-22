@@ -5,6 +5,7 @@ const { sql, connectDB } = require("../config/database");
 // =========================
 // REGISTER
 // =========================
+
 const register = async (req, res) => {
     try {
         const {
@@ -12,14 +13,42 @@ const register = async (req, res) => {
             lastName,
             email,
             phone,
-            password
+            password,
+            role,
+            companyId
         } = req.body;
 
         // Check required fields
-        if (!firstName || !lastName || !email || !phone || !password) {
+        if (
+            !firstName ||
+            !lastName ||
+            !email ||
+            !phone ||
+            !password ||
+            !role
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "First name, last name, email, phone and password are required"
+                message:
+                    "First name, last name, email, phone, password and role are required"
+            });
+        }
+
+        // Only JobSeeker and Employer can register publicly
+        const allowedRoles = ["JobSeeker", "Employer"];
+
+        if (!allowedRoles.includes(role)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid account type"
+            });
+        }
+
+        // Employer must provide a company
+        if (role === "Employer" && !companyId) {
+            return res.status(400).json({
+                success: false,
+                message: "Company is required for Employer registration"
             });
         }
 
@@ -43,11 +72,30 @@ const register = async (req, res) => {
             });
         }
 
+        // If registering as Employer,
+        // check that the company exists
+        if (role === "Employer") {
+            const companyResult = await pool
+                .request()
+                .input("CompanyID", sql.Int, companyId)
+                .query(`
+                    SELECT CompanyID
+                    FROM Company
+                    WHERE CompanyID = @CompanyID
+                `);
+
+            if (companyResult.recordset.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Selected company does not exist"
+                });
+            }
+        }
+
         // Hash password
         const passwordHash = await bcrypt.hash(password, 10);
 
         // Insert user
-        // Public registration always creates a JobSeeker
         await pool
             .request()
             .input("FirstName", sql.NVarChar, firstName)
@@ -55,14 +103,29 @@ const register = async (req, res) => {
             .input("Email", sql.NVarChar, email)
             .input("Phone", sql.NVarChar, phone)
             .input("Password", sql.NVarChar, passwordHash)
-            .input("Role", sql.NVarChar, "JobSeeker")
+            .input("Role", sql.NVarChar, role)
             .query(`
                 INSERT INTO [User]
-                (FirstName, LastName, Email, Phone, [Password], Role)
+                (
+                    FirstName,
+                    LastName,
+                    Email,
+                    Phone,
+                    [Password],
+                    Role
+                )
                 VALUES
-                (@FirstName, @LastName, @Email, @Phone, @Password, @Role)
+                (
+                    @FirstName,
+                    @LastName,
+                    @Email,
+                    @Phone,
+                    @Password,
+                    @Role
+                )
             `);
 
+        // Successful registration
         return res.status(201).json({
             success: true,
             message: "Registration successful"
@@ -82,6 +145,7 @@ const register = async (req, res) => {
 // =========================
 // LOGIN
 // =========================
+
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -181,6 +245,7 @@ const login = async (req, res) => {
 // =========================
 // EXPORT
 // =========================
+
 module.exports = {
     register,
     login

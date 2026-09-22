@@ -1,0 +1,27 @@
+$kind: http-request
+url: http://localhost:5138/api/auth/login
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\": \"daniel@example.com\",\r
+
+    \    \"password\": \"Daniel\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "const response = pm.response.json();\r
+
+      \r
+
+      if (response.token) {\r
+
+      \    pm.environment.set(\"jobSeekerToken\", response.token);\r
+
+      }"
+    language: text/javascript
+order: 4245552741505090

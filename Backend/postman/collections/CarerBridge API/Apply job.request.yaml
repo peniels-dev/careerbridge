@@ -1,4 +1,0 @@
-$kind: http-request
-url: http://localhost:5000/api/jobs/7/apply
-method: GET
-order: 4503540566902412
