@@ -5,6 +5,8 @@ import Register from "./pages/Register";
 import Unauthorized from "./pages/Unauthorized";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
+import Jobs from "./pages/Jobs";
+import JobDetails from "./pages/JobDetails";
 
 function App() {
     return (
@@ -28,7 +30,10 @@ function App() {
                     </ProtectedRoute>
                 }
             />
+             <Route path="/jobs" element={<Jobs />} />
+             <Route path="/jobs/:id" element={<JobDetails />} />
         </Routes>
+        
     );
 }
 

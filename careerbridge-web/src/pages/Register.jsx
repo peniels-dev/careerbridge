@@ -356,6 +356,7 @@ function Register() {
                                         <MenuItem value="Employer">
                                             Employer
                                         </MenuItem>
+
                                     </Select>
                                 </FormControl>
 
