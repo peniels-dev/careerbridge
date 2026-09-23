@@ -2,14 +2,27 @@ const { sql, connectDB } = require("../config/database");
 
 // ==========================================
 // GET ALL JOBS
+// Supports:
+// - Search
+// - Location
+// - Job Type
+// - Category
+// - Sorting
 // ==========================================
-
 
 const getAllJobs = async (req, res) => {
     try {
+        const {
+            search,
+            location,
+            jobType,
+            categoryId,
+            sort
+        } = req.query;
+
         const pool = await connectDB();
 
-        const result = await pool.request().query(`
+        let query = `
             SELECT
                 j.JobID,
                 j.CompanyID,
@@ -28,8 +41,81 @@ const getAllJobs = async (req, res) => {
                 ON j.CompanyID = c.CompanyID
             INNER JOIN Category cat
                 ON j.CategoryID = cat.CategoryID
-            ORDER BY j.PostedDate DESC
-        `);
+            WHERE 1 = 1
+        `;
+
+        const request = pool.request();
+
+        // SEARCH
+        if (search && search.trim()) {
+            query += `
+                AND (
+                    j.JobTitle LIKE @Search
+                    OR j.Description LIKE @Search
+                    OR j.Location LIKE @Search
+                    OR c.CompanyName LIKE @Search
+                    OR cat.CategoryName LIKE @Search
+                )
+            `;
+
+            request.input(
+                "Search",
+                sql.VarChar,
+                `%${search.trim()}%`
+            );
+        }
+
+        // LOCATION
+        if (location && location.trim()) {
+            query += `
+                AND j.Location LIKE @Location
+            `;
+
+            request.input(
+                "Location",
+                sql.VarChar,
+                `%${location.trim()}%`
+            );
+        }
+
+        // JOB TYPE
+        if (jobType && jobType.trim()) {
+            query += `
+                AND j.JobType LIKE @JobType
+            `;
+
+            request.input(
+                "JobType",
+                sql.VarChar,
+                `%${jobType.trim()}%`
+            );
+        }
+
+        // CATEGORY
+        if (categoryId) {
+            query += `
+                AND j.CategoryID = @CategoryID
+            `;
+
+            request.input(
+                "CategoryID",
+                sql.Int,
+                categoryId
+            );
+        }
+
+        // SORT
+        if (sort === "oldest") {
+            query += `
+                ORDER BY j.PostedDate ASC
+            `;
+        } else {
+            query += `
+                ORDER BY j.PostedDate DESC
+            `;
+        }
+
+        const result = await request.query(query);
 
         res.status(200).json({
             success: true,
@@ -46,7 +132,11 @@ const getAllJobs = async (req, res) => {
     }
 };
 
+
+// ==========================================
 // SORT JOBS
+// ==========================================
+
 const sortJobs = async (req, res) => {
     try {
         const { sort } = req.query;
@@ -103,7 +193,11 @@ const sortJobs = async (req, res) => {
     }
 };
 
+
+// ==========================================
 // GET ACTIVE JOBS
+// ==========================================
+
 const getActiveJobs = async (req, res) => {
     try {
         const pool = await connectDB();
@@ -168,7 +262,11 @@ const filterJobsByLocation = async (req, res) => {
 
         const result = await pool
             .request()
-            .input("Location", sql.VarChar, `%${location}%`)
+            .input(
+                "Location",
+                sql.VarChar,
+                `%${location}%`
+            )
             .query(`
                 SELECT
                     j.JobID,
@@ -207,6 +305,7 @@ const filterJobsByLocation = async (req, res) => {
     }
 };
 
+
 // ==========================================
 // FILTER JOBS BY JOB TYPE
 // ==========================================
@@ -226,7 +325,11 @@ const filterJobsByJobType = async (req, res) => {
 
         const result = await pool
             .request()
-            .input("JobType", sql.VarChar, `%${jobType}%`)
+            .input(
+                "JobType",
+                sql.VarChar,
+                `%${jobType}%`
+            )
             .query(`
                 SELECT
                     j.JobID,
@@ -265,6 +368,7 @@ const filterJobsByJobType = async (req, res) => {
     }
 };
 
+
 // ==========================================
 // FILTER JOBS BY CATEGORY
 // ==========================================
@@ -284,7 +388,11 @@ const filterJobsByCategory = async (req, res) => {
 
         const result = await pool
             .request()
-            .input("CategoryID", sql.Int, categoryId)
+            .input(
+                "CategoryID",
+                sql.Int,
+                categoryId
+            )
             .query(`
                 SELECT
                     j.JobID,
@@ -323,13 +431,18 @@ const filterJobsByCategory = async (req, res) => {
     }
 };
 
+
 // ==========================================
 // FILTER JOBS BY MULTIPLE CRITERIA
 // ==========================================
 
 const filterJobs = async (req, res) => {
     try {
-        const { location, jobType, categoryId } = req.query;
+        const {
+            location,
+            jobType,
+            categoryId
+        } = req.query;
 
         if (!location && !jobType && !categoryId) {
             return res.status(400).json({
@@ -365,21 +478,44 @@ const filterJobs = async (req, res) => {
         const request = pool.request();
 
         if (location) {
-            query += ` AND j.Location LIKE @Location`;
-            request.input("Location", sql.VarChar, `%${location}%`);
+            query += `
+                AND j.Location LIKE @Location
+            `;
+
+            request.input(
+                "Location",
+                sql.VarChar,
+                `%${location}%`
+            );
         }
 
         if (jobType) {
-            query += ` AND j.JobType LIKE @JobType`;
-            request.input("JobType", sql.VarChar, `%${jobType}%`);
+            query += `
+                AND j.JobType LIKE @JobType
+            `;
+
+            request.input(
+                "JobType",
+                sql.VarChar,
+                `%${jobType}%`
+            );
         }
 
         if (categoryId) {
-            query += ` AND j.CategoryID = @CategoryID`;
-            request.input("CategoryID", sql.Int, categoryId);
+            query += `
+                AND j.CategoryID = @CategoryID
+            `;
+
+            request.input(
+                "CategoryID",
+                sql.Int,
+                categoryId
+            );
         }
 
-        query += ` ORDER BY j.PostedDate DESC`;
+        query += `
+            ORDER BY j.PostedDate DESC
+        `;
 
         const result = await request.query(query);
 
@@ -397,6 +533,7 @@ const filterJobs = async (req, res) => {
         });
     }
 };
+
 
 // ==========================================
 // SEARCH JOBS
@@ -417,7 +554,11 @@ const searchJobs = async (req, res) => {
 
         const result = await pool
             .request()
-            .input("Keyword", sql.VarChar, `%${keyword}%`)
+            .input(
+                "Keyword",
+                sql.VarChar,
+                `%${keyword}%`
+            )
             .query(`
                 SELECT
                     j.JobID,
@@ -461,7 +602,11 @@ const searchJobs = async (req, res) => {
     }
 };
 
+
+// ==========================================
 // PAGINATE JOBS
+// ==========================================
+
 const paginateJobs = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -522,6 +667,7 @@ const paginateJobs = async (req, res) => {
         });
     }
 };
+
 
 // ==========================================
 // GET JOB BY ID
@@ -624,7 +770,11 @@ const createJob = async (req, res) => {
             .input("Description", sql.VarChar, Description)
             .input("Location", sql.VarChar, Location)
             .input("JobType", sql.VarChar, JobType)
-            .input("ApplicationDeadline", sql.Date, ApplicationDeadline)
+            .input(
+                "ApplicationDeadline",
+                sql.Date,
+                ApplicationDeadline
+            )
             .input("Status", sql.Bit, Status)
             .query(`
                 INSERT INTO Job
@@ -713,8 +863,9 @@ const updateJob = async (req, res) => {
                 FROM Job j
                 INNER JOIN Company c
                     ON j.CompanyID = c.CompanyID
-                WHERE j.JobID = @JobID
-                AND c.UserID = @UserID
+                WHERE
+                    j.JobID = @JobID
+                    AND c.UserID = @UserID
             `);
 
         if (ownershipCheck.recordset.length === 0) {
@@ -732,7 +883,11 @@ const updateJob = async (req, res) => {
             .input("Description", sql.VarChar, Description)
             .input("Location", sql.VarChar, Location)
             .input("JobType", sql.VarChar, JobType)
-            .input("ApplicationDeadline", sql.Date, ApplicationDeadline)
+            .input(
+                "ApplicationDeadline",
+                sql.Date,
+                ApplicationDeadline
+            )
             .input("Status", sql.Bit, Status)
             .query(`
                 UPDATE Job
@@ -784,8 +939,9 @@ const closeJob = async (req, res) => {
                 FROM Job j
                 INNER JOIN Company c
                     ON j.CompanyID = c.CompanyID
-                WHERE j.JobID = @JobID
-                AND c.UserID = @UserID
+                WHERE
+                    j.JobID = @JobID
+                    AND c.UserID = @UserID
             `);
 
         if (ownershipCheck.recordset.length === 0) {
@@ -817,7 +973,13 @@ const closeJob = async (req, res) => {
             message: "Unable to close job"
         });
     }
-};// GET EMPLOYER JOBS WITH APPLICATION COUNT
+};
+
+
+// ==========================================
+// GET EMPLOYER JOBS WITH APPLICATION COUNT
+// ==========================================
+
 const getEmployerJobs = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -840,7 +1002,8 @@ const getEmployerJobs = async (req, res) => {
                 WHERE c.UserID = @UserID
                 GROUP BY
                     j.JobID,
-                    j.JobTitle
+                    j.JobTitle,
+                    j.PostedDate
                 ORDER BY j.PostedDate DESC
             `);
 
@@ -860,8 +1023,6 @@ const getEmployerJobs = async (req, res) => {
 };
 
 
-
-
 // ==========================================
 // EXPORT CONTROLLERS
 // ==========================================
@@ -879,5 +1040,6 @@ module.exports = {
     getJobById,
     createJob,
     updateJob,
-    closeJob
+    closeJob,
+    getEmployerJobs
 };
