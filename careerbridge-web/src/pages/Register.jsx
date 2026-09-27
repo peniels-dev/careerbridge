@@ -24,6 +24,7 @@ function Register() {
     const navigate = useNavigate();
 
     const [firstName, setFirstName] = useState("");
+    const [middleName, setMiddleName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
@@ -77,6 +78,36 @@ function Register() {
             return;
         }
 
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters.");
+            return;
+        }
+
+        if (password.length > 20) {
+            setError("Password must not exceed 20 characters.");
+            return;
+        }
+
+        if (!/[A-Z]/.test(password)) {
+            setError("Password must contain at least one uppercase letter.");
+            return;
+        }
+
+        if (!/[a-z]/.test(password)) {
+            setError("Password must contain at least one lowercase letter.");
+            return;
+        }
+
+        if (!/[0-9]/.test(password)) {
+            setError("Password must contain at least one number.");
+            return;
+        }
+
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            setError("Password must contain at least one special character.");
+            return;
+        }
+
         // Confirm password
         if (password !== confirmPassword) {
             setError("Passwords do not match.");
@@ -100,6 +131,7 @@ function Register() {
 
             await axiosAPI.post("/auth/register", {
                 firstName,
+                middleName,
                 lastName,
                 email,
                 phone,
@@ -114,7 +146,8 @@ function Register() {
 
             // Clear form
             setFirstName("");
-            setLastName("");
+            setMiddleName("");
+            setLastName(""); 
             setEmail("");
             setPhone("");
             setPassword("");
@@ -250,6 +283,20 @@ function Register() {
                                     />
 
                                     <TextField
+                                        label="Middle Name"
+                                        value={middleName}
+                                        onChange={(e) =>
+                                            setMiddleName(
+                                                e.target.value
+                                            )
+                                        }
+                                        placeholder="Enter middle name"
+                                        fullWidth
+                                        required
+                                    />
+
+
+                                    <TextField
                                         label="Last Name"
                                         value={lastName}
                                         onChange={(e) =>
@@ -312,6 +359,11 @@ function Register() {
                                         placeholder="Enter password"
                                         fullWidth
                                         required
+                                        inputProps={{
+                                            minLength: 8,
+                                            maxLength: 20,
+                                        }}
+    helperText="8–20 characters, with uppercase, lowercase, number and special character"
                                     />
 
                                     <TextField
@@ -357,6 +409,90 @@ function Register() {
                                             Employer
                                         </MenuItem>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
                                     </Select>
                                 </FormControl>
 

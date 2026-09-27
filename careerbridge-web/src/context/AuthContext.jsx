@@ -3,11 +3,13 @@ import axiosAPI from "../api/axiosAPI";
 
 const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
+
     const [token, setToken] = useState(
         localStorage.getItem("token")
     );
+
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -23,7 +25,6 @@ export function AuthProvider({ children }) {
                 const response = await axiosAPI.get("/auth/me");
 
                 setUser(response.data.data);
-
             } catch (error) {
                 console.error("Unable to restore user:", error);
 
@@ -31,7 +32,6 @@ export function AuthProvider({ children }) {
 
                 setToken(null);
                 setUser(null);
-
             } finally {
                 setLoading(false);
             }
@@ -60,9 +60,9 @@ export function AuthProvider({ children }) {
                 user,
                 token,
                 loading,
-                isAuthenticated : !!token,
+                isAuthenticated: !!token,
                 login,
-                logout
+                logout,
             }}
         >
             {children}
@@ -70,6 +70,8 @@ export function AuthProvider({ children }) {
     );
 }
 
-export function useAuth() {
+function useAuth() {
     return useContext(AuthContext);
 }
+
+export { AuthProvider, useAuth };

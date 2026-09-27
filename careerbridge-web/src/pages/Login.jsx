@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 
 import {
@@ -38,17 +39,21 @@ function Login() {
                 password,
             });
 
-            // Backend returns token and user inside data
             const { token, user } = response.data.data;
 
             console.log("Logged in user:", user);
-            console.log("Token:", token);
+            console.log("Token received:", !!token);
 
-            // Save authentication information
             login(user, token);
 
-            // Go to dashboard
-            navigate("/dashboard");
+            // Send the user to the correct dashboard
+            if (user.role === "Employer") {
+                navigate("/employer-dashboard");
+            } else if (user.role === "JobSeeker") {
+                navigate("/dashboard");
+            } else {
+                navigate("/unauthorized");
+            }
 
         } catch (error) {
             console.error("LOGIN ERROR:", error);
@@ -59,7 +64,6 @@ function Login() {
                 error.response?.data?.message ||
                 "Unable to login. Please try again."
             );
-
         } finally {
             setLoading(false);
         }
@@ -88,7 +92,6 @@ function Login() {
                 >
                     <CardContent sx={{ p: { xs: 3, sm: 5 } }}>
 
-                        {/* Logo / Brand */}
                         <Stack spacing={1} alignItems="center" mb={4}>
                             <Typography
                                 variant="h4"
@@ -107,7 +110,6 @@ function Login() {
                             </Typography>
                         </Stack>
 
-                        {/* Error message */}
                         {error && (
                             <Alert
                                 severity="error"
@@ -117,7 +119,6 @@ function Login() {
                             </Alert>
                         )}
 
-                        {/* Login form */}
                         <Box
                             component="form"
                             onSubmit={handleLogin}
@@ -176,7 +177,6 @@ function Login() {
                             </Stack>
                         </Box>
 
-                        {/* Register link */}
                         <Typography
                             variant="body2"
                             color="text.secondary"
@@ -184,6 +184,7 @@ function Login() {
                             sx={{ mt: 4 }}
                         >
                             Don't have an account?{" "}
+
                             <Link
                                 to="/register"
                                 style={{

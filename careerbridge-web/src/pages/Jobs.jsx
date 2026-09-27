@@ -14,70 +14,63 @@ import JobCard from "../components/JobCard";
 import JobFilters from "../components/JobFilters";
 
 function Jobs() {
-    // Stores the jobs returned by the backend
     const [jobs, setJobs] = useState([]);
-
-    // Stores the categories found inside the jobs returned by the backend
     const [categories, setCategories] = useState([]);
 
-    // Loading and error states
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // Filter values
     const [search, setSearch] = useState("");
     const [location, setLocation] = useState("");
     const [jobType, setJobType] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [sort, setSort] = useState("newest");
 
-    // Used to move from Jobs page to Job Details page
     const navigate = useNavigate();
 
-    // Get jobs from the backend
-    const fetchJobs = async () => {
+    // ==========================================
+    // GET JOBS
+    // ==========================================
+
+    const fetchJobs = async (filters = {}) => {
         try {
             setLoading(true);
             setError("");
 
-            // Axios will convert these into query parameters
             const params = {};
 
-            if (search.trim()) {
-                params.search = search.trim();
+            if (filters.search?.trim()) {
+                params.search = filters.search.trim();
             }
 
-            if (location.trim()) {
-                params.location = location.trim();
+            if (filters.location?.trim()) {
+                params.location = filters.location.trim();
             }
 
-            if (jobType) {
-                params.jobType = jobType;
+            if (filters.jobType) {
+                params.jobType = filters.jobType;
             }
 
-            if (categoryId) {
-                params.categoryId = categoryId;
+            if (filters.categoryId) {
+                params.categoryId = filters.categoryId;
             }
 
-            if (sort) {
-                params.sort = sort;
+            if (filters.sort) {
+                params.sort = filters.sort;
             }
 
             const response = await axiosAPI.get("/jobs", {
-                params: params,
+                params,
             });
 
-            // Store the jobs returned by the API
             const returnedJobs =
-                response.data.jobs ||
                 response.data.data ||
+                response.data.jobs ||
                 [];
 
             setJobs(returnedJobs);
 
-            // Create the category list from the jobs returned
-            // by the backend. This means we do not need
-            // a separate /categories endpoint.
+            // Create unique category list
             const uniqueCategories = [];
 
             returnedJobs.forEach((job) => {
@@ -97,7 +90,6 @@ function Jobs() {
             });
 
             setCategories(uniqueCategories);
-
         } catch (err) {
             console.error("Error loading jobs:", err);
 
@@ -107,37 +99,71 @@ function Jobs() {
             );
 
             setJobs([]);
-            setCategories([]);
         } finally {
             setLoading(false);
         }
     };
 
-    // Run when the Jobs page first opens
+    // ==========================================
+    // LOAD JOBS WHEN PAGE OPENS
+    // ==========================================
+
     useEffect(() => {
-        fetchJobs();
+        fetchJobs({
+            sort: "newest",
+        });
     }, []);
 
-    // Search button
+    // ==========================================
+    // SEARCH
+    // ==========================================
+
     const handleSearch = () => {
-        fetchJobs();
+        fetchJobs({
+            search,
+            location,
+            jobType,
+            categoryId,
+            sort,
+        });
     };
 
-    // Clear all filters
-    const handleClearFilters = () => {
+    // ==========================================
+    // APPLY FILTERS
+    // ==========================================
+
+    const handleFilterChange = () => {
+        fetchJobs({
+            search,
+            location,
+            jobType,
+            categoryId,
+            sort,
+        });
+    };
+
+    // ==========================================
+    // CLEAR FILTERS
+    // ==========================================
+
+    const handleClear = () => {
         setSearch("");
         setLocation("");
         setJobType("");
         setCategoryId("");
         setSort("newest");
 
-        // Reload all available jobs
-        setTimeout(() => {
-            fetchJobs();
-        }, 0);
+        // Directly request all jobs.
+        // This avoids React state update timing issues.
+        fetchJobs({
+            sort: "newest",
+        });
     };
 
-    // Open the selected job's details page
+    // ==========================================
+    // VIEW JOB DETAILS
+    // ==========================================
+
     const handleViewDetails = (jobId) => {
         navigate(`/jobs/${jobId}`);
     };
@@ -152,7 +178,7 @@ function Jobs() {
         >
             <Container maxWidth="lg">
 
-                {/* Page heading */}
+                {/* PAGE HEADER */}
                 <Box sx={{ mb: 4 }}>
                     <Typography
                         variant="h3"
@@ -172,24 +198,34 @@ function Jobs() {
                     </Typography>
                 </Box>
 
-                {/* Search and filters */}
-                <JobFilters
-                    search={search}
-                    location={location}
-                    jobType={jobType}
-                    categoryId={categoryId}
-                    sort={sort}
-                    categories={categories}
-                    onSearchChange={setSearch}
-                    onLocationChange={setLocation}
-                    onJobTypeChange={setJobType}
-                    onCategoryChange={setCategoryId}
-                    onSortChange={setSort}
-                    onSearch={handleSearch}
-                    onClear={handleClearFilters}
-                />
+                {/* FILTERS */}
+              <JobFilters
+    search={search}
+    location={location}
+    jobType={jobType}
+    categoryId={categoryId}
+    sort={sort}
+    categories={categories}
+    onSearchChange={setSearch}
+    onLocationChange={setLocation}
+    onJobTypeChange={setJobType}
+    onCategoryChange={setCategoryId}
+    onSortChange={(newSort) => {
+        setSort(newSort);
 
-                {/* Number of jobs */}
+        fetchJobs({
+            search,
+            location,
+            jobType,
+            categoryId,
+            sort: newSort,
+        });
+    }}
+    onSearch={handleSearch}
+    onClear={handleClear}
+/>
+
+                {/* NUMBER OF JOBS */}
                 {!loading && !error && (
                     <Typography
                         variant="h6"
@@ -203,7 +239,7 @@ function Jobs() {
                     </Typography>
                 )}
 
-                {/* Loading */}
+                {/* LOADING */}
                 {loading && (
                     <Box
                         sx={{
@@ -216,7 +252,7 @@ function Jobs() {
                     </Box>
                 )}
 
-                {/* API error */}
+                {/* ERROR */}
                 {error && !loading && (
                     <Alert
                         severity="error"
@@ -226,7 +262,7 @@ function Jobs() {
                     </Alert>
                 )}
 
-                {/* No jobs found */}
+                {/* NO JOBS */}
                 {!loading &&
                     !error &&
                     jobs.length === 0 && (
@@ -236,7 +272,7 @@ function Jobs() {
                         </Alert>
                     )}
 
-                {/* Job cards */}
+                {/* JOB CARDS */}
                 {!loading &&
                     !error &&
                     jobs.length > 0 && (
@@ -260,11 +296,9 @@ function Jobs() {
                             ))}
                         </Box>
                     )}
-
             </Container>
         </Box>
     );
 }
 
 export default Jobs;
-

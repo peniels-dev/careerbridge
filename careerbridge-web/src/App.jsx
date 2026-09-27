@@ -4,36 +4,211 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Unauthorized from "./pages/Unauthorized";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Dashboard from "./pages/Dashboard";
+
+import Dashboard from "./pages/JobSeekerDashboard";
+import EmployerDashboard from "./pages/EmployerDashboard";
+
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
+import PublicCompanyProfile from "./pages/PublicCompanyProfile";
+import ApplyJob from "./pages/ApplyJob";
+import MyCVs from "./pages/MyCVs";
+import MyApplications from "./pages/MyApplications";
+import Profile from "./pages/Profile";
+
+import EmployerJobs from "./pages/EmployerJobs";
+import PostJob from "./pages/PostJob";
+import EmployerApplicants from "./pages/EmployerApplicants";
+import EmployerApplicantProfile from "./pages/EmployerApplicantProfile";
+import CompanyProfile from "./pages/CompanyProfile";
+import EmployerJobDetails from "./pages/EmployerJobDetails";
+import EditJob from "./pages/EditJob";
 
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<Login />} />
 
-            <Route path="/login" element={<Login />} />
+            {/* Login */}
+            <Route
+                path="/"
+                element={<Login />}
+            />
 
-            <Route path="/register" element={<Register />} />
+            <Route
+                path="/login"
+                element={<Login />}
+            />
 
+            {/* Register */}
+            <Route
+                path="/register"
+                element={<Register />}
+            />
+
+            {/* Unauthorized */}
             <Route
                 path="/unauthorized"
                 element={<Unauthorized />}
             />
 
+            {/* =========================
+                JOB SEEKER ROUTES
+            ========================= */}
+
             <Route
                 path="/dashboard"
                 element={
-                    <ProtectedRoute>
+                    <ProtectedRoute allowedRoles={["JobSeeker"]}>
                         <Dashboard />
                     </ProtectedRoute>
                 }
             />
-             <Route path="/jobs" element={<Jobs />} />
-             <Route path="/jobs/:id" element={<JobDetails />} />
+
+            <Route
+                path="/jobs"
+                element={
+                    <ProtectedRoute allowedRoles={["JobSeeker"]}>
+                        <Jobs />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/jobs/:id"
+                element={
+                    <ProtectedRoute allowedRoles={["JobSeeker"]}>
+                        <JobDetails />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+    path="/companies/:id"
+    element={
+        <ProtectedRoute>
+            <PublicCompanyProfile />
+        </ProtectedRoute>
+    }
+/>
+
+            <Route
+                path="/jobs/:id/apply"
+                element={
+                    <ProtectedRoute allowedRoles={["JobSeeker"]}>
+                        <ApplyJob />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+    path="/my-cvs"
+    element={
+        <ProtectedRoute allowedRoles={["JobSeeker"]}>
+            <MyCVs />
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/my-applications"
+    element={
+        <ProtectedRoute allowedRoles={["JobSeeker"]}>
+            <MyApplications />
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/profile"
+    element={
+        <ProtectedRoute allowedRoles={["JobSeeker"]}>
+            <Profile />
+        </ProtectedRoute>
+    }
+/>
+
+            {/* =========================
+                EMPLOYER ROUTES
+            ========================= */}
+
+            {/* Employer Dashboard */}
+            <Route
+                path="/employer-dashboard"
+                element={
+                    <ProtectedRoute allowedRoles={["Employer"]}>
+                        <EmployerDashboard />
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* Employer My Jobs */}
+            <Route
+                path="/employer/jobs"
+                element={
+                    <ProtectedRoute allowedRoles={["Employer"]}>
+                        <EmployerJobs />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+    path="/employer/jobs/:id"
+    element={
+        <ProtectedRoute allowedRoles={["Employer"]}>
+            <EmployerJobDetails />
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/employer/jobs/:id/edit"
+    element={
+        <ProtectedRoute allowedRoles={["Employer"]}>
+            <EditJob />
+        </ProtectedRoute>
+    }
+/>
+
+            {/* Employer Post Job */}
+            <Route
+                path="/employer/post-job"
+                element={
+                    <ProtectedRoute allowedRoles={["Employer"]}>
+                        <PostJob />
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* Employer Applicants */}
+            <Route
+                path="/employer/jobs/:id/applicants"
+                element={
+                    <ProtectedRoute allowedRoles={["Employer"]}>
+                        <EmployerApplicants />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+    path="/employer/jobs/:jobId/applicants/:applicationId/profile"
+    element={
+        <ProtectedRoute allowedRoles={["Employer"]}>
+            <EmployerApplicantProfile />
+        </ProtectedRoute>
+    }
+/>
+
+            {/* Employer Company Profile */}
+            <Route
+                path="/company-profile"
+                element={
+                    <ProtectedRoute allowedRoles={["Employer"]}>
+                        <CompanyProfile />
+                    </ProtectedRoute>
+                }
+            />
+
         </Routes>
-        
     );
 }
 
