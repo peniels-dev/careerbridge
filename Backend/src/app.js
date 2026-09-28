@@ -17,7 +17,7 @@ const applicationRoutes = require("./routes/applicationRoutes");
 const cvRoutes = require("./routes/cvRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 const jobSeekerRoutes = require("./routes/jobSeekerRoutes");
-
+const adminRoutes = require("./routes/adminRoutes");
 
 // =====================================================
 // MIDDLEWARE
@@ -188,6 +188,8 @@ app.use((err, req, res, next) => {
         message: "Something went wrong on the server."
     });
 });
+
+app.use("/api/admin", adminRoutes);
 
 // =====================================================
 // START SERVER

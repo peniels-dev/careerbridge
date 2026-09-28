@@ -5,75 +5,156 @@ import {
     Button,
     Box,
     Chip,
+    Divider,
 } from "@mui/material";
 
 function JobCard({ job, onViewDetails }) {
+    const description = job.Description
+        ? job.Description.length > 120
+            ? `${job.Description.substring(0, 120)}...`
+            : job.Description
+        : "No description available.";
+
+    const deadline = job.ApplicationDeadline
+        ? new Date(job.ApplicationDeadline).toLocaleDateString()
+        : "Not specified";
+
     return (
         <Card
             sx={{
+                width: "100%",
                 height: "100%",
+                minWidth: 0,
                 display: "flex",
                 flexDirection: "column",
                 borderRadius: 3,
-                boxShadow: 2,
-                transition: "0.2s",
+                border: "1px solid #e5e7eb",
+                boxShadow: "0 2px 8px rgba(16, 24, 40, 0.06)",
+                backgroundColor: "#ffffff",
+                overflow: "hidden",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
 
                 "&:hover": {
-                    boxShadow: 6,
+                    boxShadow:
+                        "0 8px 24px rgba(16, 24, 40, 0.10)",
                     transform: "translateY(-3px)",
                 },
             }}
         >
-            <CardContent sx={{ flexGrow: 1 }}>
-
-                {/* Job Title */}
+            <CardContent
+                sx={{
+                    flexGrow: 1,
+                    minWidth: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    p: {
+                        xs: 2,
+                        sm: 2.5,
+                    },
+                }}
+            >
+                {/* JOB TITLE */}
                 <Typography
-                    variant="h6"
                     component="h2"
-                    fontWeight="bold"
-                    gutterBottom
+                    sx={{
+                        fontSize: {
+                            xs: 17,
+                            sm: 18,
+                        },
+                        lineHeight: 1.35,
+                        fontWeight: 800,
+                        color: "#101828",
+                        mb: 1.5,
+
+                        // Prevent long titles from breaking the card
+                        overflowWrap: "anywhere",
+                        wordBreak: "break-word",
+
+                        // Keep card heights consistent
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                    }}
                 >
-                    {job.JobTitle}
+                    {job.JobTitle || "Untitled Job"}
                 </Typography>
 
-                {/* Company */}
+                {/* COMPANY */}
                 <Typography
-                    variant="body1"
-                    color="text.secondary"
-                    gutterBottom
+                    sx={{
+                        color: "#475467",
+                        fontSize: {
+                            xs: 13,
+                            sm: 14,
+                        },
+                        lineHeight: 1.5,
+                        mb: 0.75,
+                        overflowWrap: "anywhere",
+                        wordBreak: "break-word",
+                    }}
                 >
-                    🏢 {job.CompanyName || "Company not specified"}
+                    🏢{" "}
+                    {job.CompanyName || "Company not specified"}
                 </Typography>
 
-                {/* Location */}
+                {/* LOCATION */}
                 <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
+                    sx={{
+                        color: "#667085",
+                        fontSize: {
+                            xs: 13,
+                            sm: 14,
+                        },
+                        lineHeight: 1.5,
+                        overflowWrap: "anywhere",
+                        wordBreak: "break-word",
+                    }}
                 >
-                    📍 {job.Location || "Location not specified"}
+                    📍{" "}
+                    {job.Location || "Location not specified"}
                 </Typography>
 
-                {/* Job Type, Category and Status */}
+                {/* CHIPS */}
                 <Box
                     sx={{
                         display: "flex",
-                        gap: 1,
+                        alignItems: "flex-start",
                         flexWrap: "wrap",
+                        gap: 0.75,
                         mt: 2,
                         mb: 2,
+                        minWidth: 0,
                     }}
                 >
                     <Chip
                         label={job.JobType || "Not specified"}
                         size="small"
                         variant="outlined"
+                        sx={{
+                            maxWidth: "100%",
+                            "& .MuiChip-label": {
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                            },
+                        }}
                     />
 
                     <Chip
-                        label={job.CategoryName || "No category"}
+                        label={
+                            job.CategoryName || "No category"
+                        }
                         size="small"
                         variant="outlined"
+                        sx={{
+                            maxWidth: "100%",
+                            "& .MuiChip-label": {
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                            },
+                        }}
                     />
 
                     <Chip
@@ -83,41 +164,97 @@ function JobCard({ job, onViewDetails }) {
                     />
                 </Box>
 
-                {/* Description */}
-                <Typography
-                    variant="body2"
-                    color="text.secondary"
-                >
-                    {job.Description
-                        ? job.Description.length > 120
-                            ? `${job.Description.substring(0, 120)}...`
-                            : job.Description
-                        : "No description available."}
-                </Typography>
+                <Divider sx={{ mb: 2 }} />
 
-                {/* Application Deadline */}
+                {/* DESCRIPTION */}
                 <Typography
-                    variant="body2"
                     sx={{
-                        mt: 2,
-                        fontWeight: "bold",
+                        color: "#667085",
+                        fontSize: {
+                            xs: 13,
+                            sm: 14,
+                        },
+                        lineHeight: 1.65,
+                        overflowWrap: "anywhere",
+                        wordBreak: "break-word",
+
+                        display: "-webkit-box",
+                        WebkitLineClamp: 4,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
                     }}
                 >
-                    Application Deadline:{" "}
-                    {job.ApplicationDeadline
-                        ? new Date(
-                              job.ApplicationDeadline
-                          ).toLocaleDateString()
-                        : "Not specified"}
+                    {description}
                 </Typography>
+
+                {/* DEADLINE */}
+                <Box
+                    sx={{
+                        mt: "auto",
+                        pt: 2,
+                    }}
+                >
+                    <Typography
+                        sx={{
+                            color: "#344054",
+                            fontSize: {
+                                xs: 12.5,
+                                sm: 13,
+                            },
+                            lineHeight: 1.5,
+                            fontWeight: 700,
+                            overflowWrap: "anywhere",
+                        }}
+                    >
+                        Application Deadline
+                    </Typography>
+
+                    <Typography
+                        sx={{
+                            color: "#667085",
+                            fontSize: {
+                                xs: 12.5,
+                                sm: 13,
+                            },
+                            lineHeight: 1.5,
+                            mt: 0.25,
+                        }}
+                    >
+                        {deadline}
+                    </Typography>
+                </Box>
             </CardContent>
 
-            {/* View Details */}
-            <Box sx={{ p: 2, pt: 0 }}>
+            {/* BUTTON */}
+            <Box
+                sx={{
+                    px: {
+                        xs: 2,
+                        sm: 2.5,
+                    },
+                    pb: {
+                        xs: 2,
+                        sm: 2.5,
+                    },
+                    pt: 0,
+                }}
+            >
                 <Button
                     variant="contained"
                     fullWidth
-                    onClick={() => onViewDetails(job.JobID)}
+                    onClick={() =>
+                        onViewDetails(job.JobID)
+                    }
+                    sx={{
+                        minHeight: 42,
+                        borderRadius: 2,
+                        textTransform: "none",
+                        fontWeight: 700,
+                        fontSize: {
+                            xs: 13,
+                            sm: 14,
+                        },
+                    }}
                 >
                     View Details
                 </Button>
@@ -127,3 +264,4 @@ function JobCard({ job, onViewDetails }) {
 }
 
 export default JobCard;
+

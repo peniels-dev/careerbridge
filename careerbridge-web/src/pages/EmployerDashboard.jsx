@@ -2,42 +2,43 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
+    Alert,
+    Avatar,
     Box,
-    Typography,
+    Button,
     Card,
     CardContent,
-    Button,
-    Avatar,
-    Divider,
     Chip,
+    Drawer,
     IconButton,
-    Menu,
-    MenuItem,
-    Tooltip,
-    CircularProgress,
-    Alert,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Paper,
+    Skeleton,
+    Typography,
 } from "@mui/material";
 
 import {
-    Dashboard,
-    Work,
     Add,
-    People,
-    Business,
-    ExitToApp,
     ArrowForward,
+    Business,
+    Dashboard as DashboardIcon,
+    ExitToApp,
+    Menu,
+    People,
     TrendingUp,
+    Work,
 } from "@mui/icons-material";
 
 import axiosAPI from "../api/axiosAPI";
+import SummaryCard from "../components/SummaryCard";
 import { useAuth } from "../context/AuthContext";
 
-function EmployerDashboard() {
+const EmployerDashboard = () => {
     const navigate = useNavigate();
-
     const { user, logout } = useAuth();
-
-    const [profileAnchor, setProfileAnchor] = useState(null);
 
     const [company, setCompany] = useState(null);
 
@@ -50,386 +51,345 @@ function EmployerDashboard() {
     const [jobs, setJobs] = useState([]);
 
     const [loading, setLoading] = useState(true);
-
     const [error, setError] = useState("");
 
-    // ==========================================
-    // LOAD EMPLOYER DASHBOARD DATA
-    // ==========================================
+    const [mobileMenuOpen, setMobileMenuOpen] =
+        useState(false);
 
     useEffect(() => {
-        const loadDashboard = async () => {
+        let isMounted = true;
+
+        const loadDashboardData = async () => {
             try {
-                setLoading(true);
-                setError("");
+                const response =
+                    await axiosAPI.get("/jobs/employer");
 
-                const response = await axiosAPI.get(
-                    "/jobs/employer"
+                if (!isMounted) return;
+
+                const data = response.data?.data;
+
+                if (!data) {
+                    throw new Error(
+                        "Invalid dashboard response."
+                    );
+                }
+
+                setCompany(data.company || null);
+
+                setStatistics({
+                    totalJobs: Number(
+                        data.statistics?.totalJobs || 0
+                    ),
+                    openJobs: Number(
+                        data.statistics?.openJobs || 0
+                    ),
+                    totalApplications: Number(
+                        data.statistics
+                            ?.totalApplications || 0
+                    ),
+                });
+
+                setJobs(
+                    Array.isArray(data.jobs)
+                        ? data.jobs
+                        : []
                 );
-
-                const data = response.data.data;
-
-                setCompany(data.company);
-
-                setStatistics(
-                    data.statistics || {
-                        totalJobs: 0,
-                        openJobs: 0,
-                        totalApplications: 0,
-                    }
-                );
-
-                setJobs(data.jobs || []);
-
             } catch (err) {
+                if (!isMounted) return;
+
                 console.error(
-                    "Unable to load employer dashboard:",
+                    "Employer dashboard error:",
                     err
                 );
 
                 setError(
                     err.response?.data?.message ||
-                    "Unable to load your employer dashboard."
+                        err.message ||
+                        "Unable to load dashboard data."
                 );
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
 
-        loadDashboard();
-    }, []);
+        loadDashboardData();
 
-    // ==========================================
-    // LOGOUT
-    // ==========================================
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const handleLogout = () => {
         logout();
         navigate("/login");
     };
 
-    // ==========================================
-    // PROFILE MENU
-    // ==========================================
-
-    const handleProfileMenu = (event) => {
-        setProfileAnchor(event.currentTarget);
+    const handleNavigation = (path) => {
+        navigate(path);
+        setMobileMenuOpen(false);
     };
-
-    const closeProfileMenu = () => {
-        setProfileAnchor(null);
-    };
-
-    // ==========================================
-    // FORMAT DATE
-    // ==========================================
 
     const formatDate = (date) => {
-        if (!date) {
-            return "—";
+        if (!date) return "No deadline";
+
+        const parsedDate = new Date(date);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+            return "No deadline";
         }
 
-        return new Date(date).toLocaleDateString(
-            "en-GB",
-            {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-            }
-        );
+        return parsedDate.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        });
     };
 
-    // ==========================================
-    // COMPANY NAME
-    // ==========================================
+    const sidebarItems = [
+        {
+            label: "Dashboard",
+            icon: <DashboardIcon />,
+            path: "/employer-dashboard",
+        },
+        {
+            label: "My Job Postings",
+            icon: <Work />,
+            path: "/employer/jobs",
+        },
+        {
+            label: "Post a Job",
+            icon: <Add />,
+            path: "/employer/post-job",
+        },
+        {
+            label: "Applicants",
+            icon: <People />,
+            path: "/employer/jobs",
+        },
+    ];
 
-    const companyName =
-        company?.CompanyName ||
-        "Your Company";
-
-    // ==========================================
-    // USER INITIAL
-    // ==========================================
-
-    const userInitial =
-        user?.firstName?.charAt(0)?.toUpperCase() ||
-        user?.FirstName?.charAt(0)?.toUpperCase() ||
-        "E";
-
-    return (
+    const SidebarContent = () => (
         <Box
             sx={{
-                minHeight: "100vh",
-                backgroundColor: "#f7f9fc",
+                width: 250,
+                height: "100%",
                 display: "flex",
-                color: "#172033",
+                flexDirection: "column",
+                backgroundColor: "#172033",
+                color: "#fff",
             }}
         >
-
-            {/* ==========================================
-                SIDEBAR
-            ========================================== */}
-
+            {/* Logo */}
             <Box
                 sx={{
-                    width: 260,
-                    backgroundColor: "#101828",
-                    color: "white",
-                    display: {
-                        xs: "none",
-                        md: "flex",
-                    },
-                    flexDirection: "column",
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    zIndex: 10,
+                    px: 2.5,
+                    py: 3,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
                 }}
             >
-
-                {/* LOGO */}
-
-                <Box
+                <Avatar
                     sx={{
-                        px: 3,
-                        py: 3,
+                        width: 42,
+                        height: 42,
+                        backgroundColor: "#4f46e5",
+                        fontWeight: 800,
                     }}
                 >
+                    C
+                </Avatar>
+
+                <Box>
                     <Typography
                         sx={{
-                            fontSize: 24,
+                            fontSize: 20,
                             fontWeight: 800,
-                            letterSpacing: "-0.5px",
+                            lineHeight: 1,
                         }}
                     >
-                        Career<span style={{ color: "#4f8cff" }}>
-                            Bridge
-                        </span>
+                        CareerBridge
                     </Typography>
 
                     <Typography
                         sx={{
+                            fontSize: 11,
                             color: "#98a2b3",
-                            fontSize: 12,
                             mt: 0.5,
                         }}
                     >
                         Employer Portal
                     </Typography>
                 </Box>
+            </Box>
 
-                <Divider
-                    sx={{
-                        borderColor: "rgba(255,255,255,0.08)",
-                    }}
-                />
-
-                {/* NAVIGATION */}
-
-                <Box
-                    sx={{
-                        px: 2,
-                        py: 3,
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 1,
-                    }}
-                >
-
-                    {/* Dashboard */}
-
-                    <Button
-                        startIcon={<Dashboard />}
+            {/* Navigation */}
+            <List sx={{ px: 1.5, flex: 1 }}>
+                {sidebarItems.map((item) => (
+                    <ListItemButton
+                        key={item.label}
                         onClick={() =>
-                            navigate("/employer-dashboard")
+                            handleNavigation(item.path)
                         }
                         sx={{
-                            justifyContent: "flex-start",
-                            textTransform: "none",
-                            color: "white",
+                            borderRadius: 2,
+                            mb: 0.5,
+                            py: 1.2,
+                            color: "#d0d5dd",
+                            "&:hover": {
+                                backgroundColor:
+                                    "rgba(255,255,255,0.08)",
+                                color: "#fff",
+                            },
+                        }}
+                    >
+                        <ListItemIcon
+                            sx={{
+                                minWidth: 42,
+                                color: "inherit",
+                            }}
+                        >
+                            {item.icon}
+                        </ListItemIcon>
+
+                        <ListItemText
+                            primary={item.label}
+                            slotProps={{
+                                primary: {
+                                    style: {
+                                        fontSize: "14px",
+                                        fontWeight: 600,
+                                    },
+                                },
+                            }}
+                        />
+                    </ListItemButton>
+                ))}
+            </List>
+
+            {/* Logout */}
+            <Box sx={{ p: 1.5 }}>
+                <ListItemButton
+                    onClick={handleLogout}
+                    sx={{
+                        borderRadius: 2,
+                        color: "#d0d5dd",
+                        "&:hover": {
                             backgroundColor:
-                                "rgba(79,140,255,0.16)",
-                            borderRadius: 2,
-                            px: 2,
-                            py: 1.3,
-                            fontWeight: 600,
-                            "&:hover": {
-                                backgroundColor:
-                                    "rgba(79,140,255,0.24)",
-                            },
-                        }}
-                    >
-                        Dashboard
-                    </Button>
-
-                    {/* My Jobs */}
-
-                    <Button
-                        startIcon={<Work />}
-                        onClick={() =>
-                            navigate("/employer/jobs")
-                        }
-                        sx={{
-                            justifyContent: "flex-start",
-                            textTransform: "none",
-                            color: "#cbd5e1",
-                            borderRadius: 2,
-                            px: 2,
-                            py: 1.3,
-                            "&:hover": {
-                                color: "white",
-                                backgroundColor:
-                                    "rgba(255,255,255,0.06)",
-                            },
-                        }}
-                    >
-                        My Job Postings
-                    </Button>
-
-                    {/* Post Job */}
-
-                    <Button
-                        startIcon={<Add />}
-                        onClick={() =>
-                            navigate("/employer/post-job")
-                        }
-                        sx={{
-                            justifyContent: "flex-start",
-                            textTransform: "none",
-                            color: "#cbd5e1",
-                            borderRadius: 2,
-                            px: 2,
-                            py: 1.3,
-                            "&:hover": {
-                                color: "white",
-                                backgroundColor:
-                                    "rgba(255,255,255,0.06)",
-                            },
-                        }}
-                    >
-                        Post a Job
-                    </Button>
-
-                    {/* Applicants */}
-
-                    <Button
-                        startIcon={<People />}
-                        onClick={() =>
-                            navigate("/employer/applicants")
-                        }
-                        sx={{
-                            justifyContent: "flex-start",
-                            textTransform: "none",
-                            color: "#cbd5e1",
-                            borderRadius: 2,
-                            px: 2,
-                            py: 1.3,
-                            "&:hover": {
-                                color: "white",
-                                backgroundColor:
-                                    "rgba(255,255,255,0.06)",
-                            },
-                        }}
-                    >
-                        Applicants
-                    </Button>
-
-                </Box>
-
-                <Box sx={{ flexGrow: 1 }} />
-
-                {/* BOTTOM NAVIGATION */}
-
-                <Box
-                    sx={{
-                        px: 2,
-                        pb: 3,
+                                "rgba(255,255,255,0.08)",
+                            color: "#fff",
+                        },
                     }}
                 >
-
-                    <Button
-                        fullWidth
-                        startIcon={<Business />}
-                        onClick={() =>
-                            navigate("/company-profile")
-                        }
+                    <ListItemIcon
                         sx={{
-                            justifyContent: "flex-start",
-                            textTransform: "none",
-                            color: "#cbd5e1",
-                            borderRadius: 2,
-                            px: 2,
-                            py: 1.3,
-                            mb: 1,
-                            "&:hover": {
-                                color: "white",
-                                backgroundColor:
-                                    "rgba(255,255,255,0.06)",
-                            },
+                            minWidth: 42,
+                            color: "inherit",
                         }}
                     >
-                        Company Profile
-                    </Button>
+                        <ExitToApp />
+                    </ListItemIcon>
 
-                    <Button
-                        fullWidth
-                        startIcon={<ExitToApp />}
-                        onClick={handleLogout}
-                        sx={{
-                            justifyContent: "flex-start",
-                            textTransform: "none",
-                            color: "#fca5a5",
-                            borderRadius: 2,
-                            px: 2,
-                            py: 1.3,
-                            "&:hover": {
-                                backgroundColor:
-                                    "rgba(239,68,68,0.10)",
+                    <ListItemText
+                        primary="Logout"
+                        slotProps={{
+                            primary: {
+                                style: {
+                                    fontSize: "14px",
+                                    fontWeight: 600,
+                                },
                             },
                         }}
-                    >
-                        Logout
-                    </Button>
+                    />
+                </ListItemButton>
+            </Box>
+        </Box>
+    );
 
+    return (
+        <Box
+            sx={{
+                minHeight: "100vh",
+                width: "100%",
+                backgroundColor: "#f8fafc",
+                display: "flex",
+                overflowX: "hidden",
+            }}
+        >
+            {/* DESKTOP SIDEBAR */}
+            <Box
+                sx={{
+                    display: {
+                        xs: "none",
+                        md: "block",
+                    },
+                    width: 250,
+                    minWidth: 250,
+                }}
+            >
+                <Box
+                    sx={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        width: 250,
+                    }}
+                >
+                    <SidebarContent />
                 </Box>
             </Box>
 
-            {/* ==========================================
-                MAIN CONTENT
-            ========================================== */}
+            {/* MOBILE SIDEBAR */}
+            <Drawer
+                anchor="left"
+                open={mobileMenuOpen}
+                onClose={() =>
+                    setMobileMenuOpen(false)
+                }
+                sx={{
+                    display: {
+                        xs: "block",
+                        md: "none",
+                    },
+                    "& .MuiDrawer-paper": {
+                        width: 250,
+                        border: "none",
+                    },
+                }}
+            >
+                <SidebarContent />
+            </Drawer>
 
+            {/* MAIN AREA */}
             <Box
                 sx={{
                     flex: 1,
-                    ml: {
-                        xs: 0,
-                        md: "260px",
-                    },
                     minWidth: 0,
+                    width: "100%",
                 }}
             >
-
-                {/* ==========================================
-                    TOP BAR
-                ========================================== */}
-
+                {/* HEADER */}
                 <Box
                     sx={{
-                        height: 72,
-                        backgroundColor: "white",
+                        minHeight: 76,
+                        px: {
+                            xs: 2,
+                            sm: 3,
+                            lg: 4,
+                        },
+                        py: 1.5,
+                        backgroundColor: "#ffffff",
                         borderBottom:
                             "1px solid #eaecf0",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "flex-end",
-                        px: {
-                            xs: 2,
-                            md: 4,
-                        },
+                        justifyContent:
+                            "space-between",
                     }}
                 >
-
                     <Box
                         sx={{
                             display: "flex",
@@ -437,129 +397,120 @@ function EmployerDashboard() {
                             gap: 1.5,
                         }}
                     >
-
-                        <Tooltip title="Profile">
-
-                            <IconButton
-                                onClick={handleProfileMenu}
-                            >
-                                <Avatar
-                                    sx={{
-                                        width: 38,
-                                        height: 38,
-                                        backgroundColor:
-                                            "#4f8cff",
-                                        fontWeight: 700,
-                                    }}
-                                >
-                                    {userInitial}
-                                </Avatar>
-                            </IconButton>
-
-                        </Tooltip>
-
-                        <Menu
-                            anchorEl={profileAnchor}
-                            open={Boolean(profileAnchor)}
-                            onClose={closeProfileMenu}
+                        <IconButton
+                            onClick={() =>
+                                setMobileMenuOpen(true)
+                            }
+                            sx={{
+                                display: {
+                                    xs: "inline-flex",
+                                    md: "none",
+                                },
+                            }}
                         >
+                            <Menu />
+                        </IconButton>
 
-                            <MenuItem
-                                onClick={() => {
-                                    closeProfileMenu();
-                                    navigate(
-                                        "/company-profile"
-                                    );
+                        <Box>
+                            <Typography
+                                sx={{
+                                    fontSize: {
+                                        xs: 18,
+                                        sm: 21,
+                                    },
+                                    fontWeight: 800,
+                                    color: "#172033",
                                 }}
                             >
-                                <Business
-                                    sx={{
-                                        mr: 1,
-                                        fontSize: 20,
-                                    }}
-                                />
-                                Company Profile
-                            </MenuItem>
+                                Employer Dashboard
+                            </Typography>
 
-                            <MenuItem
-                                onClick={() => {
-                                    closeProfileMenu();
-                                    handleLogout();
+                            <Typography
+                                sx={{
+                                    display: {
+                                        xs: "none",
+                                        sm: "block",
+                                    },
+                                    fontSize: 13,
+                                    color: "#667085",
                                 }}
                             >
-                                <ExitToApp
-                                    sx={{
-                                        mr: 1,
-                                        fontSize: 20,
-                                    }}
-                                />
-                                Logout
-                            </MenuItem>
-
-                        </Menu>
-
+                                Manage your jobs and
+                                applications
+                            </Typography>
+                        </Box>
                     </Box>
+
+                    <Avatar
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            backgroundColor: "#e0e7ff",
+                            color: "#4338ca",
+                            fontWeight: 800,
+                        }}
+                    >
+                        {user?.FirstName?.charAt(0) ||
+                            "E"}
+                    </Avatar>
                 </Box>
 
-                {/* ==========================================
-                    PAGE CONTENT
-                ========================================== */}
-
+                {/* CONTENT */}
                 <Box
                     sx={{
+                        width: "100%",
+                        maxWidth: 1500,
+                        mx: "auto",
                         p: {
                             xs: 2,
                             sm: 3,
-                            md: 4,
+                            lg: 4,
                         },
-                        maxWidth: 1500,
-                        mx: "auto",
+                        boxSizing: "border-box",
                     }}
                 >
-
-                    {/* PAGE HEADER */}
-
-                    <Box
-                        sx={{
-                            mb: 3,
-                        }}
-                    >
-
+                    {/* WELCOME */}
+                    <Box sx={{ mb: 3 }}>
                         <Typography
                             sx={{
                                 fontSize: {
-                                    xs: 25,
-                                    md: 32,
+                                    xs: 24,
+                                    sm: 30,
                                 },
                                 fontWeight: 800,
-                                letterSpacing: "-0.8px",
+                                color: "#172033",
                             }}
                         >
-                            Good to see you,
-                            {" "}
-                            {user?.firstName ||
-                                user?.FirstName ||
-                                "Employer"} 👋
+                            Welcome back
+                            {user?.FirstName
+                                ? `, ${user.FirstName}`
+                                : ""}
+                            ! 👋
                         </Typography>
 
                         <Typography
                             sx={{
-                                color: "#667085",
                                 mt: 0.5,
-                                fontSize: 15,
+                                color: "#667085",
+                                fontSize: {
+                                    xs: 14,
+                                    sm: 15,
+                                },
                             }}
                         >
-                            Here's what's happening with
-                            your recruitment activity.
+                            Here's what's happening
+                            with your recruitment
+                            activity.
                         </Typography>
-
                     </Box>
 
                     {/* ERROR */}
-
                     {error && (
                         <Alert
                             severity="error"
+                            onClose={() =>
+                                setError("")
+                            }
                             sx={{
                                 mb: 3,
                                 borderRadius: 2,
@@ -569,221 +520,119 @@ function EmployerDashboard() {
                         </Alert>
                     )}
 
-                    {/* ==========================================
-                        HERO
-                    ========================================== */}
-
-                    <Card
-                        sx={{
-                            borderRadius: 4,
-                            border: "1px solid #eaecf0",
-                            boxShadow:
-                                "0 8px 30px rgba(16,24,40,0.06)",
-                            mb: 3,
-                            overflow: "hidden",
-                            background:
-                                "linear-gradient(135deg, #101828 0%, #1d2939 100%)",
-                            color: "white",
-                        }}
-                    >
-
-                        <CardContent
+                    {/* COMPANY */}
+                    {loading ? (
+                        <Paper
                             sx={{
                                 p: {
-                                    xs: 3,
-                                    md: 4,
+                                    xs: 2,
+                                    sm: 2.5,
                                 },
-                                "&:last-child": {
-                                    pb: {
-                                        xs: 3,
-                                        md: 4,
-                                    },
-                                },
+                                mb: 3,
+                                borderRadius: 3,
+                                border:
+                                    "1px solid #eaecf0",
                             }}
                         >
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 2,
+                                }}
+                            >
+                                <Skeleton
+                                    variant="circular"
+                                    width={52}
+                                    height={52}
+                                />
 
+                                <Box sx={{ flex: 1 }}>
+                                    <Skeleton
+                                        variant="text"
+                                        width="35%"
+                                        height={28}
+                                    />
+
+                                    <Skeleton
+                                        variant="text"
+                                        width="50%"
+                                    />
+                                </Box>
+                            </Box>
+                        </Paper>
+                    ) : company ? (
+                        <Paper
+                            sx={{
+                                p: {
+                                    xs: 2,
+                                    sm: 2.5,
+                                },
+                                mb: 3,
+                                borderRadius: 3,
+                                border:
+                                    "1px solid #eaecf0",
+                                boxShadow:
+                                    "0 2px 8px rgba(16,24,40,0.04)",
+                            }}
+                        >
                             <Box
                                 sx={{
                                     display: "flex",
                                     flexDirection: {
                                         xs: "column",
-                                        md: "row",
+                                        sm: "row",
                                     },
                                     alignItems: {
                                         xs: "flex-start",
-                                        md: "center",
+                                        sm: "center",
                                     },
-                                    justifyContent:
-                                        "space-between",
-                                    gap: 3,
-                                }}
-                            >
-
-                                <Box>
-
-                                    <Typography
-                                        sx={{
-                                            color: "#98a2b3",
-                                            fontSize: 13,
-                                            fontWeight: 700,
-                                            textTransform:
-                                                "uppercase",
-                                            letterSpacing: 1,
-                                            mb: 1,
-                                        }}
-                                    >
-                                        Employer Dashboard
-                                    </Typography>
-
-                                    <Typography
-                                        sx={{
-                                            fontSize: {
-                                                xs: 25,
-                                                md: 31,
-                                            },
-                                            fontWeight: 800,
-                                            maxWidth: 600,
-                                            lineHeight: 1.2,
-                                        }}
-                                    >
-                                        Build your team with
-                                        better opportunities.
-                                    </Typography>
-
-                                    <Typography
-                                        sx={{
-                                            color: "#cbd5e1",
-                                            mt: 1.5,
-                                            maxWidth: 560,
-                                            lineHeight: 1.6,
-                                        }}
-                                    >
-                                        Manage your job
-                                        postings, discover
-                                        applicants and grow
-                                        your team from one
-                                        place.
-                                    </Typography>
-
-                                </Box>
-
-                                <Button
-                                    variant="contained"
-                                    startIcon={<Add />}
-                                    onClick={() =>
-                                        navigate(
-                                            "/employer/post-job"
-                                        )
-                                    }
-                                    sx={{
-                                        backgroundColor:
-                                            "#4f8cff",
-                                        textTransform:
-                                            "none",
-                                        fontWeight: 700,
-                                        borderRadius: 2,
-                                        px: 2.5,
-                                        py: 1.3,
-                                        whiteSpace:
-                                            "nowrap",
-                                        "&:hover": {
-                                            backgroundColor:
-                                                "#3978ed",
-                                        },
-                                    }}
-                                >
-                                    Post a Job
-                                </Button>
-
-                            </Box>
-
-                        </CardContent>
-                    </Card>
-
-                    {/* ==========================================
-                        COMPANY CARD
-                    ========================================== */}
-
-                    <Card
-                        sx={{
-                            borderRadius: 3,
-                            border:
-                                "1px solid #eaecf0",
-                            boxShadow:
-                                "0 3px 12px rgba(16,24,40,0.04)",
-                            mb: 3,
-                        }}
-                    >
-
-                        <CardContent
-                            sx={{
-                                p: 2.5,
-                            }}
-                        >
-
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    alignItems:
-                                        "center",
-                                    justifyContent:
-                                        "space-between",
                                     gap: 2,
                                 }}
                             >
+                                <Avatar
+                                    sx={{
+                                        width: 52,
+                                        height: 52,
+                                        backgroundColor:
+                                            "#eef2ff",
+                                        color: "#4f46e5",
+                                    }}
+                                >
+                                    <Business />
+                                </Avatar>
 
                                 <Box
                                     sx={{
-                                        display: "flex",
-                                        alignItems:
-                                            "center",
-                                        gap: 2,
+                                        flex: 1,
+                                        minWidth: 0,
                                     }}
                                 >
-
-                                    <Avatar
+                                    <Typography
                                         sx={{
-                                            width: 52,
-                                            height: 52,
-                                            backgroundColor:
-                                                "#eef4ff",
-                                            color:
-                                                "#4f8cff",
+                                            fontSize: 18,
+                                            fontWeight: 800,
+                                            color: "#172033",
                                         }}
                                     >
-                                        <Business />
-                                    </Avatar>
+                                        {company.CompanyName ||
+                                            "Your Company"}
+                                    </Typography>
 
-                                    <Box>
-
-                                        <Typography
-                                            sx={{
-                                                fontWeight: 800,
-                                                fontSize: 18,
-                                            }}
-                                        >
-                                            {loading
-                                                ? "Loading..."
-                                                : companyName}
-                                        </Typography>
-
-                                        <Typography
-                                            sx={{
-                                                color:
-                                                    "#667085",
-                                                fontSize: 13,
-                                                mt: 0.3,
-                                            }}
-                                        >
-                                            Employer company
-                                            profile
-                                        </Typography>
-
-                                    </Box>
-
+                                    <Typography
+                                        sx={{
+                                            fontSize: 13,
+                                            color: "#667085",
+                                        }}
+                                    >
+                                        Company profile
+                                        and recruitment
+                                        overview
+                                    </Typography>
                                 </Box>
 
                                 <Button
+                                    variant="outlined"
                                     endIcon={
                                         <ArrowForward />
                                     }
@@ -793,400 +642,323 @@ function EmployerDashboard() {
                                         )
                                     }
                                     sx={{
+                                        width: {
+                                            xs: "100%",
+                                            sm: "auto",
+                                        },
+                                        borderRadius: 2,
                                         textTransform:
                                             "none",
                                         fontWeight: 700,
                                     }}
                                 >
-                                    View Profile
+                                    View Company
                                 </Button>
-
                             </Box>
+                        </Paper>
+                    ) : null}
 
-                        </CardContent>
-                    </Card>
-
-                    {/* ==========================================
-                        STATISTICS
-                    ========================================== */}
-
-                    {loading ? (
-                        <Box
-                            sx={{
-                                display: "flex",
-                                justifyContent:
-                                    "center",
-                                py: 6,
-                            }}
-                        >
-                            <CircularProgress />
-                        </Box>
-                    ) : (
-                        <Box
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: {
-                                    xs: "1fr",
-                                    sm: "repeat(2, 1fr)",
-                                    lg: "repeat(3, 1fr)",
-                                },
-                                gap: 2,
-                                mb: 3,
-                            }}
-                        >
-
-                            {/* TOTAL JOBS */}
-
-                            <Card
-                                sx={{
-                                    borderRadius: 3,
-                                    border:
-                                        "1px solid #eaecf0",
-                                    boxShadow:
-                                        "0 3px 12px rgba(16,24,40,0.04)",
-                                }}
-                            >
-                                <CardContent sx={{ p: 2.5 }}>
-
-                                    <Box
-                                        sx={{
-                                            display:
-                                                "flex",
-                                            justifyContent:
-                                                "space-between",
-                                            alignItems:
-                                                "flex-start",
-                                        }}
-                                    >
-
-                                        <Box>
-
-                                            <Typography
-                                                sx={{
-                                                    color:
-                                                        "#667085",
-                                                    fontSize:
-                                                        13,
-                                                    fontWeight:
-                                                        600,
-                                                }}
-                                            >
-                                                Total Jobs
-                                            </Typography>
-
-                                            <Typography
-                                                sx={{
-                                                    fontSize:
-                                                        30,
-                                                    fontWeight:
-                                                        800,
-                                                    mt: 0.5,
-                                                }}
-                                            >
-                                                {
-                                                    statistics.totalJobs
-                                                }
-                                            </Typography>
-
-                                        </Box>
-
-                                        <Avatar
+                    {/* STATISTICS */}
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: {
+                                xs: "1fr",
+                                sm: "repeat(2, 1fr)",
+                                lg: "repeat(3, 1fr)",
+                            },
+                            gap: {
+                                xs: 2,
+                                sm: 2.5,
+                            },
+                            mb: 4,
+                        }}
+                    >
+                        {loading ? (
+                            <>
+                                {[1, 2, 3].map(
+                                    (item) => (
+                                        <Card
+                                            key={item}
                                             sx={{
-                                                backgroundColor:
-                                                    "#eef4ff",
-                                                color:
-                                                    "#4f8cff",
+                                                borderRadius: 3,
+                                                border:
+                                                    "1px solid #eaecf0",
                                             }}
                                         >
-                                            <Work />
-                                        </Avatar>
-
-                                    </Box>
-
-                                    <Typography
-                                        sx={{
-                                            color:
-                                                "#667085",
-                                            fontSize: 12,
-                                            mt: 2,
-                                        }}
-                                    >
-                                        All jobs posted by
-                                        your company
-                                    </Typography>
-
-                                </CardContent>
-                            </Card>
-
-                            {/* OPEN JOBS */}
-
-                            <Card
-                                sx={{
-                                    borderRadius: 3,
-                                    border:
-                                        "1px solid #eaecf0",
-                                    boxShadow:
-                                        "0 3px 12px rgba(16,24,40,0.04)",
-                                }}
-                            >
-                                <CardContent sx={{ p: 2.5 }}>
-
-                                    <Box
-                                        sx={{
-                                            display:
-                                                "flex",
-                                            justifyContent:
-                                                "space-between",
-                                            alignItems:
-                                                "flex-start",
-                                        }}
-                                    >
-
-                                        <Box>
-
-                                            <Typography
+                                            <CardContent
                                                 sx={{
-                                                    color:
-                                                        "#667085",
-                                                    fontSize:
-                                                        13,
-                                                    fontWeight:
-                                                        600,
+                                                    p: 3,
                                                 }}
                                             >
-                                                Open Jobs
-                                            </Typography>
+                                                <Box
+                                                    sx={{
+                                                        display:
+                                                            "flex",
+                                                        justifyContent:
+                                                            "space-between",
+                                                    }}
+                                                >
+                                                    <Box
+                                                        sx={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Skeleton
+                                                            variant="text"
+                                                            width="55%"
+                                                            height={
+                                                                24
+                                                            }
+                                                        />
 
-                                            <Typography
-                                                sx={{
-                                                    fontSize:
-                                                        30,
-                                                    fontWeight:
-                                                        800,
-                                                    mt: 0.5,
-                                                }}
-                                            >
-                                                {
-                                                    statistics.openJobs
-                                                }
-                                            </Typography>
+                                                        <Skeleton
+                                                            variant="text"
+                                                            width="35%"
+                                                            height={
+                                                                48
+                                                            }
+                                                        />
+                                                    </Box>
 
-                                        </Box>
+                                                    <Skeleton
+                                                        variant="circular"
+                                                        width={
+                                                            48
+                                                        }
+                                                        height={
+                                                            48
+                                                        }
+                                                    />
+                                                </Box>
 
-                                        <Avatar
-                                            sx={{
-                                                backgroundColor:
-                                                    "#ecfdf3",
-                                                color:
-                                                    "#12b76a",
-                                            }}
-                                        >
-                                            <TrendingUp />
-                                        </Avatar>
+                                                <Skeleton
+                                                    variant="text"
+                                                    width="70%"
+                                                />
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <SummaryCard
+                                    title="Total Jobs"
+                                    value={
+                                        statistics.totalJobs
+                                    }
+                                    description="Total jobs posted by your company"
+                                    icon={<Work />}
+                                    iconBackground="#eef2ff"
+                                    iconColor="#4f46e5"
+                                />
 
-                                    </Box>
+                                <SummaryCard
+                                    title="Open Jobs"
+                                    value={
+                                        statistics.openJobs
+                                    }
+                                    description="Jobs currently accepting applications"
+                                    icon={
+                                        <TrendingUp />
+                                    }
+                                    iconBackground="#ecfdf3"
+                                    iconColor="#039855"
+                                />
 
-                                    <Typography
-                                        sx={{
-                                            color:
-                                                "#667085",
-                                            fontSize: 12,
-                                            mt: 2,
-                                        }}
-                                    >
-                                        Currently accepting
-                                        applications
-                                    </Typography>
+                                <SummaryCard
+                                    title="Applications"
+                                    value={
+                                        statistics.totalApplications
+                                    }
+                                    description="Applications received across your jobs"
+                                    icon={
+                                        <People />
+                                    }
+                                    iconBackground="#fff7ed"
+                                    iconColor="#ea580c"
+                                />
+                            </>
+                        )}
+                    </Box>
 
-                                </CardContent>
-                            </Card>
-
-                            {/* APPLICATIONS */}
-
-                            <Card
-                                sx={{
-                                    borderRadius: 3,
-                                    border:
-                                        "1px solid #eaecf0",
-                                    boxShadow:
-                                        "0 3px 12px rgba(16,24,40,0.04)",
-                                }}
-                            >
-                                <CardContent sx={{ p: 2.5 }}>
-
-                                    <Box
-                                        sx={{
-                                            display:
-                                                "flex",
-                                            justifyContent:
-                                                "space-between",
-                                            alignItems:
-                                                "flex-start",
-                                        }}
-                                    >
-
-                                        <Box>
-
-                                            <Typography
-                                                sx={{
-                                                    color:
-                                                        "#667085",
-                                                    fontSize:
-                                                        13,
-                                                    fontWeight:
-                                                        600,
-                                                }}
-                                            >
-                                                Applications
-                                            </Typography>
-
-                                            <Typography
-                                                sx={{
-                                                    fontSize:
-                                                        30,
-                                                    fontWeight:
-                                                        800,
-                                                    mt: 0.5,
-                                                }}
-                                            >
-                                                {
-                                                    statistics.totalApplications
-                                                }
-                                            </Typography>
-
-                                        </Box>
-
-                                        <Avatar
-                                            sx={{
-                                                backgroundColor:
-                                                    "#f4f3ff",
-                                                color:
-                                                    "#7f56d9",
-                                            }}
-                                        >
-                                            <People />
-                                        </Avatar>
-
-                                    </Box>
-
-                                    <Typography
-                                        sx={{
-                                            color:
-                                                "#667085",
-                                            fontSize: 12,
-                                            mt: 2,
-                                        }}
-                                    >
-                                        Applications received
-                                        across your jobs
-                                    </Typography>
-
-                                </CardContent>
-                            </Card>
-
-                        </Box>
-                    )}
-
-                    {/* ==========================================
-                        RECENT JOBS
-                    ========================================== */}
-
-                    <Card
+                    {/* RECENT JOBS */}
+                    <Paper
                         sx={{
                             borderRadius: 3,
                             border:
                                 "1px solid #eaecf0",
-                            boxShadow:
-                                "0 3px 12px rgba(16,24,40,0.04)",
+                            overflow: "hidden",
                         }}
                     >
-
-                        <CardContent
+                        {/* Section Header */}
+                        <Box
                             sx={{
-                                p: 0,
+                                p: {
+                                    xs: 2,
+                                    sm: 3,
+                                },
+                                borderBottom:
+                                    "1px solid #eaecf0",
+                                display: "flex",
+                                flexDirection: {
+                                    xs: "column",
+                                    sm: "row",
+                                },
+                                alignItems: {
+                                    xs: "flex-start",
+                                    sm: "center",
+                                },
+                                justifyContent:
+                                    "space-between",
+                                gap: 2,
                             }}
                         >
-
-                            <Box
-                                sx={{
-                                    p: 2.5,
-                                    display: "flex",
-                                    alignItems:
-                                        "center",
-                                    justifyContent:
-                                        "space-between",
-                                    gap: 2,
-                                }}
-                            >
-
-                                <Box>
-
-                                    <Typography
-                                        sx={{
-                                            fontSize: 18,
-                                            fontWeight: 800,
-                                        }}
-                                    >
-                                        Recent Job Postings
-                                    </Typography>
-
-                                    <Typography
-                                        sx={{
-                                            color:
-                                                "#667085",
-                                            fontSize: 13,
-                                            mt: 0.5,
-                                        }}
-                                    >
-                                        Your latest
-                                        recruitment activity
-                                    </Typography>
-
-                                </Box>
-
-                                <Button
-                                    endIcon={
-                                        <ArrowForward />
-                                    }
-                                    onClick={() =>
-                                        navigate(
-                                            "/employer/jobs"
-                                        )
-                                    }
+                            <Box>
+                                <Typography
                                     sx={{
-                                        textTransform:
-                                            "none",
-                                        fontWeight: 700,
+                                        fontSize: 18,
+                                        fontWeight: 800,
+                                        color: "#172033",
                                     }}
                                 >
-                                    View All
-                                </Button>
+                                    Recent Job Postings
+                                </Typography>
 
+                                <Typography
+                                    sx={{
+                                        fontSize: 13,
+                                        color: "#667085",
+                                        mt: 0.3,
+                                    }}
+                                >
+                                    Overview of your latest
+                                    job postings
+                                </Typography>
                             </Box>
 
-                            <Divider />
+                            <Button
+                                variant="outlined"
+                                endIcon={
+                                    <ArrowForward />
+                                }
+                                onClick={() =>
+                                    navigate(
+                                        "/employer/jobs"
+                                    )
+                                }
+                                sx={{
+                                    width: {
+                                        xs: "100%",
+                                        sm: "auto",
+                                    },
+                                    borderRadius: 2,
+                                    textTransform:
+                                        "none",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                View All Jobs
+                            </Button>
+                        </Box>
 
-                            {jobs.length === 0 ? (
-
+                        {/* Recent Jobs Body */}
+                        <Box
+                            sx={{
+                                p: {
+                                    xs: 2,
+                                    sm: 3,
+                                },
+                            }}
+                        >
+                            {loading ? (
                                 <Box
                                     sx={{
-                                        textAlign:
-                                            "center",
-                                        py: 7,
-                                        px: 3,
+                                        display: "flex",
+                                        flexDirection:
+                                            "column",
+                                        gap: 2,
                                     }}
                                 >
+                                    {[1, 2, 3].map(
+                                        (item) => (
+                                            <Box
+                                                key={item}
+                                                sx={{
+                                                    p: 2,
+                                                    border:
+                                                        "1px solid #eaecf0",
+                                                    borderRadius: 2,
+                                                }}
+                                            >
+                                                <Skeleton
+                                                    variant="text"
+                                                    width="55%"
+                                                    height={
+                                                        30
+                                                    }
+                                                />
 
+                                                <Skeleton
+                                                    variant="text"
+                                                    width="35%"
+                                                />
+
+                                                <Box
+                                                    sx={{
+                                                        display:
+                                                            "flex",
+                                                        flexWrap:
+                                                            "wrap",
+                                                        gap: 1,
+                                                        mt: 1,
+                                                    }}
+                                                >
+                                                    <Skeleton
+                                                        variant="rounded"
+                                                        width={
+                                                            100
+                                                        }
+                                                        height={
+                                                            28
+                                                        }
+                                                    />
+
+                                                    <Skeleton
+                                                        variant="rounded"
+                                                        width={
+                                                            120
+                                                        }
+                                                        height={
+                                                            28
+                                                        }
+                                                    />
+                                                </Box>
+                                            </Box>
+                                        )
+                                    )}
+                                </Box>
+                            ) : jobs.length === 0 ? (
+                                <Box
+                                    sx={{
+                                        py: {
+                                            xs: 5,
+                                            sm: 7,
+                                        },
+                                        textAlign:
+                                            "center",
+                                    }}
+                                >
                                     <Avatar
                                         sx={{
-                                            width: 60,
-                                            height: 60,
+                                            width: 64,
+                                            height: 64,
                                             mx: "auto",
                                             mb: 2,
                                             backgroundColor:
-                                                "#eef4ff",
-                                            color:
-                                                "#4f8cff",
+                                                "#f2f4f7",
+                                            color: "#667085",
                                         }}
                                     >
                                         <Work />
@@ -1194,9 +966,9 @@ function EmployerDashboard() {
 
                                     <Typography
                                         sx={{
-                                            fontWeight:
-                                                800,
-                                            fontSize: 17,
+                                            fontSize: 18,
+                                            fontWeight: 800,
+                                            color: "#172033",
                                         }}
                                     >
                                         No job postings yet
@@ -1204,16 +976,16 @@ function EmployerDashboard() {
 
                                     <Typography
                                         sx={{
-                                            color:
-                                                "#667085",
-                                            fontSize: 14,
-                                            mt: 0.7,
+                                            mt: 0.5,
                                             mb: 2.5,
+                                            color: "#667085",
+                                            fontSize: 14,
                                         }}
                                     >
                                         Create your first
-                                        job posting and start
-                                        finding candidates.
+                                        job posting to start
+                                        receiving
+                                        applications.
                                     </Typography>
 
                                     <Button
@@ -1227,233 +999,158 @@ function EmployerDashboard() {
                                             )
                                         }
                                         sx={{
+                                            borderRadius: 2,
                                             textTransform:
                                                 "none",
-                                            fontWeight:
-                                                700,
-                                            borderRadius:
-                                                2,
+                                            fontWeight: 700,
                                         }}
                                     >
-                                        Post Your First Job
+                                        Post a Job
                                     </Button>
-
                                 </Box>
-
                             ) : (
-
-                                <Box>
-
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        flexDirection:
+                                            "column",
+                                        gap: 2,
+                                    }}
+                                >
                                     {jobs
                                         .slice(0, 5)
                                         .map((job) => (
-
-                                            <Box
+                                            <Card
                                                 key={
                                                     job.JobID
                                                 }
+                                                variant="outlined"
                                                 sx={{
-                                                    px: 2.5,
-                                                    py: 2,
-                                                    display:
-                                                        "flex",
-                                                    alignItems:
-                                                        "center",
-                                                    justifyContent:
-                                                        "space-between",
-                                                    gap: 2,
-                                                    borderBottom:
-                                                        "1px solid #f2f4f7",
-                                                    transition:
-                                                        "background-color 0.2s",
-                                                    "&:hover":
-                                                        {
-                                                            backgroundColor:
-                                                                "#f9fafb",
-                                                        },
+                                                    borderRadius: 2.5,
+                                                    boxShadow:
+                                                        "none",
                                                 }}
                                             >
-
-                                                <Box
+                                                <CardContent
                                                     sx={{
-                                                        minWidth: 0,
-                                                        flex: 1,
+                                                        p: {
+                                                            xs: 2,
+                                                            sm: 2.5,
+                                                        },
                                                     }}
                                                 >
-
-                                                    <Typography
-                                                        sx={{
-                                                            fontWeight:
-                                                                700,
-                                                            fontSize:
-                                                                15,
-                                                            overflow:
-                                                                "hidden",
-                                                            textOverflow:
-                                                                "ellipsis",
-                                                            whiteSpace:
-                                                                "nowrap",
-                                                        }}
-                                                    >
-                                                        {
-                                                            job.JobTitle
-                                                        }
-                                                    </Typography>
-
-                                                    <Typography
-                                                        sx={{
-                                                            color:
-                                                                "#667085",
-                                                            fontSize:
-                                                                12,
-                                                            mt: 0.5,
-                                                        }}
-                                                    >
-                                                        {
-                                                            job.Location
-                                                        }
-                                                        {" • "}
-                                                        {
-                                                            job.JobType
-                                                        }
-                                                    </Typography>
-
-                                                </Box>
-
-                                                <Box
-                                                    sx={{
-                                                        display:
-                                                            {
-                                                                xs: "none",
-                                                                sm: "block",
-                                                            },
-                                                        textAlign:
-                                                            "right",
-                                                    }}
-                                                >
-
-                                                    <Typography
-                                                        sx={{
-                                                            fontSize:
-                                                                12,
-                                                            color:
-                                                                "#667085",
-                                                        }}
-                                                    >
-                                                        Posted
-                                                    </Typography>
-
-                                                    <Typography
-                                                        sx={{
-                                                            fontSize:
-                                                                13,
-                                                            fontWeight:
-                                                                600,
-                                                        }}
-                                                    >
-                                                        {formatDate(
-                                                            job.PostedDate
-                                                        )}
-                                                    </Typography>
-
-                                                </Box>
-
-                                                <Box
-                                                    sx={{
-                                                        display:
-                                                            "flex",
-                                                        flexDirection:
-                                                            {
-                                                                xs: "column",
-                                                                sm: "row",
-                                                            },
-                                                        alignItems:
-                                                            "center",
-                                                        gap: 1.5,
-                                                    }}
-                                                >
-
-                                                    <Chip
-                                                        label={
-                                                            job.Status ===
-                                                                true ||
-                                                            job.Status ===
-                                                                1
-                                                                ? "Open"
-                                                                : "Closed"
-                                                        }
-                                                        size="small"
-                                                        sx={{
-                                                            fontWeight:
-                                                                700,
-                                                            backgroundColor:
-                                                                job.Status ===
-                                                                    true ||
-                                                                job.Status ===
-                                                                    1
-                                                                    ? "#ecfdf3"
-                                                                    : "#f2f4f7",
-                                                            color:
-                                                                job.Status ===
-                                                                    true ||
-                                                                job.Status ===
-                                                                    1
-                                                                    ? "#027a48"
-                                                                    : "#667085",
-                                                        }}
-                                                    />
-
                                                     <Box
                                                         sx={{
-                                                            textAlign:
-                                                                "center",
+                                                            display:
+                                                                "flex",
+                                                            flexDirection:
+                                                                {
+                                                                    xs: "column",
+                                                                    sm: "row",
+                                                                },
+                                                            alignItems:
+                                                                {
+                                                                    xs: "flex-start",
+                                                                    sm: "center",
+                                                                },
+                                                            gap: 2,
                                                         }}
                                                     >
+                                                        <Box
+                                                            sx={{
+                                                                flex: 1,
+                                                                minWidth: 0,
+                                                            }}
+                                                        >
+                                                            <Typography
+                                                                sx={{
+                                                                    fontSize: 16,
+                                                                    fontWeight: 800,
+                                                                    color: "#172033",
+                                                                    overflowWrap:
+                                                                        "anywhere",
+                                                                }}
+                                                            >
+                                                                {job.JobTitle ||
+                                                                    "Untitled Job"}
+                                                            </Typography>
+
+                                                            <Typography
+                                                                sx={{
+                                                                    fontSize: 13,
+                                                                    color: "#667085",
+                                                                    mt: 0.5,
+                                                                }}
+                                                            >
+                                                                {job.Location ||
+                                                                    "Location not specified"}
+                                                            </Typography>
+                                                        </Box>
+
+                                                        <Box
+                                                            sx={{
+                                                                display:
+                                                                    "flex",
+                                                                flexWrap:
+                                                                    "wrap",
+                                                                gap: 1,
+                                                            }}
+                                                        >
+                                                            <Chip
+                                                                label={
+                                                                    job.Status
+                                                                        ? "Open"
+                                                                        : "Closed"
+                                                                }
+                                                                size="small"
+                                                                sx={{
+                                                                    fontWeight: 700,
+                                                                    backgroundColor:
+                                                                        job.Status
+                                                                            ? "#ecfdf3"
+                                                                            : "#f2f4f7",
+                                                                    color:
+                                                                        job.Status
+                                                                            ? "#027a48"
+                                                                            : "#667085",
+                                                                }}
+                                                            />
+
+                                                            <Chip
+                                                                label={`${Number(
+                                                                    job.applicationCount ||
+                                                                        0
+                                                                )} applications`}
+                                                                size="small"
+                                                                sx={{
+                                                                    fontWeight: 600,
+                                                                }}
+                                                            />
+                                                        </Box>
 
                                                         <Typography
                                                             sx={{
-                                                                fontSize:
-                                                                    16,
-                                                                fontWeight:
-                                                                    800,
+                                                                fontSize: 12,
+                                                                color: "#667085",
                                                             }}
                                                         >
-                                                            {
-                                                                job.applicationCount
-                                                            }
+                                                            Deadline:{" "}
+                                                            {formatDate(
+                                                                job.ApplicationDeadline
+                                                            )}
                                                         </Typography>
-
-                                                        <Typography
-                                                            sx={{
-                                                                fontSize:
-                                                                    10,
-                                                                color:
-                                                                    "#667085",
-                                                            }}
-                                                        >
-                                                            Applicants
-                                                        </Typography>
-
                                                     </Box>
-
-                                                </Box>
-
-                                            </Box>
-
+                                                </CardContent>
+                                            </Card>
                                         ))}
-
                                 </Box>
-
                             )}
-
-                        </CardContent>
-                    </Card>
-
+                        </Box>
+                    </Paper>
                 </Box>
             </Box>
         </Box>
     );
-}
+};
 
 export default EmployerDashboard;
-

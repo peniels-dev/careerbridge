@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
-
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
     Alert,
     Box,
     Button,
+    Chip,
     CircularProgress,
     Container,
+    Divider,
+    FormControlLabel,
     Paper,
-    TextField,
-    Typography,
     Radio,
     RadioGroup,
-    FormControlLabel,
-    Divider,
-    Chip,
+    TextField,
+    Typography,
 } from "@mui/material";
 
 import {
@@ -47,9 +46,10 @@ const ApplyJob = () => {
         const loadData = async () => {
             try {
                 setLoading(true);
+                setLoadingCVs(true);
                 setError("");
 
-                // Get job
+                // Load job
                 const jobResponse = await axiosAPI.get(
                     `/jobs/${id}`
                 );
@@ -60,16 +60,13 @@ const ApplyJob = () => {
 
                 setJob(jobData);
 
-                // Get saved CVs
-                setLoadingCVs(true);
-
+                // Load saved CVs
                 const cvResponse = await axiosAPI.get("/cvs");
 
                 const cvData =
                     cvResponse.data?.data ||
                     cvResponse.data;
 
-                // Only show proper CV records
                 const validCVs = Array.isArray(cvData)
                     ? cvData.filter(
                           (cv) =>
@@ -134,11 +131,9 @@ const ApplyJob = () => {
                 response.data
             );
 
-            // Show success message and KEEP the user on this page
             setSuccess(
                 "Application submitted successfully! Your application has been sent to the employer."
             );
-
         } catch (err) {
             console.error(
                 "Application error:",
@@ -154,49 +149,136 @@ const ApplyJob = () => {
         }
     };
 
+    // Loading state
     if (loading) {
         return (
             <Box
                 sx={{
                     minHeight: "100vh",
+                    backgroundColor: "#f8fafc",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    px: 2,
                 }}
             >
-                <CircularProgress />
+                <Box
+                    sx={{
+                        textAlign: "center",
+                    }}
+                >
+                    <CircularProgress size={42} />
+
+                    <Typography
+                        sx={{
+                            mt: 2,
+                            color: "#667085",
+                            fontSize: 14,
+                        }}
+                    >
+                        Loading application page...
+                    </Typography>
+                </Box>
             </Box>
         );
     }
 
+    // Job failed to load
     if (!job) {
         return (
-            <Container sx={{ mt: 5 }}>
-                <Alert severity="error">
-                    Job information could not be loaded.
-                </Alert>
-
-                <Button
-                    sx={{ mt: 2 }}
-                    startIcon={<ArrowBack />}
-                    onClick={() => navigate("/jobs")}
+            <Box
+                sx={{
+                    minHeight: "100vh",
+                    backgroundColor: "#f8fafc",
+                    py: {
+                        xs: 3,
+                        sm: 5,
+                    },
+                }}
+            >
+                <Container
+                    maxWidth="md"
+                    sx={{
+                        px: {
+                            xs: 2,
+                            sm: 3,
+                        },
+                    }}
                 >
-                    Back to Jobs
-                </Button>
-            </Container>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: {
+                                xs: 3,
+                                sm: 5,
+                            },
+                            borderRadius: 3,
+                            border: "1px solid #e5e7eb",
+                            textAlign: "center",
+                        }}
+                    >
+                        <Alert
+                            severity="error"
+                            sx={{
+                                mb: 3,
+                                textAlign: "left",
+                            }}
+                        >
+                            {error ||
+                                "Job information could not be loaded."}
+                        </Alert>
+
+                        <Button
+                            variant="outlined"
+                            startIcon={<ArrowBack />}
+                            onClick={() =>
+                                navigate("/jobs")
+                            }
+                            sx={{
+                                textTransform: "none",
+                                fontWeight: 600,
+                                borderRadius: 2,
+                            }}
+                        >
+                            Back to Jobs
+                        </Button>
+                    </Paper>
+                </Container>
+            </Box>
         );
     }
+
+    const jobTitle =
+        job.JobTitle || job.jobTitle || "Job Position";
+
+    const companyName =
+        job.CompanyName ||
+        job.companyName ||
+        "Company";
 
     return (
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f5f7fb",
-                py: 5,
+                backgroundColor: "#f8fafc",
+                py: {
+                    xs: 2.5,
+                    sm: 4,
+                    md: 5,
+                },
+                overflowX: "hidden",
             }}
         >
-            <Container maxWidth="md">
-
+            <Container
+                maxWidth="md"
+                sx={{
+                    px: {
+                        xs: 2,
+                        sm: 3,
+                        md: 4,
+                    },
+                }}
+            >
                 {/* Back button */}
                 <Button
                     startIcon={<ArrowBack />}
@@ -204,67 +286,165 @@ const ApplyJob = () => {
                         navigate(`/jobs/${id}`)
                     }
                     sx={{
-                        mb: 3,
+                        mb: {
+                            xs: 2,
+                            sm: 3,
+                        },
                         textTransform: "none",
                         fontWeight: 600,
+                        color: "#475467",
+                        "&:hover": {
+                            backgroundColor: "#eef2f6",
+                        },
                     }}
                 >
                     Back to Job Details
                 </Button>
 
-                {/* Header */}
+                {/* Job header */}
                 <Paper
                     elevation={0}
                     sx={{
-                        p: { xs: 3, md: 4 },
-                        mb: 3,
-                        borderRadius: 3,
+                        p: {
+                            xs: 2.5,
+                            sm: 3.5,
+                            md: 4,
+                        },
+                        mb: {
+                            xs: 2,
+                            sm: 3,
+                        },
+                        borderRadius: {
+                            xs: 2.5,
+                            sm: 3,
+                        },
                         border: "1px solid #e5e7eb",
+                        background:
+                            "linear-gradient(135deg, #ffffff 0%, #f8fbff 100%)",
                     }}
                 >
-                    <Typography
-                        variant="h4"
+                    <Box
                         sx={{
-                            fontWeight: 700,
-                            mb: 1,
+                            display: "flex",
+                            alignItems: {
+                                xs: "flex-start",
+                                sm: "center",
+                            },
+                            justifyContent: "space-between",
+                            gap: 2,
+                            flexWrap: "wrap",
                         }}
                     >
-                        Apply for this position
-                    </Typography>
+                        <Box
+                            sx={{
+                                minWidth: 0,
+                                flex: 1,
+                            }}
+                        >
+                            <Typography
+                                sx={{
+                                    color: "#667085",
+                                    fontSize: {
+                                        xs: 12,
+                                        sm: 13,
+                                    },
+                                    fontWeight: 600,
+                                    mb: 1,
+                                    textTransform:
+                                        "uppercase",
+                                    letterSpacing: "0.5px",
+                                }}
+                            >
+                                Application
+                            </Typography>
 
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            fontWeight: 600,
-                            color: "primary.main",
-                            mb: 1,
-                        }}
-                    >
-                        {job.JobTitle ||
-                            job.jobTitle}
-                    </Typography>
+                            <Typography
+                                component="h1"
+                                sx={{
+                                    fontSize: {
+                                        xs: 25,
+                                        sm: 31,
+                                        md: 36,
+                                    },
+                                    lineHeight: 1.2,
+                                    fontWeight: 800,
+                                    color: "#172033",
+                                    letterSpacing:
+                                        "-0.6px",
+                                    overflowWrap:
+                                        "anywhere",
+                                }}
+                            >
+                                {jobTitle}
+                            </Typography>
 
-                    <Typography color="text.secondary">
-                        {job.CompanyName ||
-                            job.companyName ||
-                            "Company"}
-                    </Typography>
+                            <Typography
+                                sx={{
+                                    mt: 1,
+                                    color: "#667085",
+                                    fontSize: {
+                                        xs: 14,
+                                        sm: 15,
+                                    },
+                                    overflowWrap:
+                                        "anywhere",
+                                }}
+                            >
+                                {companyName}
+                            </Typography>
+                        </Box>
+
+                        <Chip
+                            icon={<DescriptionOutlined />}
+                            label="Job Application"
+                            sx={{
+                                flexShrink: 0,
+                                fontWeight: 600,
+                                backgroundColor: "#eef4ff",
+                                color: "#175cd3",
+                            }}
+                        />
+                    </Box>
                 </Paper>
 
-                {/* Error message */}
+                {/* Error */}
                 {error && (
                     <Alert
                         severity="error"
-                        sx={{ mb: 3 }}
+                        onClose={() => setError("")}
+                        sx={{
+                            mb: 3,
+                            borderRadius: 2,
+                        }}
                     >
                         {error}
                     </Alert>
                 )}
 
-                {/* SUCCESS MESSAGE */}
+                {/* Success */}
                 {success && (
-                    <Box sx={{ mb: 3 }}>
-                        <Alert severity="success">
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            mb: 3,
+                            p: {
+                                xs: 2.5,
+                                sm: 3,
+                            },
+                            borderRadius: 3,
+                            border: "1px solid #abefc6",
+                            backgroundColor: "#f6fef9",
+                        }}
+                    >
+                        <Alert
+                            severity="success"
+                            sx={{
+                                mb: 2,
+                                backgroundColor:
+                                    "transparent",
+                                p: 0,
+                            }}
+                        >
                             {success}
                         </Alert>
 
@@ -274,343 +454,506 @@ const ApplyJob = () => {
                                 navigate("/dashboard")
                             }
                             sx={{
-                                mt: 2,
                                 textTransform: "none",
-                                fontWeight: 600,
+                                fontWeight: 700,
+                                borderRadius: 2,
                             }}
                         >
                             Back to Dashboard
                         </Button>
-                    </Box>
+                    </Paper>
                 )}
 
+                {/* Main application form */}
                 <Paper
                     elevation={0}
                     sx={{
-                        p: { xs: 3, md: 4 },
-                        borderRadius: 3,
+                        borderRadius: {
+                            xs: 2.5,
+                            sm: 3,
+                        },
                         border: "1px solid #e5e7eb",
+                        overflow: "hidden",
                     }}
                 >
                     <Box
                         component="form"
                         onSubmit={handleSubmit}
                     >
-
-                        {/* CV SECTION */}
-                        <Typography
-                            variant="h6"
+                        {/* Form content */}
+                        <Box
                             sx={{
-                                fontWeight: 700,
-                                mb: 1,
+                                p: {
+                                    xs: 2.5,
+                                    sm: 3.5,
+                                    md: 4,
+                                },
                             }}
                         >
-                            Select your CV
-                        </Typography>
-
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mb: 3 }}
-                        >
-                            Choose one of your saved CVs
-                            to submit with this
-                            application.
-                        </Typography>
-
-                        {loadingCVs ? (
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    justifyContent:
-                                        "center",
-                                    py: 4,
-                                }}
-                            >
-                                <CircularProgress
-                                    size={30}
-                                />
-                            </Box>
-                        ) : cvs.length === 0 ? (
-                            <Paper
-                                elevation={0}
-                                sx={{
-                                    p: 3,
-                                    borderRadius: 2,
-                                    backgroundColor:
-                                        "#f8fafc",
-                                    border:
-                                        "1px dashed #cbd5e1",
-                                    textAlign: "center",
-                                }}
-                            >
-                                <DescriptionOutlined
-                                    sx={{
-                                        fontSize: 42,
-                                        color:
-                                            "text.secondary",
-                                        mb: 1,
-                                    }}
-                                />
-
+                            {/* CV section */}
+                            <Box>
                                 <Typography
+                                    component="h2"
                                     sx={{
-                                        fontWeight: 600,
-                                        mb: 1,
+                                        fontSize: {
+                                            xs: 19,
+                                            sm: 21,
+                                        },
+                                        fontWeight: 800,
+                                        color: "#172033",
+                                        mb: 0.7,
                                     }}
                                 >
-                                    No CVs found
+                                    Select your CV
                                 </Typography>
 
                                 <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                    sx={{ mb: 2 }}
+                                    sx={{
+                                        color: "#667085",
+                                        fontSize: {
+                                            xs: 13,
+                                            sm: 14,
+                                        },
+                                        lineHeight: 1.6,
+                                        mb: 3,
+                                    }}
                                 >
-                                    Upload a CV in My CVs
-                                    before applying.
+                                    Choose the CV you want
+                                    to send with your
+                                    application.
                                 </Typography>
 
-                                <Button
-                                    variant="contained"
-                                    startIcon={
-                                        <UploadFile />
-                                    }
-                                    onClick={() =>
-                                        navigate(
-                                            "/my-cvs"
-                                        )
-                                    }
-                                    sx={{
-                                        textTransform:
-                                            "none",
-                                    }}
-                                >
-                                    Go to My CVs
-                                </Button>
-                            </Paper>
-                        ) : (
-                            <RadioGroup
-                                value={selectedCV}
-                                onChange={(event) =>
-                                    setSelectedCV(
-                                        event.target.value
-                                    )
-                                }
-                            >
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        flexDirection:
-                                            "column",
-                                        gap: 2,
-                                    }}
-                                >
-                                    {cvs.map((cv) => {
-                                        const isSelected =
-                                            String(
-                                                selectedCV
-                                            ) ===
-                                            String(
-                                                cv.CVID
-                                            );
+                                {loadingCVs ? (
+                                    <Box
+                                        sx={{
+                                            py: 5,
+                                            display: "flex",
+                                            flexDirection:
+                                                "column",
+                                            alignItems:
+                                                "center",
+                                            justifyContent:
+                                                "center",
+                                        }}
+                                    >
+                                        <CircularProgress
+                                            size={32}
+                                        />
 
-                                        return (
-                                            <Paper
-                                                key={
-                                                    cv.CVID
-                                                }
-                                                elevation={0}
-                                                onClick={() =>
-                                                    setSelectedCV(
-                                                        String(
-                                                            cv.CVID
-                                                        )
-                                                    )
-                                                }
-                                                sx={{
-                                                    p: 2.5,
-                                                    borderRadius:
-                                                        2.5,
-                                                    cursor:
-                                                        "pointer",
-                                                    border:
-                                                        isSelected
-                                                            ? "2px solid #1976d2"
-                                                            : "1px solid #d9dee7",
-                                                    backgroundColor:
-                                                        isSelected
-                                                            ? "#f0f7ff"
-                                                            : "#ffffff",
-                                                    transition:
-                                                        "all 0.2s ease",
+                                        <Typography
+                                            sx={{
+                                                mt: 1.5,
+                                                fontSize: 13,
+                                                color: "#667085",
+                                            }}
+                                        >
+                                            Loading your
+                                            CVs...
+                                        </Typography>
+                                    </Box>
+                                ) : cvs.length === 0 ? (
+                                    <Box
+                                        sx={{
+                                            p: {
+                                                xs: 2.5,
+                                                sm: 3.5,
+                                            },
+                                            borderRadius: 2.5,
+                                            border: "1px dashed #cbd5e1",
+                                            backgroundColor:
+                                                "#f8fafc",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        <DescriptionOutlined
+                                            sx={{
+                                                fontSize: 44,
+                                                color: "#98a2b3",
+                                                mb: 1,
+                                            }}
+                                        />
 
-                                                    "&:hover": {
-                                                        borderColor:
-                                                            "#1976d2",
-                                                        boxShadow:
-                                                            "0 4px 14px rgba(0,0,0,0.08)",
-                                                    },
-                                                }}
-                                            >
-                                                <FormControlLabel
-                                                    value={String(
+                                        <Typography
+                                            sx={{
+                                                fontWeight: 700,
+                                                fontSize: 16,
+                                                color: "#344054",
+                                                mb: 0.8,
+                                            }}
+                                        >
+                                            No CVs found
+                                        </Typography>
+
+                                        <Typography
+                                            sx={{
+                                                color: "#667085",
+                                                fontSize: 13,
+                                                lineHeight: 1.6,
+                                                maxWidth: 430,
+                                                mx: "auto",
+                                                mb: 2.5,
+                                            }}
+                                        >
+                                            You need to
+                                            upload a CV
+                                            before you can
+                                            apply for this
+                                            position.
+                                        </Typography>
+
+                                        <Button
+                                            variant="contained"
+                                            startIcon={
+                                                <UploadFile />
+                                            }
+                                            onClick={() =>
+                                                navigate(
+                                                    "/my-cvs"
+                                                )
+                                            }
+                                            sx={{
+                                                textTransform:
+                                                    "none",
+                                                fontWeight: 700,
+                                                borderRadius: 2,
+                                                px: 2.5,
+                                            }}
+                                        >
+                                            Go to My CVs
+                                        </Button>
+                                    </Box>
+                                ) : (
+                                    <RadioGroup
+                                        value={selectedCV}
+                                        onChange={(event) =>
+                                            setSelectedCV(
+                                                event.target
+                                                    .value
+                                            )
+                                        }
+                                    >
+                                        <Box
+                                            sx={{
+                                                display:
+                                                    "flex",
+                                                flexDirection:
+                                                    "column",
+                                                gap: 1.5,
+                                            }}
+                                        >
+                                            {cvs.map((cv) => {
+                                                const isSelected =
+                                                    String(
+                                                        selectedCV
+                                                    ) ===
+                                                    String(
                                                         cv.CVID
-                                                    )}
-                                                    control={
-                                                        <Radio />
-                                                    }
-                                                    sx={{
-                                                        width:
-                                                            "100%",
-                                                        m: 0,
-                                                        alignItems:
-                                                            "flex-start",
-                                                    }}
-                                                    label={
-                                                        <Box
+                                                    );
+
+                                                return (
+                                                    <Paper
+                                                        key={
+                                                            cv.CVID
+                                                        }
+                                                        elevation={
+                                                            0
+                                                        }
+                                                        onClick={() =>
+                                                            setSelectedCV(
+                                                                String(
+                                                                    cv.CVID
+                                                                )
+                                                            )
+                                                        }
+                                                        sx={{
+                                                            p: {
+                                                                xs: 1.5,
+                                                                sm: 2,
+                                                            },
+                                                            borderRadius: 2.5,
+                                                            cursor: "pointer",
+                                                            border: isSelected
+                                                                ? "2px solid #1976d2"
+                                                                : "1px solid #d9dee7",
+                                                            backgroundColor:
+                                                                isSelected
+                                                                    ? "#f0f7ff"
+                                                                    : "#ffffff",
+                                                            transition:
+                                                                "all 0.2s ease",
+                                                            "&:hover":
+                                                                {
+                                                                    borderColor:
+                                                                        "#1976d2",
+                                                                    boxShadow:
+                                                                        "0 5px 16px rgba(16, 24, 40, 0.08)",
+                                                                },
+                                                        }}
+                                                    >
+                                                        <FormControlLabel
+                                                            value={String(
+                                                                cv.CVID
+                                                            )}
+                                                            control={
+                                                                <Radio />
+                                                            }
                                                             sx={{
-                                                                ml: 1,
-                                                                pr: 1,
-                                                                width:
-                                                                    "100%",
+                                                                width: "100%",
+                                                                m: 0,
+                                                                alignItems:
+                                                                    "flex-start",
                                                             }}
-                                                        >
-                                                            <Box
-                                                                sx={{
-                                                                    display:
-                                                                        "flex",
-                                                                    alignItems:
-                                                                        "center",
-                                                                    justifyContent:
-                                                                        "space-between",
-                                                                    gap: 2,
-                                                                    flexWrap:
-                                                                        "wrap",
-                                                                }}
-                                                            >
+                                                            label={
                                                                 <Box
                                                                     sx={{
-                                                                        display:
-                                                                            "flex",
-                                                                        alignItems:
-                                                                            "center",
-                                                                        gap: 1,
+                                                                        ml: 0.5,
+                                                                        pr: 0.5,
+                                                                        width: "100%",
+                                                                        minWidth: 0,
                                                                     }}
                                                                 >
-                                                                    <DescriptionOutlined
-                                                                        color="primary"
-                                                                    />
+                                                                    <Box
+                                                                        sx={{
+                                                                            display:
+                                                                                "flex",
+                                                                            alignItems:
+                                                                                {
+                                                                                    xs: "flex-start",
+                                                                                    sm: "center",
+                                                                                },
+                                                                            justifyContent:
+                                                                                "space-between",
+                                                                            gap: 1.5,
+                                                                            flexDirection:
+                                                                                {
+                                                                                    xs: "column",
+                                                                                    sm: "row",
+                                                                                },
+                                                                        }}
+                                                                    >
+                                                                        <Box
+                                                                            sx={{
+                                                                                display:
+                                                                                    "flex",
+                                                                                alignItems:
+                                                                                    "center",
+                                                                                gap: 1,
+                                                                                minWidth: 0,
+                                                                            }}
+                                                                        >
+                                                                            <DescriptionOutlined
+                                                                                color="primary"
+                                                                                fontSize="small"
+                                                                            />
+
+                                                                            <Typography
+                                                                                sx={{
+                                                                                    fontWeight: 700,
+                                                                                    fontSize: {
+                                                                                        xs: 14,
+                                                                                        sm: 15,
+                                                                                    },
+                                                                                    color: "#344054",
+                                                                                    overflowWrap:
+                                                                                        "anywhere",
+                                                                                }}
+                                                                            >
+                                                                                {cv.CVTitle ||
+                                                                                    "My CV"}
+                                                                            </Typography>
+                                                                        </Box>
+
+                                                                        {isSelected && (
+                                                                            <Chip
+                                                                                label="Selected"
+                                                                                color="primary"
+                                                                                size="small"
+                                                                                sx={{
+                                                                                    fontWeight: 600,
+                                                                                }}
+                                                                            />
+                                                                        )}
+                                                                    </Box>
 
                                                                     <Typography
                                                                         sx={{
-                                                                            fontWeight:
-                                                                                700,
+                                                                            mt: 0.8,
+                                                                            color: "#667085",
+                                                                            fontSize: 12,
                                                                         }}
                                                                     >
-                                                                        {cv.CVTitle ||
-                                                                            "My CV"}
+                                                                        Uploaded{" "}
+                                                                        {cv.UploadDate
+                                                                            ? new Date(
+                                                                                  cv.UploadDate
+                                                                              ).toLocaleDateString()
+                                                                            : "recently"}
                                                                     </Typography>
                                                                 </Box>
+                                                            }
+                                                        />
+                                                    </Paper>
+                                                );
+                                            })}
+                                        </Box>
+                                    </RadioGroup>
+                                )}
+                            </Box>
 
-                                                                {isSelected && (
-                                                                    <Chip
-                                                                        label="Selected"
-                                                                        color="primary"
-                                                                        size="small"
-                                                                    />
-                                                                )}
-                                                            </Box>
+                            <Divider
+                                sx={{
+                                    my: {
+                                        xs: 3,
+                                        sm: 4,
+                                    },
+                                }}
+                            />
 
-                                                            <Typography
-                                                                variant="body2"
-                                                                color="text.secondary"
-                                                                sx={{
-                                                                    mt: 1,
-                                                                }}
-                                                            >
-                                                                Uploaded{" "}
-                                                                {cv.UploadDate
-                                                                    ? new Date(
-                                                                          cv.UploadDate
-                                                                      ).toLocaleDateString()
-                                                                    : "recently"}
-                                                            </Typography>
-                                                        </Box>
-                                                    }
-                                                />
-                                            </Paper>
-                                        );
-                                    })}
-                                </Box>
-                            </RadioGroup>
-                        )}
+                            {/* Cover letter */}
+                            <Box>
+                                <Typography
+                                    component="h2"
+                                    sx={{
+                                        fontSize: {
+                                            xs: 19,
+                                            sm: 21,
+                                        },
+                                        fontWeight: 800,
+                                        color: "#172033",
+                                        mb: 0.7,
+                                    }}
+                                >
+                                    Cover Letter
+                                </Typography>
 
-                        <Divider sx={{ my: 4 }} />
+                                <Typography
+                                    sx={{
+                                        color: "#667085",
+                                        fontSize: {
+                                            xs: 13,
+                                            sm: 14,
+                                        },
+                                        lineHeight: 1.6,
+                                        mb: 2,
+                                    }}
+                                >
+                                    Tell the employer why
+                                    you are interested in
+                                    this position and what
+                                    makes you a suitable
+                                    candidate.
+                                </Typography>
 
-                        {/* COVER LETTER */}
-                        <Typography
-                            variant="h6"
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    minRows={7}
+                                    placeholder="Write your cover letter here..."
+                                    value={coverLetter}
+                                    onChange={(event) =>
+                                        setCoverLetter(
+                                            event.target
+                                                .value
+                                        )
+                                    }
+                                    disabled={applying}
+                                    sx={{
+                                        "& .MuiOutlinedInput-root":
+                                            {
+                                                borderRadius: 2,
+                                                backgroundColor:
+                                                    "#ffffff",
+                                                fontSize: {
+                                                    xs: 14,
+                                                    sm: 15,
+                                                },
+                                                lineHeight: 1.6,
+                                            },
+                                    }}
+                                />
+
+                                <Typography
+                                    sx={{
+                                        mt: 1,
+                                        textAlign: "right",
+                                        color: "#98a2b3",
+                                        fontSize: 12,
+                                    }}
+                                >
+                                    {coverLetter.length}{" "}
+                                    characters
+                                </Typography>
+                            </Box>
+                        </Box>
+
+                        {/* Submit section */}
+                        <Box
                             sx={{
-                                fontWeight: 700,
-                                mb: 1,
+                                borderTop:
+                                    "1px solid #eaecf0",
+                                backgroundColor:
+                                    "#fcfcfd",
+                                p: {
+                                    xs: 2.5,
+                                    sm: 3,
+                                    md: 4,
+                                },
                             }}
                         >
-                            Cover Letter
-                        </Typography>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                size="large"
+                                fullWidth
+                                startIcon={
+                                    applying ? (
+                                        <CircularProgress
+                                            size={20}
+                                            color="inherit"
+                                        />
+                                    ) : (
+                                        <Send />
+                                    )
+                                }
+                                disabled={
+                                    applying ||
+                                    cvs.length === 0 ||
+                                    Boolean(success)
+                                }
+                                sx={{
+                                    py: 1.5,
+                                    borderRadius: 2,
+                                    textTransform: "none",
+                                    fontSize: {
+                                        xs: "0.95rem",
+                                        sm: "1rem",
+                                    },
+                                    fontWeight: 700,
+                                    boxShadow:
+                                        "0 4px 12px rgba(25, 118, 210, 0.18)",
+                                }}
+                            >
+                                {applying
+                                    ? "Submitting Application..."
+                                    : success
+                                    ? "Application Submitted"
+                                    : "Submit Application"}
+                            </Button>
 
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mb: 2 }}
-                        >
-                            Tell the employer why you
-                            are interested in this
-                            position.
-                        </Typography>
-
-                        <TextField
-                            fullWidth
-                            multiline
-                            minRows={7}
-                            placeholder="Write your cover letter here..."
-                            value={coverLetter}
-                            onChange={(event) =>
-                                setCoverLetter(
-                                    event.target.value
-                                )
-                            }
-                            disabled={applying}
-                        />
-
-                        {/* SUBMIT */}
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            size="large"
-                            fullWidth
-                            startIcon={<Send />}
-                            disabled={
-                                applying ||
-                                cvs.length === 0 ||
-                                Boolean(success)
-                            }
-                            sx={{
-                                mt: 4,
-                                py: 1.5,
-                                borderRadius: 2,
-                                textTransform: "none",
-                                fontSize: "1rem",
-                                fontWeight: 700,
-                            }}
-                        >
-                            {applying
-                                ? "Submitting Application..."
-                                : success
-                                ? "Application Submitted"
-                                : "Submit Application"}
-                        </Button>
-
+                            <Typography
+                                sx={{
+                                    mt: 1.5,
+                                    textAlign: "center",
+                                    color: "#98a2b3",
+                                    fontSize: 12,
+                                    lineHeight: 1.5,
+                                }}
+                            >
+                                Make sure your CV and
+                                cover letter are correct
+                                before submitting.
+                            </Typography>
+                        </Box>
                     </Box>
                 </Paper>
             </Container>

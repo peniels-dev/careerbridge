@@ -150,6 +150,10 @@ const register = async (req, res) => {
 // LOGIN
 // =========================
 
+// =========================
+// LOGIN
+// =========================
+
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -178,7 +182,8 @@ const login = async (req, res) => {
                     Email,
                     Phone,
                     [Password],
-                    Role
+                    Role,
+                    IsActive
                 FROM [User]
                 WHERE Email = @Email
             `);
@@ -193,6 +198,14 @@ const login = async (req, res) => {
 
         // Get the user
         const user = result.recordset[0];
+
+        // Check if account is active
+        if (!user.IsActive) {
+            return res.status(403).json({
+                success: false,
+                message: "Your account has been disabled. Please contact the administrator."
+            });
+        }
 
         // Compare entered password with stored password hash
         const passwordMatch = await bcrypt.compare(
@@ -246,7 +259,6 @@ const login = async (req, res) => {
         });
     }
 };
-
 
 // =========================
 // EXPORT

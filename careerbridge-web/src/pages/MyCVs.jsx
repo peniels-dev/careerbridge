@@ -2,32 +2,31 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-    Box,
-    Container,
-    Typography,
-    Button,
-    Paper,
-    CircularProgress,
     Alert,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    IconButton,
+    Box,
+    Button,
+    CircularProgress,
     Chip,
-    Stack,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     Divider,
+    IconButton,
+    Paper,
+    TextField,
+    Typography,
 } from "@mui/material";
 
 import {
-    UploadFile,
-    Visibility,
-    Delete,
-    Description,
-    Close,
     Add,
     ArrowBack,
+    Close,
+    Delete,
+    Description,
+    UploadFile,
+    Visibility,
 } from "@mui/icons-material";
 
 import axiosAPI from "../api/axiosAPI";
@@ -37,10 +36,12 @@ const MyCVs = () => {
 
     const [cvs, setCvs] = useState([]);
     const [loading, setLoading] = useState(true);
+
     const [uploadOpen, setUploadOpen] = useState(false);
     const [cvFile, setCvFile] = useState(null);
     const [cvTitle, setCvTitle] = useState("");
     const [uploading, setUploading] = useState(false);
+
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
@@ -55,7 +56,7 @@ const MyCVs = () => {
 
             const response = await axiosAPI.get("/cvs");
 
-            setCvs(response.data.data || []);
+            setCvs(response.data?.data || []);
         } catch (error) {
             console.error("Get CVs error:", error);
 
@@ -77,7 +78,7 @@ const MyCVs = () => {
     // ==========================
 
     const handleFileChange = (event) => {
-        const file = event.target.files[0];
+        const file = event.target.files?.[0];
 
         if (!file) {
             return;
@@ -93,7 +94,6 @@ const MyCVs = () => {
             setError(
                 "Only PDF, DOC, and DOCX files are allowed."
             );
-
             setCvFile(null);
             return;
         }
@@ -107,7 +107,7 @@ const MyCVs = () => {
         setError("");
         setCvFile(file);
 
-        if (!cvTitle) {
+        if (!cvTitle.trim()) {
             setCvTitle(
                 file.name.replace(/\.[^/.]+$/, "")
             );
@@ -137,7 +137,7 @@ const MyCVs = () => {
             const formData = new FormData();
 
             formData.append("cv", cvFile);
-            formData.append("cvTitle", cvTitle);
+            formData.append("cvTitle", cvTitle.trim());
 
             await axiosAPI.post("/cvs", formData);
 
@@ -166,6 +166,8 @@ const MyCVs = () => {
 
     const handleViewCV = async (cvId) => {
         try {
+            setError("");
+
             const response = await axiosAPI.get(
                 `/cvs/${cvId}`,
                 {
@@ -234,6 +236,20 @@ const MyCVs = () => {
     };
 
     // ==========================
+    // CLOSE UPLOAD DIALOG
+    // ==========================
+
+    const closeUploadDialog = () => {
+        if (uploading) {
+            return;
+        }
+
+        setUploadOpen(false);
+        setCvFile(null);
+        setCvTitle("");
+    };
+
+    // ==========================
     // LOADING
     // ==========================
 
@@ -242,13 +258,26 @@ const MyCVs = () => {
             <Box
                 sx={{
                     minHeight: "100vh",
-                    backgroundColor: "#f5f7fb",
+                    backgroundColor: "#f8fafc",
                     display: "flex",
-                    justifyContent: "center",
                     alignItems: "center",
+                    justifyContent: "center",
+                    px: 2,
                 }}
             >
-                <CircularProgress />
+                <Box sx={{ textAlign: "center" }}>
+                    <CircularProgress size={42} />
+
+                    <Typography
+                        sx={{
+                            mt: 2,
+                            color: "#667085",
+                            fontSize: 14,
+                        }}
+                    >
+                        Loading your CVs...
+                    </Typography>
+                </Box>
             </Box>
         );
     }
@@ -257,14 +286,27 @@ const MyCVs = () => {
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f5f7fb",
-                py: 5,
+                backgroundColor: "#f8fafc",
+                py: {
+                    xs: 2.5,
+                    sm: 4,
+                    md: 5,
+                },
+                overflowX: "hidden",
             }}
         >
-            <Container maxWidth="lg">
-
+            <Container
+                maxWidth="lg"
+                sx={{
+                    px: {
+                        xs: 2,
+                        sm: 3,
+                        md: 4,
+                    },
+                }}
+            >
                 {/* ==========================
-                    TOP NAVIGATION
+                    PAGE HEADER
                 ========================== */}
 
                 <Box
@@ -272,18 +314,21 @@ const MyCVs = () => {
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: {
-                            xs: "flex-start",
+                            xs: "stretch",
                             sm: "center",
                         },
                         flexDirection: {
                             xs: "column",
                             sm: "row",
                         },
-                        gap: 2,
-                        mb: 4,
+                        gap: 2.5,
+                        mb: {
+                            xs: 3,
+                            sm: 4,
+                        },
                     }}
                 >
-                    <Box>
+                    <Box sx={{ minWidth: 0 }}>
                         <Button
                             startIcon={<ArrowBack />}
                             onClick={() =>
@@ -291,10 +336,10 @@ const MyCVs = () => {
                             }
                             sx={{
                                 mb: 1.5,
+                                px: 0,
                                 textTransform: "none",
                                 fontWeight: 700,
                                 color: "#2563eb",
-                                px: 0,
                                 "&:hover": {
                                     backgroundColor:
                                         "transparent",
@@ -305,20 +350,32 @@ const MyCVs = () => {
                         </Button>
 
                         <Typography
-                            variant="h4"
+                            component="h1"
                             sx={{
+                                fontSize: {
+                                    xs: 28,
+                                    sm: 34,
+                                    md: 40,
+                                },
+                                lineHeight: 1.15,
                                 fontWeight: 800,
                                 color: "#111827",
-                                mb: 0.8,
+                                letterSpacing: "-0.7px",
+                                mb: 1,
                             }}
                         >
                             My CVs
                         </Typography>
 
                         <Typography
-                            variant="body1"
                             sx={{
-                                color: "#6b7280",
+                                color: "#667085",
+                                fontSize: {
+                                    xs: 13,
+                                    sm: 15,
+                                },
+                                lineHeight: 1.6,
+                                maxWidth: 620,
                             }}
                         >
                             Manage your CVs and keep them
@@ -331,18 +388,21 @@ const MyCVs = () => {
                         startIcon={<Add />}
                         onClick={openUploadDialog}
                         sx={{
-                            minHeight: 44,
-                            px: 3,
+                            minHeight: 46,
+                            px: {
+                                xs: 2,
+                                sm: 2.5,
+                            },
                             borderRadius: 2,
                             textTransform: "none",
                             fontWeight: 700,
-                            fontSize: "0.95rem",
-                            backgroundColor: "#2563eb",
-                            boxShadow: "none",
-                            "&:hover": {
-                                backgroundColor: "#1d4ed8",
-                                boxShadow: "none",
+                            fontSize: 14,
+                            alignSelf: {
+                                xs: "stretch",
+                                sm: "auto",
                             },
+                            boxShadow:
+                                "0 4px 12px rgba(37, 99, 235, 0.18)",
                         }}
                     >
                         Upload New CV
@@ -356,11 +416,11 @@ const MyCVs = () => {
                 {error && (
                     <Alert
                         severity="error"
+                        onClose={() => setError("")}
                         sx={{
                             mb: 3,
                             borderRadius: 2,
                         }}
-                        onClose={() => setError("")}
                     >
                         {error}
                     </Alert>
@@ -369,40 +429,60 @@ const MyCVs = () => {
                 {success && (
                     <Alert
                         severity="success"
+                        onClose={() => setSuccess("")}
                         sx={{
                             mb: 3,
                             borderRadius: 2,
                         }}
-                        onClose={() => setSuccess("")}
                     >
                         {success}
                     </Alert>
                 )}
 
                 {/* ==========================
-                    PAGE INTRO CARD
+                    INFORMATION CARD
                 ========================== */}
 
                 <Paper
                     elevation={0}
                     sx={{
-                        p: 3,
-                        mb: 4,
+                        p: {
+                            xs: 2.5,
+                            sm: 3,
+                        },
+                        mb: {
+                            xs: 3,
+                            sm: 4,
+                        },
                         borderRadius: 3,
                         border: "1px solid #e5e7eb",
-                        backgroundColor: "white",
+                        backgroundColor: "#ffffff",
                     }}
                 >
-                    <Stack
-                        direction="row"
-                        spacing={2}
-                        alignItems="center"
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: {
+                                xs: "flex-start",
+                                sm: "center",
+                            },
+                            gap: 2,
+                        }}
                     >
                         <Box
                             sx={{
-                                width: 48,
-                                height: 48,
-                                minWidth: 48,
+                                width: {
+                                    xs: 44,
+                                    sm: 48,
+                                },
+                                height: {
+                                    xs: 44,
+                                    sm: 48,
+                                },
+                                minWidth: {
+                                    xs: 44,
+                                    sm: 48,
+                                },
                                 borderRadius: 2,
                                 backgroundColor: "#eff6ff",
                                 color: "#2563eb",
@@ -414,29 +494,37 @@ const MyCVs = () => {
                             <Description />
                         </Box>
 
-                        <Box>
+                        <Box sx={{ minWidth: 0 }}>
                             <Typography
                                 sx={{
                                     fontWeight: 700,
                                     color: "#111827",
+                                    fontSize: {
+                                        xs: 14,
+                                        sm: 15,
+                                    },
                                 }}
                             >
                                 Keep your CVs organized
                             </Typography>
 
                             <Typography
-                                variant="body2"
                                 sx={{
-                                    color: "#6b7280",
+                                    color: "#667085",
                                     mt: 0.3,
+                                    fontSize: {
+                                        xs: 12,
+                                        sm: 13,
+                                    },
+                                    lineHeight: 1.6,
                                 }}
                             >
-                                Upload different versions of
-                                your CV for different types of
-                                opportunities.
+                                Upload different versions
+                                of your CV for different
+                                types of opportunities.
                             </Typography>
                         </Box>
-                    </Stack>
+                    </Box>
                 </Paper>
 
                 {/* ==========================
@@ -448,18 +536,26 @@ const MyCVs = () => {
                         elevation={0}
                         sx={{
                             p: {
-                                xs: 4,
-                                sm: 7,
+                                xs: 3,
+                                sm: 5,
+                                md: 7,
                             },
                             textAlign: "center",
                             borderRadius: 3,
                             border: "1px solid #e5e7eb",
+                            backgroundColor: "#ffffff",
                         }}
                     >
                         <Box
                             sx={{
-                                width: 80,
-                                height: 80,
+                                width: {
+                                    xs: 68,
+                                    sm: 80,
+                                },
+                                height: {
+                                    xs: 68,
+                                    sm: 80,
+                                },
                                 borderRadius: "50%",
                                 backgroundColor: "#eff6ff",
                                 color: "#2563eb",
@@ -467,17 +563,26 @@ const MyCVs = () => {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 mx: "auto",
-                                mb: 3,
+                                mb: 2.5,
                             }}
                         >
                             <Description
-                                sx={{ fontSize: 42 }}
+                                sx={{
+                                    fontSize: {
+                                        xs: 36,
+                                        sm: 42,
+                                    },
+                                }}
                             />
                         </Box>
 
                         <Typography
-                            variant="h5"
+                            component="h2"
                             sx={{
+                                fontSize: {
+                                    xs: 20,
+                                    sm: 24,
+                                },
                                 fontWeight: 800,
                                 color: "#111827",
                                 mb: 1,
@@ -488,16 +593,20 @@ const MyCVs = () => {
 
                         <Typography
                             sx={{
-                                color: "#6b7280",
-                                maxWidth: 500,
+                                color: "#667085",
+                                maxWidth: 520,
                                 mx: "auto",
                                 lineHeight: 1.7,
+                                fontSize: {
+                                    xs: 13,
+                                    sm: 14,
+                                },
                                 mb: 3,
                             }}
                         >
-                            Upload your CV so you can quickly
-                            select it when applying for jobs on
-                            CareerBridge.
+                            Upload your CV so you can
+                            quickly select it when applying
+                            for jobs on CareerBridge.
                         </Typography>
 
                         <Button
@@ -510,12 +619,6 @@ const MyCVs = () => {
                                 borderRadius: 2,
                                 textTransform: "none",
                                 fontWeight: 700,
-                                backgroundColor: "#2563eb",
-                                boxShadow: "none",
-                                "&:hover": {
-                                    backgroundColor: "#1d4ed8",
-                                    boxShadow: "none",
-                                },
                             }}
                         >
                             Upload Your First CV
@@ -527,12 +630,24 @@ const MyCVs = () => {
                             CV COUNT
                         ========================== */}
 
-                        <Box sx={{ mb: 2 }}>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent:
+                                    "space-between",
+                                alignItems: "center",
+                                mb: 2,
+                                gap: 2,
+                            }}
+                        >
                             <Typography
-                                variant="body2"
                                 sx={{
-                                    color: "#6b7280",
-                                    fontWeight: 600,
+                                    color: "#475467",
+                                    fontWeight: 700,
+                                    fontSize: {
+                                        xs: 14,
+                                        sm: 15,
+                                    },
                                 }}
                             >
                                 {cvs.length}{" "}
@@ -552,10 +667,14 @@ const MyCVs = () => {
                                 display: "grid",
                                 gridTemplateColumns: {
                                     xs: "1fr",
-                                    sm: "repeat(2, 1fr)",
-                                    md: "repeat(3, 1fr)",
+                                    sm: "repeat(2, minmax(0, 1fr))",
+                                    lg: "repeat(3, minmax(0, 1fr))",
                                 },
-                                gap: 3,
+                                gap: {
+                                    xs: 2,
+                                    sm: 2.5,
+                                    md: 3,
+                                },
                             }}
                         >
                             {cvs.map((cv) => (
@@ -563,23 +682,30 @@ const MyCVs = () => {
                                     key={cv.CVID}
                                     elevation={0}
                                     sx={{
-                                        p: 3,
+                                        p: {
+                                            xs: 2.5,
+                                            sm: 3,
+                                        },
                                         borderRadius: 3,
                                         border:
                                             "1px solid #e5e7eb",
                                         backgroundColor:
-                                            "white",
+                                            "#ffffff",
                                         display: "flex",
                                         flexDirection:
                                             "column",
-                                        minHeight: 260,
+                                        minWidth: 0,
+                                        minHeight: {
+                                            xs: 235,
+                                            sm: 260,
+                                        },
                                         transition:
-                                            "all 0.2s ease",
+                                            "transform 0.2s ease, box-shadow 0.2s ease",
                                         "&:hover": {
                                             transform:
                                                 "translateY(-3px)",
                                             boxShadow:
-                                                "0 8px 25px rgba(0,0,0,0.07)",
+                                                "0 10px 25px rgba(16, 24, 40, 0.08)",
                                             borderColor:
                                                 "#bfdbfe",
                                         },
@@ -610,11 +736,14 @@ const MyCVs = () => {
                                         />
                                     </Box>
 
-                                    {/* CV TITLE */}
+                                    {/* TITLE */}
 
                                     <Typography
-                                        variant="h6"
                                         sx={{
+                                            fontSize: {
+                                                xs: 17,
+                                                sm: 18,
+                                            },
                                             fontWeight: 800,
                                             color: "#111827",
                                             mb: 1,
@@ -642,15 +771,15 @@ const MyCVs = () => {
                                             mb: 2,
                                             fontWeight: 600,
                                             backgroundColor:
-                                                "#f3f4f6",
+                                                "#f2f4f7",
                                         }}
                                     />
 
                                     <Typography
-                                        variant="body2"
                                         sx={{
-                                            color: "#6b7280",
-                                            mb: 3,
+                                            color: "#667085",
+                                            fontSize: 13,
+                                            mb: 2.5,
                                         }}
                                     >
                                         Uploaded{" "}
@@ -667,7 +796,11 @@ const MyCVs = () => {
                                         }}
                                     />
 
-                                    <Divider sx={{ mb: 2 }} />
+                                    <Divider
+                                        sx={{
+                                            mb: 2,
+                                        }}
+                                    />
 
                                     {/* BUTTONS */}
 
@@ -694,15 +827,9 @@ const MyCVs = () => {
                                                     "none",
                                                 fontWeight: 700,
                                                 borderRadius: 2,
-                                                backgroundColor:
-                                                    "#2563eb",
-                                                boxShadow:
-                                                    "none",
-                                                "&:hover": {
-                                                    backgroundColor:
-                                                        "#1d4ed8",
-                                                    boxShadow:
-                                                        "none",
+                                                fontSize: {
+                                                    xs: 13,
+                                                    sm: 14,
                                                 },
                                             }}
                                         >
@@ -710,6 +837,7 @@ const MyCVs = () => {
                                         </Button>
 
                                         <IconButton
+                                            aria-label="Delete CV"
                                             onClick={() =>
                                                 handleDeleteCV(
                                                     cv.CVID
@@ -718,16 +846,18 @@ const MyCVs = () => {
                                             sx={{
                                                 width: 42,
                                                 height: 42,
+                                                flexShrink: 0,
                                                 borderRadius: 2,
                                                 border:
                                                     "1px solid #fecaca",
                                                 color: "#dc2626",
-                                                "&:hover": {
-                                                    backgroundColor:
-                                                        "#fef2f2",
-                                                    borderColor:
-                                                        "#fca5a5",
-                                                },
+                                                "&:hover":
+                                                    {
+                                                        backgroundColor:
+                                                            "#fef2f2",
+                                                        borderColor:
+                                                            "#fca5a5",
+                                                    },
                                             }}
                                         >
                                             <Delete />
@@ -746,46 +876,78 @@ const MyCVs = () => {
 
             <Dialog
                 open={uploadOpen}
-                onClose={() => {
-                    if (!uploading) {
-                        setUploadOpen(false);
-                    }
-                }}
+                onClose={closeUploadDialog}
                 fullWidth
                 maxWidth="sm"
                 PaperProps={{
                     sx: {
-                        borderRadius: 3,
+                        borderRadius: {
+                            xs: 2.5,
+                            sm: 3,
+                        },
+                        m: {
+                            xs: 1.5,
+                            sm: 3,
+                        },
+                        width: {
+                            xs: "calc(100% - 24px)",
+                            sm: "100%",
+                        },
                     },
                 }}
             >
                 <DialogTitle
                     sx={{
                         display: "flex",
-                        justifyContent:
-                            "space-between",
+                        justifyContent: "space-between",
                         alignItems: "center",
+                        gap: 2,
                         fontWeight: 800,
                         color: "#111827",
+                        fontSize: {
+                            xs: 19,
+                            sm: 21,
+                        },
+                        pb: 1,
                     }}
                 >
-                    Upload New CV
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1.2,
+                            minWidth: 0,
+                        }}
+                    >
+                        <UploadFile
+                            color="primary"
+                        />
+
+                        <span>Upload New CV</span>
+                    </Box>
 
                     <IconButton
-                        onClick={() =>
-                            setUploadOpen(false)
-                        }
+                        onClick={closeUploadDialog}
                         disabled={uploading}
+                        size="small"
                     >
                         <Close />
                     </IconButton>
                 </DialogTitle>
 
-                <DialogContent>
+                <DialogContent
+                    sx={{
+                        pt: 1.5,
+                    }}
+                >
                     <Typography
-                        variant="body2"
                         sx={{
-                            color: "#6b7280",
+                            color: "#667085",
+                            fontSize: {
+                                xs: 13,
+                                sm: 14,
+                            },
+                            lineHeight: 1.6,
                             mb: 3,
                         }}
                     >
@@ -798,10 +960,18 @@ const MyCVs = () => {
                         label="CV Title"
                         placeholder="e.g. Software Developer CV"
                         value={cvTitle}
-                        onChange={(e) =>
-                            setCvTitle(e.target.value)
+                        onChange={(event) =>
+                            setCvTitle(
+                                event.target.value
+                            )
                         }
-                        sx={{ mb: 3 }}
+                        disabled={uploading}
+                        sx={{
+                            mb: 2.5,
+                            "& .MuiOutlinedInput-root": {
+                                borderRadius: 2,
+                            },
+                        }}
                     />
 
                     <Button
@@ -809,23 +979,39 @@ const MyCVs = () => {
                         variant="outlined"
                         fullWidth
                         startIcon={<UploadFile />}
+                        disabled={uploading}
                         sx={{
-                            minHeight: 70,
+                            minHeight: {
+                                xs: 72,
+                                sm: 80,
+                            },
+                            px: 2,
                             borderRadius: 2,
                             textTransform: "none",
                             fontWeight: 600,
                             borderStyle: "dashed",
                             borderWidth: 2,
-                            color: "#2563eb",
+                            overflow: "hidden",
                             "&:hover": {
                                 borderWidth: 2,
-                                backgroundColor: "#eff6ff",
+                                backgroundColor:
+                                    "#eff6ff",
                             },
                         }}
                     >
-                        {cvFile
-                            ? cvFile.name
-                            : "Choose CV File"}
+                        <Box
+                            component="span"
+                            sx={{
+                                maxWidth: "100%",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {cvFile
+                                ? cvFile.name
+                                : "Choose CV File"}
+                        </Box>
 
                         <input
                             type="file"
@@ -836,11 +1022,11 @@ const MyCVs = () => {
                     </Button>
 
                     <Typography
-                        variant="caption"
                         sx={{
                             display: "block",
                             mt: 1.5,
-                            color: "#6b7280",
+                            color: "#667085",
+                            fontSize: 12,
                         }}
                     >
                         PDF, DOC or DOCX • Maximum 5MB
@@ -852,6 +1038,8 @@ const MyCVs = () => {
                             sx={{
                                 mt: 2,
                                 borderRadius: 2,
+                                overflowWrap:
+                                    "anywhere",
                             }}
                         >
                             {cvFile.name} selected
@@ -861,15 +1049,24 @@ const MyCVs = () => {
 
                 <DialogActions
                     sx={{
-                        px: 3,
-                        pb: 3,
+                        px: {
+                            xs: 2.5,
+                            sm: 3,
+                        },
+                        pb: {
+                            xs: 2.5,
+                            sm: 3,
+                        },
                         gap: 1,
+                        flexDirection: {
+                            xs: "column-reverse",
+                            sm: "row",
+                        },
+                        alignItems: "stretch",
                     }}
                 >
                     <Button
-                        onClick={() =>
-                            setUploadOpen(false)
-                        }
+                        onClick={closeUploadDialog}
                         disabled={uploading}
                         sx={{
                             minHeight: 44,
@@ -877,7 +1074,7 @@ const MyCVs = () => {
                             textTransform: "none",
                             fontWeight: 700,
                             borderRadius: 2,
-                            color: "#6b7280",
+                            color: "#667085",
                         }}
                     >
                         Cancel
@@ -903,12 +1100,6 @@ const MyCVs = () => {
                             textTransform: "none",
                             fontWeight: 700,
                             borderRadius: 2,
-                            backgroundColor: "#2563eb",
-                            boxShadow: "none",
-                            "&:hover": {
-                                backgroundColor: "#1d4ed8",
-                                boxShadow: "none",
-                            },
                         }}
                     >
                         {uploading

@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Unauthorized from "./pages/Unauthorized";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Dashboard from "./pages/JobSeekerDashboard";
@@ -12,6 +13,7 @@ import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 import PublicCompanyProfile from "./pages/PublicCompanyProfile";
 import ApplyJob from "./pages/ApplyJob";
+
 import MyCVs from "./pages/MyCVs";
 import MyApplications from "./pages/MyApplications";
 import Profile from "./pages/Profile";
@@ -24,11 +26,21 @@ import CompanyProfile from "./pages/CompanyProfile";
 import EmployerJobDetails from "./pages/EmployerJobDetails";
 import EditJob from "./pages/EditJob";
 
+// ADMIN
+import AdminLayout from "./layouts/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminJobs from "./pages/admin/AdminJobs";
+import AdminApplications from "./pages/admin/AdminApplications";
+
 function App() {
     return (
         <Routes>
 
-            {/* Login */}
+            {/* =========================
+                LOGIN
+            ========================= */}
+
             <Route
                 path="/"
                 element={<Login />}
@@ -39,17 +51,26 @@ function App() {
                 element={<Login />}
             />
 
-            {/* Register */}
+
+            {/* =========================
+                REGISTER
+            ========================= */}
+
             <Route
                 path="/register"
                 element={<Register />}
             />
 
-            {/* Unauthorized */}
+
+            {/* =========================
+                UNAUTHORIZED
+            ========================= */}
+
             <Route
                 path="/unauthorized"
                 element={<Unauthorized />}
             />
+
 
             {/* =========================
                 JOB SEEKER ROUTES
@@ -83,13 +104,13 @@ function App() {
             />
 
             <Route
-    path="/companies/:id"
-    element={
-        <ProtectedRoute>
-            <PublicCompanyProfile />
-        </ProtectedRoute>
-    }
-/>
+                path="/companies/:id"
+                element={
+                    <ProtectedRoute>
+                        <PublicCompanyProfile />
+                    </ProtectedRoute>
+                }
+            />
 
             <Route
                 path="/jobs/:id/apply"
@@ -101,37 +122,37 @@ function App() {
             />
 
             <Route
-    path="/my-cvs"
-    element={
-        <ProtectedRoute allowedRoles={["JobSeeker"]}>
-            <MyCVs />
-        </ProtectedRoute>
-    }
-/>
+                path="/my-cvs"
+                element={
+                    <ProtectedRoute allowedRoles={["JobSeeker"]}>
+                        <MyCVs />
+                    </ProtectedRoute>
+                }
+            />
 
-<Route
-    path="/my-applications"
-    element={
-        <ProtectedRoute allowedRoles={["JobSeeker"]}>
-            <MyApplications />
-        </ProtectedRoute>
-    }
-/>
+            <Route
+                path="/my-applications"
+                element={
+                    <ProtectedRoute allowedRoles={["JobSeeker"]}>
+                        <MyApplications />
+                    </ProtectedRoute>
+                }
+            />
 
-<Route
-    path="/profile"
-    element={
-        <ProtectedRoute allowedRoles={["JobSeeker"]}>
-            <Profile />
-        </ProtectedRoute>
-    }
-/>
+            <Route
+                path="/profile"
+                element={
+                    <ProtectedRoute allowedRoles={["JobSeeker"]}>
+                        <Profile />
+                    </ProtectedRoute>
+                }
+            />
+
 
             {/* =========================
                 EMPLOYER ROUTES
             ========================= */}
 
-            {/* Employer Dashboard */}
             <Route
                 path="/employer-dashboard"
                 element={
@@ -141,7 +162,6 @@ function App() {
                 }
             />
 
-            {/* Employer My Jobs */}
             <Route
                 path="/employer/jobs"
                 element={
@@ -152,24 +172,23 @@ function App() {
             />
 
             <Route
-    path="/employer/jobs/:id"
-    element={
-        <ProtectedRoute allowedRoles={["Employer"]}>
-            <EmployerJobDetails />
-        </ProtectedRoute>
-    }
-/>
+                path="/employer/jobs/:id"
+                element={
+                    <ProtectedRoute allowedRoles={["Employer"]}>
+                        <EmployerJobDetails />
+                    </ProtectedRoute>
+                }
+            />
 
-<Route
-    path="/employer/jobs/:id/edit"
-    element={
-        <ProtectedRoute allowedRoles={["Employer"]}>
-            <EditJob />
-        </ProtectedRoute>
-    }
-/>
+            <Route
+                path="/employer/jobs/:id/edit"
+                element={
+                    <ProtectedRoute allowedRoles={["Employer"]}>
+                        <EditJob />
+                    </ProtectedRoute>
+                }
+            />
 
-            {/* Employer Post Job */}
             <Route
                 path="/employer/post-job"
                 element={
@@ -179,7 +198,6 @@ function App() {
                 }
             />
 
-            {/* Employer Applicants */}
             <Route
                 path="/employer/jobs/:id/applicants"
                 element={
@@ -190,15 +208,14 @@ function App() {
             />
 
             <Route
-    path="/employer/jobs/:jobId/applicants/:applicationId/profile"
-    element={
-        <ProtectedRoute allowedRoles={["Employer"]}>
-            <EmployerApplicantProfile />
-        </ProtectedRoute>
-    }
-/>
+                path="/employer/jobs/:jobId/applicants/:applicationId/profile"
+                element={
+                    <ProtectedRoute allowedRoles={["Employer"]}>
+                        <EmployerApplicantProfile />
+                    </ProtectedRoute>
+                }
+            />
 
-            {/* Employer Company Profile */}
             <Route
                 path="/company-profile"
                 element={
@@ -207,6 +224,40 @@ function App() {
                     </ProtectedRoute>
                 }
             />
+
+
+            {/* =========================
+                ADMIN ROUTES
+            ========================= */}
+
+            <Route
+                path="/admin"
+                element={
+                    <ProtectedRoute allowedRoles={["Admin"]}>
+                        <AdminLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route
+                    index
+                    element={<AdminDashboard />}
+                />
+
+                <Route
+                    path="users"
+                    element={<AdminUsers />}
+                />
+
+                <Route
+                    path="jobs"
+                    element={<AdminJobs />}
+                />
+
+                <Route
+                    path="applications"
+                    element={<AdminApplications />}
+                />
+            </Route>
 
         </Routes>
     );

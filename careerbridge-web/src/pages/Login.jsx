@@ -47,14 +47,17 @@ function Login() {
             login(user, token);
 
             // Send the user to the correct dashboard
-            if (user.role === "Employer") {
+            if (user.role === "Admin") {
+                navigate("/admin");
+            } else if (user.role === "Employer") {
                 navigate("/employer-dashboard");
-            } else if (user.role === "JobSeeker") {
+            } else if (
+                user.role === "JobSeeker"   
+            ) {
                 navigate("/dashboard");
             } else {
                 navigate("/unauthorized");
             }
-
         } catch (error) {
             console.error("LOGIN ERROR:", error);
             console.log("STATUS:", error.response?.status);
@@ -62,7 +65,7 @@ function Login() {
 
             setError(
                 error.response?.data?.message ||
-                "Unable to login. Please try again."
+                    "Unable to login. Please try again."
             );
         } finally {
             setLoading(false);
@@ -91,14 +94,13 @@ function Login() {
                     }}
                 >
                     <CardContent sx={{ p: { xs: 3, sm: 5 } }}>
-
-                       <Stack
-    spacing={1}
-    sx={{
-        alignItems: "center",
-        mb: 4,
-    }}
->
+                        <Stack
+                            spacing={1}
+                            sx={{
+                                alignItems: "center",
+                                mb: 4,
+                            }}
+                        >
                             <Typography
                                 variant="h4"
                                 fontWeight={800}
@@ -117,10 +119,7 @@ function Login() {
                         </Stack>
 
                         {error && (
-                            <Alert
-                                severity="error"
-                                sx={{ mb: 3 }}
-                            >
+                            <Alert severity="error" sx={{ mb: 3 }}>
                                 {error}
                             </Alert>
                         )}
@@ -130,7 +129,6 @@ function Login() {
                             onSubmit={handleLogin}
                         >
                             <Stack spacing={3}>
-
                                 <TextField
                                     label="Email"
                                     type="email"
@@ -179,20 +177,18 @@ function Login() {
                                         "Login"
                                     )}
                                 </Button>
-
                             </Stack>
                         </Box>
 
                         <Typography
-    variant="body2"
-    color="text.secondary"
-    sx={{
-        mt: 4,
-        textAlign: "center",
-    }}
->
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                                mt: 4,
+                                textAlign: "center",
+                            }}
+                        >
                             Don't have an account?{" "}
-
                             <Link
                                 to="/register"
                                 style={{
@@ -204,7 +200,6 @@ function Login() {
                                 Create an account
                             </Link>
                         </Typography>
-
                     </CardContent>
                 </Card>
             </Container>
@@ -213,3 +208,4 @@ function Login() {
 }
 
 export default Login;
+
