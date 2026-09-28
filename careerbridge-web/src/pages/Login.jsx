@@ -92,7 +92,13 @@ function Login() {
                 >
                     <CardContent sx={{ p: { xs: 3, sm: 5 } }}>
 
-                        <Stack spacing={1} alignItems="center" mb={4}>
+                       <Stack
+    spacing={1}
+    sx={{
+        alignItems: "center",
+        mb: 4,
+    }}
+>
                             <Typography
                                 variant="h4"
                                 fontWeight={800}
@@ -178,11 +184,13 @@ function Login() {
                         </Box>
 
                         <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            textAlign="center"
-                            sx={{ mt: 4 }}
-                        >
+    variant="body2"
+    color="text.secondary"
+    sx={{
+        mt: 4,
+        textAlign: "center",
+    }}
+>
                             Don't have an account?{" "}
 
                             <Link

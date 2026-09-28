@@ -875,105 +875,89 @@ const PostJob = () => {
                                     </Box>
                                 </Box>
 
-                                {/* LOCATION + DEADLINE */}
-                                <Box
-                                    sx={{
-                                        display: "grid",
-                                        gridTemplateColumns:
-                                            {
-                                                xs: "1fr",
-                                                md: "1fr 1fr",
-                                            },
-                                        gap: 3,
-                                        mb: 3,
-                                    }}
-                                >
-                                    {/* LOCATION */}
-                                    <Box>
-                                        <Typography
-                                            sx={{
-                                                fontWeight: 700,
-                                                mb: 1,
-                                                color:
-                                                    "#334155",
-                                            }}
-                                        >
-                                            Location
-                                        </Typography>
+                               {/* LOCATION + DEADLINE */}
+<Box
+    sx={{
+        display: "grid",
+        gridTemplateColumns: {
+            xs: "1fr",
+            md: "1fr 1fr",
+        },
+        gap: 3,
+        mb: 3,
+    }}
+>
+    {/* LOCATION */}
+    <Box>
+        <Typography
+            sx={{
+                fontWeight: 700,
+                mb: 1,
+                color: "#334155",
+            }}
+        >
+            Location
+        </Typography>
 
-                                        <TextField
-                                            fullWidth
-                                            name="location"
-                                            value={
-                                                formData.location
-                                            }
-                                            onChange={
-                                                handleChange
-                                            }
-                                            placeholder="e.g. Accra, Ghana"
-                                            disabled={
-                                                submitting
-                                            }
-                                            InputProps={{
-                                                startAdornment:
-                                                    (
-                                                        <LocationOn
-                                                            sx={{
-                                                                mr: 1,
-                                                                color:
-                                                                    "#94a3b8",
-                                                            }}
-                                                        />
-                                                    ),
-                                            }}
-                                        />
-                                    </Box>
+        <TextField
+            fullWidth
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            placeholder="e.g. Accra, Ghana"
+            disabled={submitting}
+            slotProps={{
+                input: {
+                    startAdornment: (
+                        <LocationOn
+                            sx={{
+                                mr: 1,
+                                color: "#94a3b8",
+                            }}
+                        />
+                    ),
+                },
+            }}
+        />
+    </Box>
 
-                                    {/* DEADLINE */}
-                                    <Box>
-                                        <Typography
-                                            sx={{
-                                                fontWeight: 700,
-                                                mb: 1,
-                                                color:
-                                                    "#334155",
-                                            }}
-                                        >
-                                            Application
-                                            Deadline
-                                        </Typography>
+    {/* DEADLINE */}
+    <Box>
+        <Typography
+            sx={{
+                fontWeight: 700,
+                mb: 1,
+                color: "#334155",
+            }}
+        >
+            Application Deadline
+        </Typography>
 
-                                        <TextField
-                                            fullWidth
-                                            type="date"
-                                            name="applicationDeadline"
-                                            value={
-                                                formData.applicationDeadline
-                                            }
-                                            onChange={
-                                                handleChange
-                                            }
-                                            disabled={
-                                                submitting
-                                            }
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            InputProps={{
-                                                startAdornment:
-                                                    (
-                                                        <CalendarToday
-                                                            sx={{
-                                                                mr: 1,
-                                                                color:
-                                                                    "#94a3b8",
-                                                            }}
-                                                        />
-                                                    ),
-                                            }}
-                                        />
-                                    </Box>
-                                </Box>
+        <TextField
+            fullWidth
+            type="date"
+            name="applicationDeadline"
+            value={formData.applicationDeadline}
+            onChange={handleChange}
+            disabled={submitting}
+            slotProps={{
+                inputLabel: {
+                    shrink: true,
+                },
+                input: {
+                    startAdornment: (
+                        <CalendarToday
+                            sx={{
+                                mr: 1,
+                                color: "#94a3b8",
+                            }}
+                        />
+                    ),
+                },
+            }}
+        />
+    </Box>
+</Box>
 
                                 {/* DESCRIPTION */}
                                 <Box sx={{ mb: 4 }}>
