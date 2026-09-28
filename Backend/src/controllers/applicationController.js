@@ -1,14 +1,20 @@
 const { sql, connectDB } = require("../config/database");
 
+// =====================================================
+// APPLY FOR JOB
+// =====================================================
+
 const applyForJob = async (req, res) => {
     try {
         const { jobId } = req.params;
-        const { CVID } = req.body || {};
-
-        // Get logged-in user's ID from JWT
         const userId = req.user.userId;
 
-        // Validate Job ID
+        const { CVID, CoverLetter } = req.body;
+
+        // -----------------------------
+        // Basic validation
+        // -----------------------------
+
         if (!jobId) {
             return res.status(400).json({
                 success: false,
@@ -16,250 +22,39 @@ const applyForJob = async (req, res) => {
             });
         }
 
-        // Validate CV ID
         if (!CVID) {
             return res.status(400).json({
                 success: false,
-                message: "CVID is required"
+                message: "CV is required"
             });
         }
 
-        // Get database connection
-        const pool = await connectDB();
-        // Check if the Job exists
-const jobResult = await pool.request()
-
-    .input("JobID", sql.Int, parseInt(jobId))
-    .query(`
-        SELECT JobID
-        FROM Job
-        WHERE JobID = @JobID
-    `);
-
-if (jobResult.recordset.length === 0) {
-    return res.status(404).json({
-        success: false,
-        message: "Job not found"
-    });
-}
-
-// Check if the job is still available
-const availabilityResult = await pool.request()
-    .input("JobID", sql.Int, parseInt(jobId))
-    .query(`
-        SELECT Status, ApplicationDeadline
-        FROM Job
-        WHERE JobID = @JobID
-    `);
-
-const job = availabilityResult.recordset[0];
-
-if (job.Status !== true) {
-    return res.status(400).json({
-        success: false,
-        message: "This job is closed and no longer accepting applications"
-    });
-}
-
-if (new Date(job.ApplicationDeadline) < new Date()) {
-    return res.status(400).json({
-        success: false,
-        message: "The application deadline for this job has passed"
-    });
-}
-
-        // Find the JobSeekerID belonging to the logged-in UserID
-        const jobSeekerResult = await pool.request()
-            .input("UserID", sql.Int, userId)
-            .query(`
-                SELECT JobSeekerID
-                FROM JobSeeker
-                WHERE UserID = @UserID
-            `);
-
-        if (jobSeekerResult.recordset.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Job seeker profile not found"
-            });
-        }
-
-        const jobSeekerID = jobSeekerResult.recordset[0].JobSeekerID;
-
-        // Insert the application
-        await pool.request()
-            .input("JobSeekerID", sql.Int, jobSeekerID)
-            .input("JobID", sql.Int, parseInt(jobId))
-            .input("CVID", sql.Int, parseInt(CVID))
-            .input("ApplicationDate", sql.DateTime, new Date())
-            .input("Status", sql.NVarChar(50), "Submitted")
-            .query(`
-                INSERT INTO Application
-                (
-                    JobSeekerID,
-                    JobID,
-                    CVID,
-                    ApplicationDate,
-                    Status
-                )
-                VALUES
-                (
-                    @JobSeekerID,
-                    @JobID,
-                    @CVID,
-                    @ApplicationDate,
-                    @Status
-                )
-            `);
-
-        return res.status(201).json({
-            success: true,
-            message: "Job application submitted successfully"
-        });
-
-    } catch (error) {
-        console.error("Apply for job error:", error);
-
-        if (error.number === 547) {
+        if (!CoverLetter || CoverLetter.trim() === "") {
             return res.status(400).json({
                 success: false,
-                message: "Invalid Job, Job Seeker or CV"
-            });
-        }
-
-        if (error.number === 2601 || error.number === 2627) {
-            return res.status(409).json({
-                success: false,
-                message: "You have already applied for this job"
-            });
-        }
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to submit job application"
-        });
-    }
-};
-
-const getMyApplications = async (req, res) => {
-    try {
-        const userId = req.user.userId;
-
-        const pool = await connectDB();
-
-        const result = await pool.request()
-            .input("UserID", sql.Int, userId)
-            .query(`
-                SELECT
-                    Application.ApplicationID AS applicationId,
-                    Application.JobID AS jobId,
-                    Job.JobTitle AS jobTitle,
-                    Company.CompanyName AS companyName,
-                    Job.Location AS location,
-                    Application.Status AS status,
-                    Application.ApplicationDate AS appliedOn
-                FROM Application
-                INNER JOIN JobSeeker
-                    ON Application.JobSeekerID = JobSeeker.JobSeekerID
-                INNER JOIN Job
-                    ON Application.JobID = Job.JobID
-                INNER JOIN Company
-                    ON Job.CompanyID = Company.CompanyID
-                WHERE JobSeeker.UserID = @UserID
-                ORDER BY Application.ApplicationDate DESC
-            `);
-
-        return res.status(200).json({
-            success: true,
-            count: result.recordset.length,
-            data: result.recordset
-        });
-
-    } catch (error) {
-        console.error("Get my applications error:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to retrieve applications"
-        });
-    }
-};
-
-const getApplicationById = async (req, res) => {
-    try {
-        const applicationId = req.params.id;
-        const userId = req.user.userId;
-
-        const pool = await connectDB();
-
-        const result = await pool.request()
-            .input("ApplicationID", sql.Int, parseInt(applicationId))
-            .input("UserID", sql.Int, userId)
-            .query(`
-                SELECT
-                    Application.ApplicationID AS applicationId,
-                    Application.JobID AS jobId,
-                    Job.JobTitle AS jobTitle,
-                    Company.CompanyName AS companyName,
-                    Job.Location AS location,
-                    Application.Status AS status,
-                    Application.ApplicationDate AS appliedOn
-                FROM Application
-                INNER JOIN JobSeeker
-                    ON Application.JobSeekerID = JobSeeker.JobSeekerID
-                INNER JOIN Job
-                    ON Application.JobID = Job.JobID
-                INNER JOIN Company
-                    ON Job.CompanyID = Company.CompanyID
-                WHERE Application.ApplicationID = @ApplicationID
-                  AND JobSeeker.UserID = @UserID
-            `);
-
-        if (result.recordset.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Application not found or access denied"
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            data: result.recordset[0]
-        });
-
-    } catch (error) {
-        console.error("Get application by ID error:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to retrieve application"
-        });
-    }
-};
-
-const getJobApplicants = async (req, res) => {
-    try {
-        const jobId = req.params.jobId;
-        const userId = req.user.userId;
-
-        if (!jobId) {
-            return res.status(400).json({
-                success: false,
-                message: "Job ID is required"
+                message: "Cover letter is required"
             });
         }
 
         const pool = await connectDB();
+
+        // -----------------------------
+        // Check job
+        // -----------------------------
 
         const jobResult = await pool.request()
-            .input("JobID", sql.Int, parseInt(jobId))
+            .input(
+                "JobID",
+                sql.Int,
+                parseInt(jobId)
+            )
             .query(`
                 SELECT
-                    Job.JobID,
-                    Job.JobTitle,
-                    Job.CompanyID
+                    JobID,
+                    Status,
+                    ApplicationDeadline
                 FROM Job
-                WHERE Job.JobID = @JobID
+                WHERE JobID = @JobID
             `);
 
         if (jobResult.recordset.length === 0) {
@@ -271,82 +66,556 @@ const getJobApplicants = async (req, res) => {
 
         const job = jobResult.recordset[0];
 
-        const ownershipResult = await pool.request()
-            .input("CompanyID", sql.Int, job.CompanyID)
-            .input("UserID", sql.Int, userId)
-            .query(`
-                SELECT CompanyID
-                FROM Company
-                WHERE CompanyID = @CompanyID
-                  AND UserID = @UserID
-            `);
-
-        if (ownershipResult.recordset.length === 0) {
-            return res.status(403).json({
+        // Job must be active
+        if (!job.Status) {
+            return res.status(400).json({
                 success: false,
-                message: "You are not authorized to view applicants for this job"
+                message: "This job is no longer accepting applications"
             });
         }
 
-        const result = await pool.request()
-            .input("JobID", sql.Int, parseInt(jobId))
+        // Check deadline
+        if (
+            job.ApplicationDeadline &&
+            new Date(job.ApplicationDeadline) < new Date()
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "The application deadline has passed"
+            });
+        }
+
+        // -----------------------------
+        // Find JobSeeker
+        // -----------------------------
+
+        const jobSeekerResult = await pool.request()
+            .input(
+                "UserID",
+                sql.Int,
+                userId
+            )
             .query(`
-                SELECT
-                    Application.ApplicationID AS applicationId,
-                    CONCAT([User].FirstName, ' ', [User].LastName) AS applicantName,
-                    [User].Email AS email,
-                    Application.Status AS status,
-                    Application.ApplicationDate AS appliedOn
-                FROM Application
-                INNER JOIN JobSeeker
-                    ON Application.JobSeekerID = JobSeeker.JobSeekerID
-                INNER JOIN [User]
-                    ON JobSeeker.UserID = [User].UserID
-                WHERE Application.JobID = @JobID
-                ORDER BY Application.ApplicationDate DESC
+                SELECT JobSeekerID
+                FROM JobSeeker
+                WHERE UserID = @UserID
             `);
 
-        return res.status(200).json({
+        if (jobSeekerResult.recordset.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "JobSeeker profile not found"
+            });
+        }
+
+        const jobSeekerID =
+            jobSeekerResult.recordset[0].JobSeekerID;
+
+        // -----------------------------
+        // Check that CV belongs to user
+        // -----------------------------
+
+        const cvResult = await pool.request()
+            .input(
+                "CVID",
+                sql.Int,
+                parseInt(CVID)
+            )
+            .input(
+                "JobSeekerID",
+                sql.Int,
+                jobSeekerID
+            )
+            .query(`
+                SELECT
+                    CVID,
+                    CVTitle,
+                    FilePath
+                FROM CV
+                WHERE CVID = @CVID
+                AND JobSeekerID = @JobSeekerID
+            `);
+
+        if (cvResult.recordset.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Selected CV was not found or does not belong to you"
+            });
+        }
+
+        // -----------------------------
+        // Prevent duplicate application
+        // -----------------------------
+
+        const duplicateResult = await pool.request()
+            .input(
+                "JobSeekerID",
+                sql.Int,
+                jobSeekerID
+            )
+            .input(
+                "JobID",
+                sql.Int,
+                parseInt(jobId)
+            )
+            .query(`
+                SELECT ApplicationID
+                FROM Application
+                WHERE JobSeekerID = @JobSeekerID
+                AND JobID = @JobID
+            `);
+
+        if (duplicateResult.recordset.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: "You have already applied for this job"
+            });
+        }
+
+        // -----------------------------
+        // Create application
+        // -----------------------------
+
+        const applicationResult = await pool.request()
+            .input(
+                "JobSeekerID",
+                sql.Int,
+                jobSeekerID
+            )
+            .input(
+                "JobID",
+                sql.Int,
+                parseInt(jobId)
+            )
+            .input(
+                "CVID",
+                sql.Int,
+                parseInt(CVID)
+            )
+            .input(
+                "CoverLetter",
+                sql.NVarChar(sql.MAX),
+                CoverLetter.trim()
+            )
+            .query(`
+                INSERT INTO Application
+                (
+                    JobSeekerID,
+                    JobID,
+                    CVID,
+                    CoverLetter,
+                    Status,
+                    ApplicationDate
+                )
+                OUTPUT INSERTED.ApplicationID
+                VALUES
+                (
+                    @JobSeekerID,
+                    @JobID,
+                    @CVID,
+                    @CoverLetter,
+                    'Submitted',
+                    GETDATE()
+                )
+            `);
+
+        return res.status(201).json({
             success: true,
-            job: {
-                jobId: job.JobID,
-                title: job.JobTitle
-            },
-            count: result.recordset.length,
-            data: result.recordset
+            message: "Application submitted successfully",
+            data: {
+                ApplicationID:
+                    applicationResult.recordset[0].ApplicationID
+            }
         });
 
     } catch (error) {
-        console.error("Get job applicants error:", error);
+        console.error("Apply for job error:", error);
 
         return res.status(500).json({
             success: false,
-            message: "Failed to retrieve job applicants"
+            message: "Failed to submit job application"
         });
     }
 };
 
-const updateApplicationStatus = async (req, res) => {
+// =====================================================
+// GET MY APPLICATIONS
+// =====================================================
+
+const getMyApplications = async (req, res) => {
     try {
-        const applicationId = req.params.id;
-        const { status } = req.body || {};
         const userId = req.user.userId;
 
-        if (!applicationId) {
+        const pool = await connectDB();
+
+        const result = await pool
+            .request()
+            .input(
+                "UserID",
+                sql.Int,
+                userId
+            )
+            .query(`
+                SELECT
+                    A.ApplicationID AS applicationId,
+                    J.JobID AS jobId,
+                    J.JobTitle AS jobTitle,
+                    C.CompanyName AS companyName,
+                    J.Location AS location,
+                    A.CVID AS cvId,
+                    CV.CVTitle AS cvTitle,
+                    CV.FilePath AS cvPath,
+                    A.CoverLetter AS coverLetter,
+                    A.Status AS status,
+                    A.ApplicationDate AS appliedOn
+                FROM Application A
+                INNER JOIN JobSeeker JS
+                    ON A.JobSeekerID = JS.JobSeekerID
+                INNER JOIN Job J
+                    ON A.JobID = J.JobID
+                INNER JOIN Company C
+                    ON J.CompanyID = C.CompanyID
+                LEFT JOIN CV
+                    ON A.CVID = CV.CVID
+                WHERE JS.UserID = @UserID
+                ORDER BY A.ApplicationDate DESC
+            `);
+
+        return res.status(200).json({
+            success: true,
+            data: result.recordset
+        });
+
+    } catch (error) {
+        console.error(
+            "Get my applications error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve applications"
+        });
+    }
+};
+
+// =====================================================
+// GET APPLICATION BY ID
+// =====================================================
+
+const getApplicationById = async (req, res) => {
+    try {
+        const applicationId = parseInt(req.params.id);
+        const userId = req.user.userId;
+
+        if (isNaN(applicationId)) {
             return res.status(400).json({
                 success: false,
-                message: "Application ID is required"
+                message: "Invalid application ID"
             });
         }
 
-        if (!status) {
-            return res.status(400).json({
+        const pool = await connectDB();
+
+        const result = await pool
+            .request()
+            .input(
+                "ApplicationID",
+                sql.Int,
+                applicationId
+            )
+            .input(
+                "UserID",
+                sql.Int,
+                userId
+            )
+            .query(`
+                SELECT
+                    A.ApplicationID AS applicationId,
+                    J.JobID AS jobId,
+                    J.JobTitle AS jobTitle,
+                    C.CompanyName AS companyName,
+                    J.Location AS location,
+                    A.CVID AS cvId,
+                    CV.CVTitle AS cvTitle,
+                    CV.FilePath AS cvPath,
+                    A.CoverLetter AS coverLetter,
+                    A.Status AS status,
+                    A.ApplicationDate AS appliedOn
+                FROM Application A
+                INNER JOIN JobSeeker JS
+                    ON A.JobSeekerID = JS.JobSeekerID
+                INNER JOIN Job J
+                    ON A.JobID = J.JobID
+                INNER JOIN Company C
+                    ON J.CompanyID = C.CompanyID
+                LEFT JOIN CV
+                    ON A.CVID = CV.CVID
+                WHERE A.ApplicationID = @ApplicationID
+                AND JS.UserID = @UserID
+            `);
+
+        if (result.recordset.length === 0) {
+            return res.status(404).json({
                 success: false,
-                message: "Status is required"
+                message: "Application not found"
             });
         }
 
-        // PART V — STATUS VALIDATION
+        return res.status(200).json({
+            success: true,
+            data: result.recordset[0]
+        });
+
+    } catch (error) {
+        console.error(
+            "Get application error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve application"
+        });
+    }
+};
+
+// =====================================================
+// GET JOB APPLICANTS
+// =====================================================
+
+// =====================================================
+// GET JOB APPLICANTS
+// =====================================================
+
+const getJobApplicants = async (req, res) => {
+    try {
+        // Get the JobID from the URL
+        const jobId = parseInt(req.params.jobId);
+
+        // Get the logged-in employer's UserID from the JWT
+        const userId = req.user.userId;
+
+        // Validate JobID
+        if (isNaN(jobId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid job ID"
+            });
+        }
+
+        // Make sure we have an authenticated user
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required"
+            });
+        }
+
+        const pool = await connectDB();
+
+        // =====================================================
+        // CALL STORED PROCEDURE
+        // =====================================================
+        const result = await pool
+            .request()
+            .input("JobID", sql.Int, jobId)
+            .input("UserID", sql.Int, userId)
+            .execute("dbo.uspGetJobApplicants");
+
+        // =====================================================
+        // CHECK IF THE EMPLOYER OWNS THE JOB
+        // =====================================================
+
+        // When the job does not belong to the employer,
+        // the procedure returns a message instead of applicants.
+        if (
+            result.recordsets.length === 1 &&
+            result.recordsets[0][0]?.Success === false
+        ) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    result.recordsets[0][0].Message ||
+                    "Job not found or you are not authorized to view its applicants"
+            });
+        }
+
+        // =====================================================
+        // GET THE TWO RESULT SETS
+        // =====================================================
+
+        const job = result.recordsets[0]?.[0] || null;
+
+        const applicants =
+            result.recordsets[1] || [];
+
+        // =====================================================
+        // RETURN RESPONSE
+        // =====================================================
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                job,
+                applicants
+            }
+        });
+
+    } catch (error) {
+        console.error(
+            "Get job applicants error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve applicants"
+        });
+    }
+};
+
+// =====================================================
+// VIEW APPLICANT CV
+// =====================================================
+
+const viewApplicantCV = async (req, res) => {
+    try {
+        const applicationId = parseInt(req.params.id);
+        const userId = req.user.userId;
+
+        if (isNaN(applicationId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid application ID"
+            });
+        }
+
+        const pool = await connectDB();
+
+        // Make sure the application belongs to a job
+        // owned by the logged-in employer
+        const result = await pool.request()
+            .input(
+                "ApplicationID",
+                sql.Int,
+                applicationId
+            )
+            .input(
+                "UserID",
+                sql.Int,
+                userId
+            )
+            .query(`
+                SELECT
+                    CV.FilePath,
+                    CV.CVTitle
+                FROM Application A
+
+                INNER JOIN Job J
+                    ON A.JobID = J.JobID
+
+                INNER JOIN Company C
+                    ON J.CompanyID = C.CompanyID
+
+                INNER JOIN CV
+                    ON A.CVID = CV.CVID
+
+                WHERE A.ApplicationID = @ApplicationID
+                AND C.UserID = @UserID
+            `);
+
+        if (result.recordset.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "CV not found or you are not authorized to view it"
+            });
+        }
+
+        const filePath =
+            result.recordset[0].FilePath;
+
+        const cvTitle =
+            result.recordset[0].CVTitle ||
+            "CV";
+
+        const fs = require("fs");
+        const path = require("path");
+
+        if (!filePath || !fs.existsSync(filePath)) {
+            return res.status(404).json({
+                success: false,
+                message: "CV file could not be found"
+            });
+        }
+
+        const extension =
+            path.extname(filePath).toLowerCase();
+
+        let contentType =
+            "application/octet-stream";
+
+        if (extension === ".pdf") {
+            contentType = "application/pdf";
+        } else if (extension === ".doc") {
+            contentType = "application/msword";
+        } else if (extension === ".docx") {
+            contentType =
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        }
+
+        res.setHeader(
+            "Content-Type",
+            contentType
+        );
+
+        res.setHeader(
+            "Content-Disposition",
+            `inline; filename="${cvTitle}${extension}"`
+        );
+
+        return res.sendFile(
+            path.resolve(filePath)
+        );
+
+    } catch (error) {
+        console.error(
+            "View applicant CV error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to open CV"
+        });
+    }
+};
+// =====================================================
+// UPDATE APPLICATION STATUS
+// =====================================================
+
+const updateApplicationStatus = async (req, res) => {
+    try {
+        const applicationId = parseInt(req.params.id);
+        const userId = req.user.userId;
+        const { status: newStatus } = req.body;
+
+        // =====================================================
+        // VALIDATE APPLICATION ID
+        // =====================================================
+
+        if (isNaN(applicationId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid application ID"
+            });
+        }
+
+        // =====================================================
+        // VALIDATE STATUS
+        // =====================================================
+
         const allowedStatuses = [
             "Submitted",
             "Reviewed",
@@ -355,7 +624,7 @@ const updateApplicationStatus = async (req, res) => {
             "Rejected"
         ];
 
-        if (!allowedStatuses.includes(status)) {
+        if (!allowedStatuses.includes(newStatus)) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid application status"
@@ -364,63 +633,125 @@ const updateApplicationStatus = async (req, res) => {
 
         const pool = await connectDB();
 
-        // Check ownership and get current status
-        const ownershipResult = await pool.request()
-            .input("ApplicationID", sql.Int, parseInt(applicationId))
-            .input("UserID", sql.Int, userId)
+        // =====================================================
+        // GET CURRENT APPLICATION
+        // ALSO CHECK EMPLOYER OWNERSHIP
+        // =====================================================
+
+        const applicationResult = await pool.request()
+            .input(
+                "ApplicationID",
+                sql.Int,
+                applicationId
+            )
+            .input(
+                "UserID",
+                sql.Int,
+                userId
+            )
             .query(`
                 SELECT
-                    Application.ApplicationID,
-                    Application.Status
-                FROM Application
-                INNER JOIN Job
-                    ON Application.JobID = Job.JobID
-                INNER JOIN Company
-                    ON Job.CompanyID = Company.CompanyID
-                WHERE Application.ApplicationID = @ApplicationID
-                  AND Company.UserID = @UserID
+                    A.ApplicationID,
+                    A.Status AS CurrentStatus,
+                    J.JobID,
+                    C.CompanyID,
+                    C.UserID AS CompanyUserID
+                FROM Application A
+
+                INNER JOIN Job J
+                    ON A.JobID = J.JobID
+
+                INNER JOIN Company C
+                    ON J.CompanyID = C.CompanyID
+
+                WHERE A.ApplicationID = @ApplicationID
+                AND C.UserID = @UserID
             `);
 
-        if (ownershipResult.recordset.length === 0) {
-            return res.status(403).json({
+        // =====================================================
+        // APPLICATION NOT FOUND / NOT OWNED
+        // =====================================================
+
+        if (applicationResult.recordset.length === 0) {
+            return res.status(404).json({
                 success: false,
-                message: "You are not authorized to update this application"
+                message:
+                    "Application not found or you are not authorized to update it"
             });
         }
 
-        const currentStatus = ownershipResult.recordset[0].Status;
+        const application =
+            applicationResult.recordset[0];
 
-        // PART X — STATUS TRANSITION RULES
+        const currentStatus =
+            application.CurrentStatus;
+
+        // =====================================================
+        // DON'T UPDATE TO SAME STATUS
+        // =====================================================
+
+        if (currentStatus === newStatus) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    `Application is already "${currentStatus}"`
+            });
+        }
+
+        // =====================================================
+        // FINAL STATUSES CANNOT BE CHANGED
+        // =====================================================
+
+        if (
+            currentStatus === "Accepted" ||
+            currentStatus === "Rejected"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    `This application has already been ${currentStatus.toLowerCase()} and cannot be changed.`
+            });
+        }
+
+        // =====================================================
+        // STATUS TRANSITION RULES
+        // =====================================================
+
         const allowedTransitions = {
-            Submitted: ["Reviewed", "Rejected"],
-            Reviewed: ["Shortlisted", "Rejected"],
-            Shortlisted: ["Accepted", "Rejected"],
-            Accepted: [],
-            Rejected: []
+            Submitted: ["Reviewed"],
+            Reviewed: ["Shortlisted"],
+            Shortlisted: [
+                "Accepted",
+                "Rejected"
+            ]
         };
 
-        // Prevent same status
-        if (currentStatus === status) {
+        const nextStatuses =
+            allowedTransitions[currentStatus] || [];
+
+        if (!nextStatuses.includes(newStatus)) {
             return res.status(400).json({
                 success: false,
-                message: `Application is already ${status}`
+                message:
+                    `You cannot change an application from "${currentStatus}" to "${newStatus}".`
             });
         }
 
-        // Check whether the transition is allowed
-        const nextStatuses = allowedTransitions[currentStatus] || [];
+        // =====================================================
+        // UPDATE STATUS
+        // =====================================================
 
-        if (!nextStatuses.includes(status)) {
-            return res.status(400).json({
-                success: false,
-                message: `Invalid status transition from ${currentStatus} to ${status}`
-            });
-        }
-
-        // Update status
         await pool.request()
-            .input("ApplicationID", sql.Int, parseInt(applicationId))
-            .input("Status", sql.NVarChar(50), status)
+            .input(
+                "ApplicationID",
+                sql.Int,
+                applicationId
+            )
+            .input(
+                "Status",
+                sql.VarChar(50),
+                newStatus
+            )
             .query(`
                 UPDATE Application
                 SET Status = @Status
@@ -429,25 +760,39 @@ const updateApplicationStatus = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Application status updated successfully",
-            previousStatus: currentStatus,
-            newStatus: status
+            message:
+                `Application status changed from "${currentStatus}" to "${newStatus}".`,
+            data: {
+                ApplicationID: applicationId,
+                previousStatus: currentStatus,
+                status: newStatus
+            }
         });
 
     } catch (error) {
-        console.error("Update application status error:", error);
+        console.error(
+            "Update application status error:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: "Failed to update application status"
+            message:
+                "Failed to update application status"
         });
     }
 };
+
+
+// =====================================================
+// EXPORTS
+// =====================================================
 
 module.exports = {
     applyForJob,
     getMyApplications,
     getApplicationById,
     getJobApplicants,
+    viewApplicantCV,
     updateApplicationStatus
 };

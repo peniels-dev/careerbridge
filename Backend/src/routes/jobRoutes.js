@@ -5,9 +5,6 @@ const router = express.Router();
 const {
     getAllJobs,
     getActiveJobs,
-    filterJobsByLocation,
-    filterJobsByJobType,
-    filterJobsByCategory,
     filterJobs,
     searchJobs,
     sortJobs,
@@ -15,46 +12,105 @@ const {
     getJobById,
     createJob,
     updateJob,
-    closeJob
+    closeJob,
+    getEmployerJobs
 } = require("../controllers/jobController");
 
 const { applyForJob } = require("../controllers/applicationController");
+
 const authMiddleware = require("../middleware/authMiddleware");
+
 const allowRoles = require("../middleware/roleMiddleware");
 
+// ================================
 // GET ALL JOBS
-router.get("/", getAllJobs);
+// ================================
 
-// FILTER JOBS BY LOCATION
-router.get("/filter/location", filterJobsByLocation);
+router.get(
+    "/",
+    getAllJobs
+);
 
-// FILTER JOBS BY JOB TYPE
-router.get("/filter/job-type", filterJobsByJobType);
+// ================================
+// FILTER JOBS
+// ================================
 
-// FILTER JOBS BY CATEGORY
-router.get("/filter/category", filterJobsByCategory);
+router.get(
+    "/filter",
+    filterJobs
+);
 
-// FILTER JOBS BY MULTIPLE CRITERIA
-router.get("/filter", filterJobs);
-
+// ================================
 // SEARCH JOBS
-router.get("/search", searchJobs);
+// ================================
 
+router.get(
+    "/search",
+    searchJobs
+);
+
+// ================================
 // GET ACTIVE JOBS
-router.get("/active", getActiveJobs);
+// ================================
 
+router.get(
+    "/active",
+    getActiveJobs
+);
+
+// ================================
 // SORT JOBS
-router.get("/sort", sortJobs);
+// ================================
 
+router.get(
+    "/sort",
+    sortJobs
+);
+
+// ================================
 // PAGINATE JOBS
-router.get("/paginate", paginateJobs);
+// ================================
 
+router.get(
+    "/paginate",
+    paginateJobs
+);
+
+// ================================
+// GET EMPLOYER JOBS
+// ================================
+
+router.get(
+    "/employer",
+    authMiddleware,
+    allowRoles("Employer"),
+    getEmployerJobs
+);
+
+// ================================
 // GET JOB BY ID
-router.get("/:id", getJobById);
+// ================================
 
-router.post("/:jobId/apply", applyForJob);
+router.get(
+    "/:id",
+    getJobById
+);
 
+// ================================
+// APPLY FOR JOB
+// ================================
+
+router.post(
+    "/:jobId/apply",
+    authMiddleware,
+    allowRoles("JobSeeker"),
+    applyForJob
+);
+
+// ================================
 // CREATE JOB - EMPLOYER ONLY
+// ================================
+
 router.post(
     "/",
     authMiddleware,
@@ -62,7 +118,10 @@ router.post(
     createJob
 );
 
+// ================================
 // UPDATE JOB - EMPLOYER ONLY
+// ================================
+
 router.put(
     "/:id",
     authMiddleware,
@@ -70,7 +129,10 @@ router.put(
     updateJob
 );
 
+// ================================
 // CLOSE JOB - EMPLOYER ONLY
+// ================================
+
 router.patch(
     "/:id/close",
     authMiddleware,
@@ -78,6 +140,5 @@ router.patch(
     closeJob
 );
 
-
-
 module.exports = router;
+

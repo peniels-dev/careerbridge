@@ -10,6 +10,7 @@ const register = async (req, res) => {
     try {
         const {
             firstName,
+            middleName,
             lastName,
             email,
             phone,
@@ -99,6 +100,7 @@ const register = async (req, res) => {
         await pool
             .request()
             .input("FirstName", sql.NVarChar, firstName)
+            .input("MiddleName", sql.NVarChar, middleName)
             .input("LastName", sql.NVarChar, lastName)
             .input("Email", sql.NVarChar, email)
             .input("Phone", sql.NVarChar, phone)
@@ -108,6 +110,7 @@ const register = async (req, res) => {
                 INSERT INTO [User]
                 (
                     FirstName,
+                    MiddleName,
                     LastName,
                     Email,
                     Phone,
@@ -117,6 +120,7 @@ const register = async (req, res) => {
                 VALUES
                 (
                     @FirstName,
+                    @MiddleName,
                     @LastName,
                     @Email,
                     @Phone,
@@ -169,6 +173,7 @@ const login = async (req, res) => {
                 SELECT
                     UserID,
                     FirstName,
+                    MiddleName,
                     LastName,
                     Email,
                     Phone,
@@ -223,6 +228,7 @@ const login = async (req, res) => {
                 user: {
                     userId: user.UserID,
                     firstName: user.FirstName,
+                    middleName: user.MiddleName,
                     lastName: user.LastName,
                     email: user.Email,
                     role: user.Role

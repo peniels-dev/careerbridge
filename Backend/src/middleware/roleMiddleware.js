@@ -8,6 +8,9 @@ const allowRoles = (...allowedRoles) => {
             });
         }
 
+        console.log("ROLE CHECK:", req.user.role);
+console.log("ALLOWED ROLES:", allowedRoles);
+
         if (!allowedRoles.includes(req.user.role)) {
             return res.status(403).json({
                 success: false,

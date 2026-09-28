@@ -17,6 +17,8 @@ router.post("/login", login);
 
 router.get("/me", authMiddleware, async (req, res) => {
     try {
+        console.log("========== /AUTH/ME ==========");
+console.log("Authenticated user:", req.user);
         const pool = await connectDB();
 
         const result = await pool
