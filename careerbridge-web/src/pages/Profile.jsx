@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 
 import {
-    ArrowBack,
     Email,
     LocationOn,
     Phone,
@@ -32,6 +31,7 @@ const Profile = () => {
 
     const [profile, setProfile] = useState({
         firstName: "",
+        middleName: "",
         lastName: "",
         email: "",
         phone: "",
@@ -60,6 +60,7 @@ const Profile = () => {
                 if (data) {
                     setProfile({
                         firstName: data.FirstName || "",
+                        middleName: data.MiddleName || "",
                         lastName: data.LastName || "",
                         email: data.Email || "",
                         phone: data.Phone || "",
@@ -101,6 +102,9 @@ const Profile = () => {
             await axiosAPI.put(
                 "/jobseeker/profile",
                 {
+                    firstName: profile.firstName,
+                    middleName: profile.middleName,
+                    lastName: profile.lastName,
                     phone: profile.phone,
                     location: profile.location,
                     skills: profile.skills,
@@ -127,9 +131,9 @@ const Profile = () => {
         const first = profile.firstName?.charAt(0) || "";
         const last = profile.lastName?.charAt(0) || "";
 
-        return (
-            `${first}${last}`.toUpperCase() || "U"
-        );
+        const initials = `${first}${last}`.toUpperCase();
+
+        return initials || "U";
     };
 
     if (loading) {
@@ -186,26 +190,26 @@ const Profile = () => {
                         </Typography>
                     </Box>
 
-                   <Button
-    variant="contained"
-    onClick={() => navigate("/dashboard")}
-    sx={{
-        minHeight: 44,
-        px: 3,
-        borderRadius: 2,
-        textTransform: "none",
-        fontWeight: 700,
-        fontSize: "0.95rem",
-        backgroundColor: "#2563eb",
-        boxShadow: "none",
-        "&:hover": {
-            backgroundColor: "#1d4ed8",
-            boxShadow: "none",
-        },
-    }}
->
-    Return to Dashboard
-</Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => navigate("/dashboard")}
+                        sx={{
+                            minHeight: 44,
+                            px: 3,
+                            borderRadius: 2,
+                            textTransform: "none",
+                            fontWeight: 700,
+                            fontSize: "0.95rem",
+                            backgroundColor: "#2563eb",
+                            boxShadow: "none",
+                            "&:hover": {
+                                backgroundColor: "#1d4ed8",
+                                boxShadow: "none",
+                            },
+                        }}
+                    >
+                        Return to Dashboard
+                    </Button>
                 </Stack>
 
                 {/* Messages */}
@@ -235,7 +239,8 @@ const Profile = () => {
                         overflow: "hidden",
                     }}
                 >
-                    {/* Profile header */}
+
+                    {/* Profile Header */}
                     <Box
                         sx={{
                             background:
@@ -258,8 +263,7 @@ const Profile = () => {
                                     height: 72,
                                     fontSize: 26,
                                     fontWeight: 800,
-                                    backgroundColor:
-                                        "#ffffff",
+                                    backgroundColor: "#ffffff",
                                     color: "#172033",
                                 }}
                             >
@@ -273,6 +277,9 @@ const Profile = () => {
                                     color="white"
                                 >
                                     {profile.firstName}{" "}
+                                    {profile.middleName
+                                        ? `${profile.middleName} `
+                                        : ""}
                                     {profile.lastName}
                                 </Typography>
 
@@ -318,36 +325,46 @@ const Profile = () => {
                         <Grid container spacing={3}>
 
                             {/* First Name */}
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="First Name"
-                                    value={
-                                        profile.firstName
-                                    }
-                                    disabled
+                                    name="firstName"
+                                    value={profile.firstName}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+
+                            {/* Middle Name */}
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <TextField
+                                    fullWidth
+                                    label="Middle Name"
+                                    name="middleName"
+                                    value={profile.middleName}
+                                    onChange={handleChange}
                                 />
                             </Grid>
 
                             {/* Last Name */}
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Last Name"
-                                    value={
-                                        profile.lastName
-                                    }
-                                    disabled
+                                    name="lastName"
+                                    value={profile.lastName}
+                                    onChange={handleChange}
                                 />
                             </Grid>
 
                             {/* Email */}
-                            <Grid item xs={12}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Email Address"
                                     value={profile.email}
                                     disabled
+                                    helperText="Email is used for login and cannot be changed."
                                     InputProps={{
                                         startAdornment: (
                                             <Email
@@ -363,14 +380,12 @@ const Profile = () => {
                             </Grid>
 
                             {/* Phone */}
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Phone Number"
                                     name="phone"
-                                    value={
-                                        profile.phone
-                                    }
+                                    value={profile.phone}
                                     onChange={handleChange}
                                     InputProps={{
                                         startAdornment: (
@@ -387,14 +402,12 @@ const Profile = () => {
                             </Grid>
 
                             {/* Location */}
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Location"
                                     name="location"
-                                    value={
-                                        profile.location
-                                    }
+                                    value={profile.location}
                                     onChange={handleChange}
                                     placeholder="e.g. Accra, Ghana"
                                     InputProps={{
@@ -412,14 +425,12 @@ const Profile = () => {
                             </Grid>
 
                             {/* Skills */}
-                            <Grid item xs={12}>
+                            <Grid size={{ xs: 12 }}>
                                 <TextField
                                     fullWidth
                                     label="Skills"
                                     name="skills"
-                                    value={
-                                        profile.skills
-                                    }
+                                    value={profile.skills}
                                     onChange={handleChange}
                                     multiline
                                     rows={3}
@@ -429,14 +440,12 @@ const Profile = () => {
                             </Grid>
 
                             {/* Education */}
-                            <Grid item xs={12}>
+                            <Grid size={{ xs: 12 }}>
                                 <TextField
                                     fullWidth
                                     label="Education"
                                     name="education"
-                                    value={
-                                        profile.education
-                                    }
+                                    value={profile.education}
                                     onChange={handleChange}
                                     multiline
                                     rows={3}
@@ -446,6 +455,7 @@ const Profile = () => {
 
                         </Grid>
 
+                        {/* Save Button */}
                         <Stack
                             direction="row"
                             justifyContent="flex-end"
@@ -478,6 +488,7 @@ const Profile = () => {
                                     : "Save Changes"}
                             </Button>
                         </Stack>
+
                     </CardContent>
                 </Card>
             </Container>

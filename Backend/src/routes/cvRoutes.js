@@ -13,13 +13,41 @@ const {
     deleteCV
 } = require("../controllers/cvController");
 
+const {
+    validateId
+} = require("../middleware/validationMiddleware");
+
 
 // Upload a CV
 router.post(
     "/",
     authMiddleware,
     roleMiddleware("JobSeeker"),
-    upload.single("cv"),
+
+    (req, res, next) => {
+        upload.single("cv")(req, res, (err) => {
+
+            if (err) {
+
+                // File is larger than 5 MB
+                if (err.code === "LIMIT_FILE_SIZE") {
+                    return res.status(400).json({
+                        success: false,
+                        message: "CV file is too large. Maximum file size is 5 MB."
+                    });
+                }
+
+                // Unsupported file type
+                return res.status(400).json({
+                    success: false,
+                    message: err.message || "Unable to upload CV."
+                });
+            }
+
+            next();
+        });
+    },
+
     uploadCV
 );
 
@@ -38,6 +66,7 @@ router.get(
     "/:id",
     authMiddleware,
     roleMiddleware("JobSeeker"),
+    validateId,
     getCV
 );
 
@@ -47,9 +76,9 @@ router.delete(
     "/:id",
     authMiddleware,
     roleMiddleware("JobSeeker"),
+    validateId,
     deleteCV
 );
 
 
 module.exports = router;
-

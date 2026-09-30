@@ -16,6 +16,7 @@ const getAdminDashboard = async (req, res) => {
                 recentJobs: result.recordsets[2]
             }
         });
+
     } catch (error) {
         console.error("Admin dashboard error:", error);
 
@@ -26,6 +27,64 @@ const getAdminDashboard = async (req, res) => {
         });
     }
 };
+
+
+const updateEmployerApproval = async (req, res) => {
+    try {
+        const userId = Number(req.params.id);
+        const { decision, adminNote } = req.body;
+
+        if (!Number.isInteger(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid employer ID"
+            });
+        }
+
+        if (!["Approved", "Rejected"].includes(decision)) {
+            return res.status(400).json({
+                success: false,
+                message: "Decision must be Approved or Rejected"
+            });
+        }
+
+        const pool = await connectDB();
+
+        const result = await pool
+            .request()
+            .input("UserID", userId)
+            .input("Decision", decision)
+            .input("AdminNote", adminNote || null)
+            .input("ReviewedByUserID", req.user.userId)
+            .execute("dbo.uspAdminEmployerApproval");
+
+        const response = result.recordset[0];
+
+        if (!response || !response.Success) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    response?.Message ||
+                    "Failed to update employer approval"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: response.Message
+        });
+
+    } catch (error) {
+        console.error("Employer approval error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update employer approval",
+            error: error.message
+        });
+    }
+};
+
 
 const getAdminUsers = async (req, res) => {
     try {
@@ -39,6 +98,7 @@ const getAdminUsers = async (req, res) => {
             success: true,
             data: result.recordset
         });
+
     } catch (error) {
         console.error("Admin users error:", error);
 
@@ -49,6 +109,7 @@ const getAdminUsers = async (req, res) => {
         });
     }
 };
+
 
 const updateAdminUserStatus = async (req, res) => {
     try {
@@ -90,6 +151,7 @@ const updateAdminUserStatus = async (req, res) => {
             success: true,
             message: response.Message
         });
+
     } catch (error) {
         console.error("Admin user status update error:", error);
 
@@ -100,6 +162,7 @@ const updateAdminUserStatus = async (req, res) => {
         });
     }
 };
+
 
 const getAdminJobs = async (req, res) => {
     try {
@@ -113,6 +176,7 @@ const getAdminJobs = async (req, res) => {
             success: true,
             data: result.recordset
         });
+
     } catch (error) {
         console.error("Admin jobs error:", error);
 
@@ -156,6 +220,7 @@ const closeAdminJob = async (req, res) => {
             success: true,
             message: response.Message
         });
+
     } catch (error) {
         console.error("Admin job close error:", error);
 
@@ -166,6 +231,7 @@ const closeAdminJob = async (req, res) => {
         });
     }
 };
+
 
 const getAdminApplications = async (req, res) => {
     try {
@@ -179,6 +245,7 @@ const getAdminApplications = async (req, res) => {
             success: true,
             data: result.recordset
         });
+
     } catch (error) {
         console.error("Admin applications error:", error);
 
@@ -190,10 +257,12 @@ const getAdminApplications = async (req, res) => {
     }
 };
 
+
 module.exports = {
     getAdminDashboard,
     getAdminUsers,
     updateAdminUserStatus,
+    updateEmployerApproval,
     getAdminJobs,
     closeAdminJob,
     getAdminApplications

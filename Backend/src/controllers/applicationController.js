@@ -29,12 +29,6 @@ const applyForJob = async (req, res) => {
             });
         }
 
-        if (!CoverLetter || CoverLetter.trim() === "") {
-            return res.status(400).json({
-                success: false,
-                message: "Cover letter is required"
-            });
-        }
 
         const pool = await connectDB();
 
@@ -193,10 +187,12 @@ const applyForJob = async (req, res) => {
                 parseInt(CVID)
             )
             .input(
-                "CoverLetter",
-                sql.NVarChar(sql.MAX),
-                CoverLetter.trim()
-            )
+    "CoverLetter",
+    sql.NVarChar(sql.MAX),
+    CoverLetter && CoverLetter.trim()
+        ? CoverLetter.trim()
+        : null
+)
             .query(`
                 INSERT INTO Application
                 (

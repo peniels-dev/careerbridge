@@ -1,8 +1,21 @@
-import { Box, Button, Card, CardContent, Container, Typography } from "@mui/material";
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Container,
+    Typography,
+} from "@mui/material";
+
 import { useNavigate } from "react-router-dom";
 
 function Unauthorized() {
     const navigate = useNavigate();
+
+    const handleBackToDashboard = () => {
+        console.log("Back to Dashboard button clicked");
+        navigate("/employer-dashboard");
+    };
 
     return (
         <Box
@@ -25,8 +38,11 @@ function Unauthorized() {
                         borderRadius: 3,
                     }}
                 >
-                    <CardContent sx={{ p: { xs: 4, sm: 6 } }}>
-
+                    <CardContent
+                        sx={{
+                            p: { xs: 4, sm: 6 },
+                        }}
+                    >
                         <Typography
                             sx={{
                                 fontSize: "5rem",
@@ -61,7 +77,7 @@ function Unauthorized() {
                         <Button
                             variant="contained"
                             size="large"
-                            onClick={() => navigate("/dashboard")}
+                            onClick={handleBackToDashboard}
                             sx={{
                                 borderRadius: 2,
                                 textTransform: "none",
@@ -72,7 +88,6 @@ function Unauthorized() {
                         >
                             Back to Dashboard
                         </Button>
-
                     </CardContent>
                 </Card>
             </Container>

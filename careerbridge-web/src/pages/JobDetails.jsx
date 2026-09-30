@@ -23,10 +23,12 @@ import {
 } from "@mui/icons-material";
 
 import axiosAPI from "../api/axiosAPI";
+import { useAuth } from "../context/AuthContext";
 
 const JobDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -42,16 +44,11 @@ const JobDetails = () => {
                 setLoading(true);
                 setError("");
 
-                const response = await axiosAPI.get(
-                    `/jobs/${id}`
-                );
+                const response = await axiosAPI.get(`/jobs/${id}`);
 
                 setJob(response.data.data);
             } catch (error) {
-                console.error(
-                    "Error fetching job:",
-                    error
-                );
+                console.error("Error fetching job:", error);
 
                 if (error.response?.status === 404) {
                     setError("Job not found.");
@@ -71,15 +68,26 @@ const JobDetails = () => {
     }, [id]);
 
     // =====================================================
-    // GO TO APPLICATION PAGE
+    // APPLY
     // =====================================================
 
     const handleApply = () => {
+        // Public visitor
+        if (!user) {
+            navigate(`/login?redirect=/jobs/${id}/apply`);
+            return;
+        }
+
+        // Only JobSeekers can apply
+        if (user.Role !== "JobSeeker") {
+            return;
+        }
+
         navigate(`/jobs/${id}/apply`);
     };
 
     // =====================================================
-    // GO TO COMPANY PROFILE
+    // COMPANY PROFILE
     // =====================================================
 
     const handleViewCompany = () => {
@@ -97,14 +105,11 @@ const JobDetails = () => {
             return "Not specified";
         }
 
-        return new Date(date).toLocaleDateString(
-            "en-GB",
-            {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-            }
-        );
+        return new Date(date).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        });
     };
 
     // =====================================================
@@ -123,11 +128,7 @@ const JobDetails = () => {
                     px: 2,
                 }}
             >
-                <Box
-                    sx={{
-                        textAlign: "center",
-                    }}
-                >
+                <Box sx={{ textAlign: "center" }}>
                     <CircularProgress
                         size={42}
                         thickness={4}
@@ -195,9 +196,7 @@ const JobDetails = () => {
                         <Button
                             variant="contained"
                             startIcon={<ArrowBack />}
-                            onClick={() =>
-                                navigate("/jobs")
-                            }
+                            onClick={() => navigate("/jobs")}
                             sx={{
                                 mt: 3,
                                 minHeight: 44,
@@ -205,12 +204,10 @@ const JobDetails = () => {
                                 borderRadius: 2,
                                 textTransform: "none",
                                 fontWeight: 700,
-                                backgroundColor:
-                                    "#2563eb",
+                                backgroundColor: "#2563eb",
                                 boxShadow: "none",
                                 "&:hover": {
-                                    backgroundColor:
-                                        "#1d4ed8",
+                                    backgroundColor: "#1d4ed8",
                                     boxShadow: "none",
                                 },
                             }}
@@ -265,16 +262,13 @@ const JobDetails = () => {
                                 borderRadius: 2,
                             }}
                         >
-                            Job information could not be
-                            found.
+                            Job information could not be found.
                         </Alert>
 
                         <Button
                             variant="outlined"
                             startIcon={<ArrowBack />}
-                            onClick={() =>
-                                navigate("/jobs")
-                            }
+                            onClick={() => navigate("/jobs")}
                             sx={{
                                 mt: 3,
                                 minHeight: 44,
@@ -318,9 +312,7 @@ const JobDetails = () => {
                     },
                 }}
             >
-                {/* =================================================
-                    BACK BUTTON
-                ================================================= */}
+                {/* BACK BUTTON */}
 
                 <Button
                     startIcon={<ArrowBack />}
@@ -373,8 +365,7 @@ const JobDetails = () => {
                                 xs: "column",
                                 md: "row",
                             },
-                            justifyContent:
-                                "space-between",
+                            justifyContent: "space-between",
                             alignItems: {
                                 xs: "stretch",
                                 md: "center",
@@ -421,12 +412,10 @@ const JobDetails = () => {
                                     },
                                     lineHeight: 1.15,
                                     fontWeight: 800,
-                                    letterSpacing:
-                                        "-0.7px",
+                                    letterSpacing: "-0.7px",
                                     color: "#111827",
                                     mb: 1.5,
-                                    overflowWrap:
-                                        "anywhere",
+                                    overflowWrap: "anywhere",
                                 }}
                             >
                                 {job.JobTitle}
@@ -434,21 +423,15 @@ const JobDetails = () => {
 
                             <Button
                                 startIcon={<Business />}
-                                onClick={
-                                    handleViewCompany
-                                }
-                                disabled={
-                                    !job.CompanyID
-                                }
+                                onClick={handleViewCompany}
+                                disabled={!job.CompanyID}
                                 sx={{
                                     p: 0.5,
                                     ml: -0.5,
                                     minWidth: 0,
                                     maxWidth: "100%",
-                                    textTransform:
-                                        "none",
-                                    justifyContent:
-                                        "flex-start",
+                                    textTransform: "none",
+                                    justifyContent: "flex-start",
                                     color: "#2563eb",
                                     fontSize: {
                                         xs: "0.95rem",
@@ -457,11 +440,9 @@ const JobDetails = () => {
                                     fontWeight: 700,
                                     borderRadius: 1,
                                     textAlign: "left",
-                                    overflowWrap:
-                                        "anywhere",
+                                    overflowWrap: "anywhere",
                                     "&:hover": {
-                                        backgroundColor:
-                                            "#eff6ff",
+                                        backgroundColor: "#eff6ff",
                                         color: "#1d4ed8",
                                     },
                                     "&.Mui-disabled": {
@@ -486,46 +467,82 @@ const JobDetails = () => {
                             )}
                         </Box>
 
-                        {/* APPLY BUTTON */}
+                        {/* =================================================
+                            HEADER APPLY BUTTON
+                        ================================================= */}
 
-                        <Button
-                            variant="contained"
-                            size="large"
-                            disabled={!job.Status}
-                            onClick={handleApply}
-                            fullWidth
-                            sx={{
-                                width: {
-                                    xs: "100%",
-                                    md: "auto",
-                                },
-                                minWidth: {
-                                    md: 170,
-                                },
-                                minHeight: 48,
-                                alignSelf: {
-                                    xs: "stretch",
-                                    md: "center",
-                                },
-                                px: 4,
-                                py: 1.4,
-                                borderRadius: 2.5,
-                                textTransform: "none",
-                                fontWeight: 700,
-                                backgroundColor:
-                                    "#2563eb",
-                                boxShadow: "none",
-                                "&:hover": {
-                                    backgroundColor:
-                                        "#1d4ed8",
+                        {!user ? (
+                            <Button
+                                variant="contained"
+                                size="large"
+                                onClick={handleApply}
+                                fullWidth
+                                sx={{
+                                    width: {
+                                        xs: "100%",
+                                        md: "auto",
+                                    },
+                                    minWidth: {
+                                        md: 170,
+                                    },
+                                    minHeight: 48,
+                                    alignSelf: {
+                                        xs: "stretch",
+                                        md: "center",
+                                    },
+                                    px: 4,
+                                    py: 1.4,
+                                    borderRadius: 2.5,
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                    backgroundColor: "#2563eb",
                                     boxShadow: "none",
-                                },
-                            }}
-                        >
-                            {job.Status
-                                ? "Apply Now"
-                                : "Job Closed"}
-                        </Button>
+                                    "&:hover": {
+                                        backgroundColor: "#1d4ed8",
+                                        boxShadow: "none",
+                                    },
+                                }}
+                            >
+                                Login to Apply
+                            </Button>
+                        ) : user.Role === "JobSeeker" ? (
+                            <Button
+                                variant="contained"
+                                size="large"
+                                disabled={!job.Status}
+                                onClick={handleApply}
+                                fullWidth
+                                sx={{
+                                    width: {
+                                        xs: "100%",
+                                        md: "auto",
+                                    },
+                                    minWidth: {
+                                        md: 170,
+                                    },
+                                    minHeight: 48,
+                                    alignSelf: {
+                                        xs: "stretch",
+                                        md: "center",
+                                    },
+                                    px: 4,
+                                    py: 1.4,
+                                    borderRadius: 2.5,
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                    backgroundColor: "#2563eb",
+                                    boxShadow: "none",
+                                    "&:hover": {
+                                        backgroundColor: "#1d4ed8",
+                                        boxShadow: "none",
+                                    },
+                                }}
+                            >
+                                {job.Status
+                                    ? "Apply Now"
+                                    : "Job Closed"}
+                            </Button>
+                        ) : null}
                     </Box>
                 </Paper>
 
@@ -648,8 +665,7 @@ const JobDetails = () => {
                                     xs: 14,
                                     sm: 15,
                                 },
-                                overflowWrap:
-                                    "anywhere",
+                                overflowWrap: "anywhere",
                             }}
                         >
                             {job.Description ||
@@ -690,8 +706,7 @@ const JobDetails = () => {
                                     xs: 14,
                                     sm: 15,
                                 },
-                                overflowWrap:
-                                    "anywhere",
+                                overflowWrap: "anywhere",
                             }}
                         >
                             {job.Requirements ||
@@ -699,7 +714,9 @@ const JobDetails = () => {
                         </Typography>
                     </Paper>
 
-                    {/* APPLICATION SIDEBAR */}
+                    {/* =================================================
+                        APPLICATION SIDEBAR
+                    ================================================= */}
 
                     <Paper
                         elevation={0}
@@ -727,52 +744,124 @@ const JobDetails = () => {
                                 mb: 1.5,
                             }}
                         >
-                            Interested in this
-                            position?
+                            Interested in this position?
                         </Typography>
 
-                        <Typography
-                            sx={{
-                                color: "#667085",
-                                lineHeight: 1.7,
-                                mb: 3,
-                                fontSize: {
-                                    xs: 13,
-                                    sm: 14,
-                                },
-                            }}
-                        >
-                            Select one of your saved
-                            CVs and write a cover letter
-                            to apply for this opportunity.
-                        </Typography>
+                        {/* PUBLIC USER */}
 
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            size="large"
-                            disabled={!job.Status}
-                            onClick={handleApply}
-                            sx={{
-                                minHeight: 46,
-                                py: 1.3,
-                                textTransform: "none",
-                                fontWeight: 700,
-                                borderRadius: 2,
-                                backgroundColor:
-                                    "#2563eb",
-                                boxShadow: "none",
-                                "&:hover": {
-                                    backgroundColor:
-                                        "#1d4ed8",
-                                    boxShadow: "none",
-                                },
-                            }}
-                        >
-                            {job.Status
-                                ? "Apply for this Job"
-                                : "Job Closed"}
-                        </Button>
+                        {!user && (
+                            <>
+                                <Typography
+                                    sx={{
+                                        color: "#667085",
+                                        lineHeight: 1.7,
+                                        mb: 3,
+                                        fontSize: {
+                                            xs: 13,
+                                            sm: 14,
+                                        },
+                                    }}
+                                >
+                                    Sign in as a job seeker
+                                    to apply for this
+                                    opportunity and submit
+                                    your application.
+                                </Typography>
+
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    size="large"
+                                    onClick={handleApply}
+                                    sx={{
+                                        minHeight: 46,
+                                        py: 1.3,
+                                        textTransform: "none",
+                                        fontWeight: 700,
+                                        borderRadius: 2,
+                                        backgroundColor: "#2563eb",
+                                        boxShadow: "none",
+                                        "&:hover": {
+                                            backgroundColor:
+                                                "#1d4ed8",
+                                            boxShadow: "none",
+                                        },
+                                    }}
+                                >
+                                    Login to Apply
+                                </Button>
+                            </>
+                        )}
+
+                        {/* JOB SEEKER */}
+
+                        {user?.Role === "JobSeeker" && (
+                            <>
+                                <Typography
+                                    sx={{
+                                        color: "#667085",
+                                        lineHeight: 1.7,
+                                        mb: 3,
+                                        fontSize: {
+                                            xs: 13,
+                                            sm: 14,
+                                        },
+                                    }}
+                                >
+                                    Select one of your
+                                    saved CVs and submit
+                                    your application for
+                                    this opportunity.
+                                </Typography>
+
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    size="large"
+                                    disabled={!job.Status}
+                                    onClick={handleApply}
+                                    sx={{
+                                        minHeight: 46,
+                                        py: 1.3,
+                                        textTransform: "none",
+                                        fontWeight: 700,
+                                        borderRadius: 2,
+                                        backgroundColor: "#2563eb",
+                                        boxShadow: "none",
+                                        "&:hover": {
+                                            backgroundColor:
+                                                "#1d4ed8",
+                                            boxShadow: "none",
+                                        },
+                                    }}
+                                >
+                                    {job.Status
+                                        ? "Apply for this Job"
+                                        : "Job Closed"}
+                                </Button>
+                            </>
+                        )}
+
+                        {/* EMPLOYER / ADMIN */}
+
+                        {user &&
+                            user.Role !== "JobSeeker" && (
+                                <Typography
+                                    sx={{
+                                        color: "#667085",
+                                        lineHeight: 1.7,
+                                        fontSize: {
+                                            xs: 13,
+                                            sm: 14,
+                                        },
+                                    }}
+                                >
+                                    Applications for this
+                                    position are available
+                                    to registered job
+                                    seekers.
+                                </Typography>
+                            )}
                     </Paper>
                 </Box>
             </Container>

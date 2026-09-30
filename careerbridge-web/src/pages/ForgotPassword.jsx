@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
 
 import {
@@ -17,57 +16,70 @@ import {
 
 import axiosAPI from "../api/axiosAPI";
 
-import { useAuth } from "../context/AuthContext";
-
-function Login() {
+function ForgotPassword() {
     const navigate = useNavigate();
 
-    const { login } = useAuth();
-
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [phone, setPhone] = useState("");
 
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = async (e) => {
+    const handleVerify = async (e) => {
         e.preventDefault();
 
-        setLoading(true);
         setError("");
 
+        if (!firstName.trim()) {
+            setError("First name is required.");
+            return;
+        }
+
+        if (!lastName.trim()) {
+            setError("Last name is required.");
+            return;
+        }
+
+        if (!email.trim()) {
+            setError("Email is required.");
+            return;
+        }
+
+        if (!phone.trim()) {
+            setError("Phone number is required.");
+            return;
+        }
+
         try {
-            const response = await axiosAPI.post("/auth/login", {
-                email,
-                password,
+            setLoading(true);
+
+            const response = await axiosAPI.post(
+                "/auth/verify-reset",
+                {
+                    firstName: firstName.trim(),
+                    lastName: lastName.trim(),
+                    email: email.trim(),
+                    phone: phone.trim(),
+                }
+            );
+
+            const resetToken = response.data.resetToken;
+
+            // Move to reset password page
+            navigate("/reset-password", {
+                state: {
+                    resetToken,
+                },
             });
 
-            const { token, user } = response.data.data;
-
-            console.log("Logged in user:", user);
-            console.log("Token received:", !!token);
-
-            login(user, token);
-
-            // Send the user to the correct dashboard
-            if (user.role === "Admin") {
-                navigate("/admin");
-            } else if (user.role === "Employer") {
-                navigate("/employer-dashboard");
-            } else if (user.role === "JobSeeker") {
-                navigate("/dashboard");
-            } else {
-                navigate("/unauthorized");
-            }
-
         } catch (error) {
-            console.error("LOGIN ERROR:", error);
-            console.log("STATUS:", error.response?.status);
-            console.log("SERVER RESPONSE:", error.response?.data);
+            console.error("PASSWORD RESET VERIFICATION ERROR:", error);
 
             setError(
                 error.response?.data?.message ||
-                "Unable to login. Please try again."
+                "Unable to verify your account. Please try again."
             );
         } finally {
             setLoading(false);
@@ -83,7 +95,7 @@ function Login() {
                 justifyContent: "center",
                 background:
                     "linear-gradient(135deg, #eff6ff 0%, #f8fafc 50%, #eef2ff 100%)",
-                py: 4,
+                py: 5,
             }}
         >
             <Container maxWidth="sm">
@@ -95,14 +107,12 @@ function Login() {
                         borderRadius: 3,
                     }}
                 >
-                    <CardContent sx={{ p: { xs: 3, sm: 5 } }}>
-                        <Stack
-                            spacing={1}
-                            sx={{
-                                alignItems: "center",
-                                mb: 4,
-                            }}
-                        >
+                    <CardContent
+                        sx={{
+                            p: { xs: 3, sm: 5 },
+                        }}
+                    >
+                        <Stack spacing={1} alignItems="center" mb={4}>
                             <Typography
                                 variant="h4"
                                 fontWeight={800}
@@ -112,11 +122,20 @@ function Login() {
                             </Typography>
 
                             <Typography
+                                variant="h5"
+                                fontWeight={700}
+                                textAlign="center"
+                            >
+                                Forgot your password?
+                            </Typography>
+
+                            <Typography
                                 variant="body1"
                                 color="text.secondary"
                                 textAlign="center"
                             >
-                                Welcome back. Sign in to continue.
+                                Enter your account information to verify
+                                your identity.
                             </Typography>
                         </Stack>
 
@@ -128,9 +147,29 @@ function Login() {
 
                         <Box
                             component="form"
-                            onSubmit={handleLogin}
+                            onSubmit={handleVerify}
                         >
-                            <Stack spacing={3}>
+                            <Stack spacing={2.5}>
+                                <TextField
+                                    label="First Name"
+                                    value={firstName}
+                                    onChange={(e) =>
+                                        setFirstName(e.target.value)
+                                    }
+                                    fullWidth
+                                    required
+                                />
+
+                                <TextField
+                                    label="Last Name"
+                                    value={lastName}
+                                    onChange={(e) =>
+                                        setLastName(e.target.value)
+                                    }
+                                    fullWidth
+                                    required
+                                />
+
                                 <TextField
                                     label="Email"
                                     type="email"
@@ -138,43 +177,20 @@ function Login() {
                                     onChange={(e) =>
                                         setEmail(e.target.value)
                                     }
-                                    placeholder="Enter your email"
                                     fullWidth
                                     required
                                 />
 
                                 <TextField
-                                    label="Password"
-                                    type="password"
-                                    value={password}
+                                    label="Phone Number"
+                                    type="tel"
+                                    value={phone}
                                     onChange={(e) =>
-                                        setPassword(e.target.value)
+                                        setPhone(e.target.value)
                                     }
-                                    placeholder="Enter your password"
                                     fullWidth
                                     required
                                 />
-
-                                {/* Forgot Password */}
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        justifyContent: "flex-end",
-                                        mt: -1.5,
-                                    }}
-                                >
-                                    <Link
-                                        to="/forgot-password"
-                                        style={{
-                                            color: "#2563EB",
-                                            fontWeight: 600,
-                                            fontSize: "0.9rem",
-                                            textDecoration: "none",
-                                        }}
-                                    >
-                                        Forgot Password?
-                                    </Link>
-                                </Box>
 
                                 <Button
                                     type="submit"
@@ -185,6 +201,7 @@ function Login() {
                                     sx={{
                                         py: 1.5,
                                         fontSize: "1rem",
+                                        fontWeight: 600,
                                     }}
                                 >
                                     {loading ? (
@@ -194,35 +211,23 @@ function Login() {
                                                 color="inherit"
                                                 sx={{ mr: 1 }}
                                             />
-                                            Logging in...
+                                            Verifying...
                                         </>
                                     ) : (
-                                        "Login"
+                                        "Verify Account"
                                     )}
+                                </Button>
+
+                                <Button
+                                    component={Link}
+                                    to="/login"
+                                    variant="text"
+                                    fullWidth
+                                >
+                                    Back to Login
                                 </Button>
                             </Stack>
                         </Box>
-
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{
-                                mt: 4,
-                                textAlign: "center",
-                            }}
-                        >
-                            Don't have an account?{" "}
-                            <Link
-                                to="/register"
-                                style={{
-                                    color: "#2563EB",
-                                    fontWeight: 600,
-                                    textDecoration: "none",
-                                }}
-                            >
-                                Create an account
-                            </Link>
-                        </Typography>
                     </CardContent>
                 </Card>
             </Container>
@@ -230,5 +235,4 @@ function Login() {
     );
 }
 
-export default Login;
-
+export default ForgotPassword;

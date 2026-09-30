@@ -7,12 +7,18 @@ const {
     getAdminDashboard,
     getAdminUsers,
     updateAdminUserStatus,
+    updateEmployerApproval,
     getAdminJobs,
-    closeAdminJob,
-    getAdminApplications
+    getAdminApplications,
+    closeAdminJob
 } = require("../controllers/adminController");
 
 const router = express.Router();
+
+
+// =========================
+// ADMIN DASHBOARD
+// =========================
 
 router.get(
     "/dashboard",
@@ -21,12 +27,20 @@ router.get(
     getAdminDashboard
 );
 
+
+// =========================
+// ADMIN USERS
+// =========================
+
 router.get(
     "/users",
     authMiddleware,
     adminMiddleware,
     getAdminUsers
 );
+
+
+// Activate / deactivate normal users
 
 router.patch(
     "/users/:id/status",
@@ -35,12 +49,40 @@ router.patch(
     updateAdminUserStatus
 );
 
+
+// Approve / reject employers
+
+router.patch(
+    "/employers/:id/approval",
+    authMiddleware,
+    adminMiddleware,
+    updateEmployerApproval
+);
+
+
+// =========================
+// ADMIN JOBS
+// =========================
+
 router.get(
     "/jobs",
     authMiddleware,
     adminMiddleware,
     getAdminJobs
 );
+
+
+router.patch(
+    "/jobs/:id/close",
+    authMiddleware,
+    adminMiddleware,
+    closeAdminJob
+);
+
+
+// =========================
+// ADMIN APPLICATIONS
+// =========================
 
 router.get(
     "/applications",
@@ -49,11 +91,5 @@ router.get(
     getAdminApplications
 );
 
-router.patch(
-    "/jobs/:id/close",
-    authMiddleware,
-    adminMiddleware,
-    closeAdminJob
-);
 
 module.exports = router;

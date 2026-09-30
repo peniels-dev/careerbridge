@@ -1,5 +1,18 @@
 const multer = require("multer");
 const path = require("path");
+const crypto = require("crypto");
+
+const allowedMimeTypes = [
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+];
+
+const allowedExtensions = [
+    ".pdf",
+    ".doc",
+    ".docx"
+];
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -10,28 +23,35 @@ const storage = multer.diskStorage({
     },
 
     filename: (req, file, cb) => {
+        const extension = path
+            .extname(file.originalname)
+            .toLowerCase();
+
         const uniqueName =
             Date.now() +
             "-" +
-            Math.round(Math.random() * 1E9) +
-            path.extname(file.originalname);
+            crypto.randomBytes(16).toString("hex") +
+            extension;
 
         cb(null, uniqueName);
     }
 });
 
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ];
+    const extension = path
+        .extname(file.originalname)
+        .toLowerCase();
 
-    if (allowedTypes.includes(file.mimetype)) {
+    if (
+        allowedMimeTypes.includes(file.mimetype) &&
+        allowedExtensions.includes(extension)
+    ) {
         cb(null, true);
     } else {
         cb(
-            new Error("Only PDF, DOC, and DOCX files are allowed."),
+            new Error(
+                "Unsupported file type. Please upload a PDF, DOC, or DOCX file."
+            ),
             false
         );
     }
@@ -48,4 +68,3 @@ const upload = multer({
 });
 
 module.exports = upload;
-

@@ -38,12 +38,18 @@ const MyCVs = () => {
     const [loading, setLoading] = useState(true);
 
     const [uploadOpen, setUploadOpen] = useState(false);
+
     const [cvFile, setCvFile] = useState(null);
     const [cvTitle, setCvTitle] = useState("");
     const [uploading, setUploading] = useState(false);
 
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+
+    // DELETE CONFIRMATION DIALOG
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [cvToDelete, setCvToDelete] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
     // ==========================
     // GET MY CVS
@@ -94,12 +100,14 @@ const MyCVs = () => {
             setError(
                 "Only PDF, DOC, and DOCX files are allowed."
             );
+
             setCvFile(null);
             return;
         }
 
         if (file.size > 5 * 1024 * 1024) {
             setError("CV file must be smaller than 5MB.");
+
             setCvFile(null);
             return;
         }
@@ -175,44 +183,102 @@ const MyCVs = () => {
                 }
             );
 
-            const fileURL = URL.createObjectURL(
-                new Blob([response.data])
+            const contentType =
+                response.headers["content-type"] ||
+                "application/pdf";
+
+            const fileBlob = new Blob(
+                [response.data],
+                {
+                    type: contentType,
+                }
             );
 
-            window.open(fileURL, "_blank");
+            const fileURL =
+                URL.createObjectURL(fileBlob);
+
+            const newWindow = window.open(
+                fileURL,
+                "_blank"
+            );
+
+            if (!newWindow) {
+                setError(
+                    "Your browser blocked the CV window. Please allow pop-ups for CareerBridge."
+                );
+
+                URL.revokeObjectURL(fileURL);
+
+                return;
+            }
+
+            setTimeout(() => {
+                URL.revokeObjectURL(fileURL);
+            }, 60000);
         } catch (error) {
             console.error("View CV error:", error);
 
-            setError("Unable to open this CV.");
+            setError(
+                error.response?.data?.message ||
+                    "Unable to open this CV."
+            );
         }
+    };
+
+    // ==========================
+    // OPEN DELETE DIALOG
+    // ==========================
+
+    const openDeleteDialog = (cv) => {
+        setError("");
+        setSuccess("");
+
+        setCvToDelete(cv);
+        setDeleteOpen(true);
+    };
+
+    // ==========================
+    // CLOSE DELETE DIALOG
+    // ==========================
+
+    const closeDeleteDialog = () => {
+        if (deleting) {
+            return;
+        }
+
+        setDeleteOpen(false);
+        setCvToDelete(null);
     };
 
     // ==========================
     // DELETE CV
     // ==========================
 
-    const handleDeleteCV = async (cvId) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this CV?"
-        );
-
-        if (!confirmed) {
+    const handleDeleteCV = async () => {
+        if (!cvToDelete) {
             return;
         }
 
         try {
+            setDeleting(true);
             setError("");
             setSuccess("");
 
-            await axiosAPI.delete(`/cvs/${cvId}`);
+            await axiosAPI.delete(
+                `/cvs/${cvToDelete.CVID}`
+            );
 
             setSuccess("CV deleted successfully.");
 
             setCvs((currentCVs) =>
                 currentCVs.filter(
-                    (cv) => cv.CVID !== cvId
+                    (cv) =>
+                        cv.CVID !== cvToDelete.CVID
                 )
             );
+
+            setDeleteOpen(false);
+            setCvToDelete(null);
         } catch (error) {
             console.error("Delete CV error:", error);
 
@@ -220,6 +286,8 @@ const MyCVs = () => {
                 error.response?.data?.message ||
                     "Failed to delete CV."
             );
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -305,9 +373,7 @@ const MyCVs = () => {
                     },
                 }}
             >
-                {/* ==========================
-                    PAGE HEADER
-                ========================== */}
+                {/* PAGE HEADER */}
 
                 <Box
                     sx={{
@@ -409,9 +475,7 @@ const MyCVs = () => {
                     </Button>
                 </Box>
 
-                {/* ==========================
-                    ALERTS
-                ========================== */}
+                {/* ALERTS */}
 
                 {error && (
                     <Alert
@@ -439,9 +503,7 @@ const MyCVs = () => {
                     </Alert>
                 )}
 
-                {/* ==========================
-                    INFORMATION CARD
-                ========================== */}
+                {/* INFORMATION CARD */}
 
                 <Paper
                     elevation={0}
@@ -527,9 +589,7 @@ const MyCVs = () => {
                     </Box>
                 </Paper>
 
-                {/* ==========================
-                    NO CVS
-                ========================== */}
+                {/* NO CVS */}
 
                 {cvs.length === 0 ? (
                     <Paper
@@ -626,9 +686,7 @@ const MyCVs = () => {
                     </Paper>
                 ) : (
                     <>
-                        {/* ==========================
-                            CV COUNT
-                        ========================== */}
+                        {/* CV COUNT */}
 
                         <Box
                             sx={{
@@ -658,9 +716,7 @@ const MyCVs = () => {
                             </Typography>
                         </Box>
 
-                        {/* ==========================
-                            CV CARDS
-                        ========================== */}
+                        {/* CV CARDS */}
 
                         <Box
                             sx={{
@@ -839,8 +895,8 @@ const MyCVs = () => {
                                         <IconButton
                                             aria-label="Delete CV"
                                             onClick={() =>
-                                                handleDeleteCV(
-                                                    cv.CVID
+                                                openDeleteDialog(
+                                                    cv
                                                 )
                                             }
                                             sx={{
@@ -851,13 +907,12 @@ const MyCVs = () => {
                                                 border:
                                                     "1px solid #fecaca",
                                                 color: "#dc2626",
-                                                "&:hover":
-                                                    {
-                                                        backgroundColor:
-                                                            "#fef2f2",
-                                                        borderColor:
-                                                            "#fca5a5",
-                                                    },
+                                                "&:hover": {
+                                                    backgroundColor:
+                                                        "#fef2f2",
+                                                    borderColor:
+                                                        "#fca5a5",
+                                                },
                                             }}
                                         >
                                             <Delete />
@@ -919,9 +974,7 @@ const MyCVs = () => {
                             minWidth: 0,
                         }}
                     >
-                        <UploadFile
-                            color="primary"
-                        />
+                        <UploadFile color="primary" />
 
                         <span>Upload New CV</span>
                     </Box>
@@ -1004,7 +1057,8 @@ const MyCVs = () => {
                             sx={{
                                 maxWidth: "100%",
                                 overflow: "hidden",
-                                textOverflow: "ellipsis",
+                                textOverflow:
+                                    "ellipsis",
                                 whiteSpace: "nowrap",
                             }}
                         >
@@ -1105,6 +1159,129 @@ const MyCVs = () => {
                         {uploading
                             ? "Uploading..."
                             : "Upload CV"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* ==========================
+                DELETE CONFIRMATION DIALOG
+            ========================== */}
+
+            <Dialog
+                open={deleteOpen}
+                onClose={closeDeleteDialog}
+                fullWidth
+                maxWidth="xs"
+                PaperProps={{
+                    sx: {
+                        borderRadius: 3,
+                        p: 1,
+                    },
+                }}
+            >
+                <DialogTitle
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        fontWeight: 800,
+                        color: "#111827",
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: 42,
+                            height: 42,
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "#fef2f2",
+                            color: "#dc2626",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <Delete />
+                    </Box>
+
+                    Delete CV?
+                </DialogTitle>
+
+                <DialogContent>
+                    <Typography
+                        sx={{
+                            color: "#667085",
+                            fontSize: 14,
+                            lineHeight: 1.7,
+                        }}
+                    >
+                        Are you sure you want to delete{" "}
+                        <Box
+                            component="span"
+                            sx={{
+                                fontWeight: 700,
+                                color: "#344054",
+                            }}
+                        >
+                            {cvToDelete?.CVTitle ||
+                                "this CV"}
+                        </Box>
+                        ? This action cannot be undone.
+                    </Typography>
+                </DialogContent>
+
+                <DialogActions
+                    sx={{
+                        px: 2.5,
+                        pb: 2.5,
+                        gap: 1,
+                    }}
+                >
+                    <Button
+                        onClick={closeDeleteDialog}
+                        disabled={deleting}
+                        sx={{
+                            minHeight: 42,
+                            px: 2.5,
+                            borderRadius: 2,
+                            textTransform: "none",
+                            fontWeight: 700,
+                            color: "#475467",
+                        }}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        variant="contained"
+                        onClick={handleDeleteCV}
+                        disabled={deleting}
+                        startIcon={
+                            deleting ? (
+                                <CircularProgress
+                                    size={17}
+                                    color="inherit"
+                                />
+                            ) : (
+                                <Delete />
+                            )
+                        }
+                        sx={{
+                            minHeight: 42,
+                            px: 2.5,
+                            borderRadius: 2,
+                            textTransform: "none",
+                            fontWeight: 700,
+                            backgroundColor: "#dc2626",
+                            "&:hover": {
+                                backgroundColor:
+                                    "#b91c1c",
+                            },
+                        }}
+                    >
+                        {deleting
+                            ? "Deleting..."
+                            : "Yes, Delete"}
                     </Button>
                 </DialogActions>
             </Dialog>

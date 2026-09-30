@@ -12,6 +12,7 @@ const getMyProfile = async (req, res) => {
                 SELECT
                     u.UserID,
                     u.FirstName,
+                    u.MiddleName,
                     u.LastName,
                     u.Email,
                     js.JobSeekerID,
@@ -52,21 +53,98 @@ const getMyProfile = async (req, res) => {
 const updateMyProfile = async (req, res) => {
     try {
         const {
+            firstName,
+            middleName,
+            lastName,
             phone,
             location,
             skills,
             education
         } = req.body;
 
+        // Basic validation
+        if (!firstName || !firstName.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "First name is required."
+            });
+        }
+
+        if (!lastName || !lastName.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Last name is required."
+            });
+        }
+
         const pool = await connectDB();
 
-        const result = await pool
+        const userID = req.user.userId;
+
+        // Update the User table
+        // Email is intentionally NOT included.
+        await pool
             .request()
-            .input("UserID", sql.Int, req.user.userId)
-            .input("Phone", sql.VarChar, phone || null)
-            .input("Location", sql.VarChar, location || null)
-            .input("Skills", sql.VarChar, skills || null)
-            .input("Education", sql.VarChar, education || null)
+            .input("UserID", sql.Int, userID)
+            .input(
+                "FirstName",
+                sql.VarChar,
+                firstName.trim()
+            )
+            .input(
+                "MiddleName",
+                sql.VarChar,
+                middleName && middleName.trim()
+                    ? middleName.trim()
+                    : null
+            )
+            .input(
+                "LastName",
+                sql.VarChar,
+                lastName.trim()
+            )
+            .query(`
+                UPDATE [User]
+                SET
+                    FirstName = @FirstName,
+                    MiddleName = @MiddleName,
+                    LastName = @LastName
+                WHERE UserID = @UserID
+            `);
+
+
+        // Update the JobSeeker table
+        await pool
+            .request()
+            .input("UserID", sql.Int, userID)
+            .input(
+                "Phone",
+                sql.VarChar,
+                phone && phone.trim()
+                    ? phone.trim()
+                    : null
+            )
+            .input(
+                "Location",
+                sql.VarChar,
+                location && location.trim()
+                    ? location.trim()
+                    : null
+            )
+            .input(
+                "Skills",
+                sql.VarChar,
+                skills && skills.trim()
+                    ? skills.trim()
+                    : null
+            )
+            .input(
+                "Education",
+                sql.VarChar,
+                education && education.trim()
+                    ? education.trim()
+                    : null
+            )
             .query(`
                 UPDATE JobSeeker
                 SET
@@ -74,14 +152,22 @@ const updateMyProfile = async (req, res) => {
                     Location = @Location,
                     Skills = @Skills,
                     Education = @Education
-                WHERE UserID = @UserID;
+                WHERE UserID = @UserID
+            `);
 
+
+        // Get the updated profile
+        const result = await pool
+            .request()
+            .input("UserID", sql.Int, userID)
+            .query(`
                 SELECT
-                    js.JobSeekerID,
                     u.UserID,
                     u.FirstName,
+                    u.MiddleName,
                     u.LastName,
                     u.Email,
+                    js.JobSeekerID,
                     js.Phone,
                     js.Location,
                     js.Skills,
@@ -89,8 +175,9 @@ const updateMyProfile = async (req, res) => {
                 FROM [User] u
                 INNER JOIN JobSeeker js
                     ON u.UserID = js.UserID
-                WHERE u.UserID = @UserID;
+                WHERE u.UserID = @UserID
             `);
+
 
         if (result.recordset.length === 0) {
             return res.status(404).json({

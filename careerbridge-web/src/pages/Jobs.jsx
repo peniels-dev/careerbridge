@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -14,12 +14,13 @@ import {
 import { ArrowBack } from "@mui/icons-material";
 
 import axiosAPI from "../api/axiosAPI";
-
 import JobCard from "../components/JobCard";
-
 import JobFilters from "../components/JobFilters";
 
 function Jobs() {
+    const navigate = useNavigate();
+    const { user } = useAuth();
+
     const [jobs, setJobs] = useState([]);
     const [categories, setCategories] = useState([]);
 
@@ -36,8 +37,6 @@ function Jobs() {
     const [jobType, setJobType] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [sort, setSort] = useState("newest");
-
-    const navigate = useNavigate();
 
     // ======================================================
     // LOAD CATEGORIES
@@ -87,8 +86,7 @@ function Jobs() {
             const params = {};
 
             if (filters.search?.trim()) {
-                params.search =
-                    filters.search.trim();
+                params.search = filters.search.trim();
             }
 
             if (filters.location?.trim()) {
@@ -97,8 +95,7 @@ function Jobs() {
             }
 
             if (filters.jobType) {
-                params.jobType =
-                    filters.jobType;
+                params.jobType = filters.jobType;
             }
 
             if (filters.categoryId) {
@@ -107,24 +104,11 @@ function Jobs() {
             }
 
             if (filters.sort) {
-                params.sort =
-                    filters.sort;
+                params.sort = filters.sort;
             }
 
-            // IMPORTANT:
-            // Job Seekers use /jobs/active
-            // instead of /jobs.
-            //
-            // The backend sends this request to:
-            // getActiveJobs
-            //
-            // which uses:
-            // dbo.uspJobsGetActive
-            //
-            // The stored procedure contains:
-            // WHERE j.Status = 1
-            //
-            // Therefore closed jobs are not returned.
+            // Only active jobs are loaded.
+            // Closed jobs are not shown to users.
 
             const response = await axiosAPI.get(
                 "/jobs/active",
@@ -207,11 +191,15 @@ function Jobs() {
     };
 
     // ======================================================
-    // BACK TO DASHBOARD
+    // BACK BUTTON
     // ======================================================
 
-    const handleBackToDashboard = () => {
-        navigate("/dashboard");
+    const handleBack = () => {
+        if (user?.Role === "JobSeeker") {
+            navigate("/dashboard");
+        } else {
+            navigate("/");
+        }
     };
 
     return (
@@ -241,7 +229,7 @@ function Jobs() {
 
                 <Button
                     startIcon={<ArrowBack />}
-                    onClick={handleBackToDashboard}
+                    onClick={handleBack}
                     sx={{
                         mb: {
                             xs: 2.5,
@@ -257,13 +245,14 @@ function Jobs() {
                         textTransform: "none",
                         borderRadius: 2,
                         "&:hover": {
-                            backgroundColor:
-                                "#eef2f6",
+                            backgroundColor: "#eef2f6",
                             color: "#1d4ed8",
                         },
                     }}
                 >
-                    Back to Dashboard
+                    {user?.Role === "JobSeeker"
+                        ? "Back to Dashboard"
+                        : "Back to Home"}
                 </Button>
 
                 {/* PAGE HEADER */}
@@ -288,8 +277,7 @@ function Jobs() {
                             lineHeight: 1.15,
                             fontWeight: 800,
                             color: "#111827",
-                            letterSpacing:
-                                "-0.7px",
+                            letterSpacing: "-0.7px",
                             mb: 1,
                         }}
                     >
@@ -430,11 +418,9 @@ function Jobs() {
                     <Box
                         sx={{
                             display: "flex",
-                            flexDirection:
-                                "column",
+                            flexDirection: "column",
                             alignItems: "center",
-                            justifyContent:
-                                "center",
+                            justifyContent: "center",
                             py: {
                                 xs: 7,
                                 sm: 9,

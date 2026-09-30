@@ -16,12 +16,7 @@ const getAllJobs = async (req, res) => {
         } = req.query;
 
         const pool = await connectDB();
-
         const request = pool.request();
-
-        // --------------------------------------------------
-        // SEARCH
-        // --------------------------------------------------
 
         request.input(
             "Search",
@@ -29,29 +24,17 @@ const getAllJobs = async (req, res) => {
             search?.trim() || null
         );
 
-        // --------------------------------------------------
-        // LOCATION
-        // --------------------------------------------------
-
         request.input(
             "Location",
             sql.NVarChar(200),
             location?.trim() || null
         );
 
-        // --------------------------------------------------
-        // JOB TYPE
-        // --------------------------------------------------
-
         request.input(
             "JobType",
             sql.NVarChar(100),
             jobType?.trim() || null
         );
-
-        // --------------------------------------------------
-        // CATEGORY
-        // --------------------------------------------------
 
         let categoryValue = null;
 
@@ -77,10 +60,6 @@ const getAllJobs = async (req, res) => {
             sql.Int,
             categoryValue
         );
-
-        // --------------------------------------------------
-        // STATUS
-        // --------------------------------------------------
 
         let statusValue = null;
 
@@ -109,10 +88,6 @@ const getAllJobs = async (req, res) => {
             statusValue
         );
 
-        // --------------------------------------------------
-        // SORT
-        // --------------------------------------------------
-
         const allowedSorts = [
             "newest",
             "oldest",
@@ -137,17 +112,9 @@ const getAllJobs = async (req, res) => {
             selectedSort
         );
 
-        // --------------------------------------------------
-        // EXECUTE STORED PROCEDURE
-        // --------------------------------------------------
-
         const result = await request.execute(
             "dbo.uspJobsGet"
         );
-
-        // --------------------------------------------------
-        // RESPONSE
-        // --------------------------------------------------
 
         return res.json({
             success: true,
@@ -254,10 +221,6 @@ const sortJobs = async (req, res) => {
 // GET ACTIVE JOBS
 // ======================================================
 
-// ======================================================
-// GET ACTIVE JOBS
-// ======================================================
-
 const getActiveJobs = async (req, res) => {
     try {
         const {
@@ -267,10 +230,6 @@ const getActiveJobs = async (req, res) => {
             categoryId,
             sort,
         } = req.query;
-
-        // --------------------------------------------------
-        // VALIDATE CATEGORY
-        // --------------------------------------------------
 
         let categoryValue = null;
 
@@ -291,10 +250,6 @@ const getActiveJobs = async (req, res) => {
             categoryValue = parsedCategory;
         }
 
-        // --------------------------------------------------
-        // VALIDATE SORT
-        // --------------------------------------------------
-
         const allowedSorts = [
             "newest",
             "oldest",
@@ -313,15 +268,7 @@ const getActiveJobs = async (req, res) => {
             });
         }
 
-        // --------------------------------------------------
-        // CONNECT TO DATABASE
-        // --------------------------------------------------
-
         const pool = await connectDB();
-
-        // --------------------------------------------------
-        // GET ACTIVE JOBS
-        // --------------------------------------------------
 
         const result = await pool
             .request()
@@ -351,10 +298,6 @@ const getActiveJobs = async (req, res) => {
                 selectedSort
             )
             .execute("dbo.uspJobsGetActive");
-
-        // --------------------------------------------------
-        // RESPONSE
-        // --------------------------------------------------
 
         return res.json({
             success: true,
@@ -491,9 +434,7 @@ const filterJobs = async (req, res) => {
 
 const searchJobs = async (req, res) => {
     try {
-        const {
-            keyword,
-        } = req.query;
+        const { keyword } = req.query;
 
         if (
             !keyword ||
@@ -616,21 +557,16 @@ const paginateJobs = async (req, res) => {
                     j.PostedDate,
                     j.ApplicationDeadline,
                     j.Status,
+                    j.PostedByUserID,
                     c.CompanyName,
                     cat.CategoryName
-
                 FROM Job j
-
                 INNER JOIN Company c
                     ON j.CompanyID = c.CompanyID
-
                 INNER JOIN Category cat
                     ON j.CategoryID = cat.CategoryID
-
                 ORDER BY j.PostedDate DESC
-
                 OFFSET @Offset ROWS
-
                 FETCH NEXT @Limit ROWS ONLY
             `);
 
@@ -670,7 +606,10 @@ const getJobById = async (req, res) => {
         const jobId =
             Number(req.params.id);
 
-        if (!Number.isInteger(jobId) || jobId <= 0) {
+        if (
+            !Number.isInteger(jobId) ||
+            jobId <= 0
+        ) {
             return res.status(400).json({
                 success: false,
                 message:
@@ -699,24 +638,19 @@ const getJobById = async (req, res) => {
                     j.PostedDate,
                     j.ApplicationDeadline,
                     j.Status,
-
+                    j.PostedByUserID,
                     c.CompanyName,
                     c.Email AS CompanyEmail,
                     c.Phone AS CompanyPhone,
                     c.Address AS CompanyAddress,
                     c.Description AS CompanyDescription,
                     c.CompanyWebsite,
-
                     cat.CategoryName
-
                 FROM Job j
-
                 INNER JOIN Company c
                     ON j.CompanyID = c.CompanyID
-
                 INNER JOIN Category cat
                     ON j.CategoryID = cat.CategoryID
-
                 WHERE j.JobID = @JobID
             `);
 
@@ -755,30 +689,31 @@ const getJobById = async (req, res) => {
 
 const createJob = async (req, res) => {
     try {
-        console.log("");
         console.log(
             "======================================"
         );
+
         console.log(
             "CREATE JOB REQUEST RECEIVED"
         );
+
+        console.log(
+            "REQUEST BODY:",
+            req.body
+        );
+
+        console.log(
+            "AUTHENTICATED USER:",
+            req.user
+        );
+
         console.log(
             "======================================"
         );
 
-        console.log("REQUEST BODY:");
-        console.log(req.body);
-
-        console.log("AUTHENTICATED USER:");
-        console.log(req.user);
-
-        console.log(
-            "======================================"
-        );
-
-        // --------------------------------------------------
+        // ----------------------------------------------
         // NORMALIZE REQUEST DATA
-        // --------------------------------------------------
+        // ----------------------------------------------
 
         const JobTitle =
             req.body.JobTitle ??
@@ -804,9 +739,9 @@ const createJob = async (req, res) => {
             req.body.ApplicationDeadline ??
             req.body.applicationDeadline;
 
-        // --------------------------------------------------
+        // ----------------------------------------------
         // VALIDATE REQUIRED FIELDS
-        // --------------------------------------------------
+        // ----------------------------------------------
 
         const missingFields = [];
 
@@ -869,9 +804,9 @@ const createJob = async (req, res) => {
             });
         }
 
-        // --------------------------------------------------
-        // VALIDATE AUTHENTICATION
-        // --------------------------------------------------
+        // ----------------------------------------------
+        // CHECK AUTHENTICATION
+        // ----------------------------------------------
 
         if (
             !req.user ||
@@ -884,9 +819,23 @@ const createJob = async (req, res) => {
             });
         }
 
-        // --------------------------------------------------
+        const userId =
+            Number(req.user.userId);
+
+        if (
+            !Number.isInteger(userId) ||
+            userId <= 0
+        ) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Invalid authenticated user.",
+            });
+        }
+
+        // ----------------------------------------------
         // VALIDATE CATEGORY
-        // --------------------------------------------------
+        // ----------------------------------------------
 
         const categoryIDNumber =
             Number(CategoryID);
@@ -903,22 +852,18 @@ const createJob = async (req, res) => {
             });
         }
 
-        // --------------------------------------------------
-        // CONNECT TO DATABASE
-        // --------------------------------------------------
+        // ----------------------------------------------
+        // CREATE JOB
+        // ----------------------------------------------
 
         const pool = await connectDB();
-
-        // --------------------------------------------------
-        // CREATE JOB USING STORED PROCEDURE
-        // --------------------------------------------------
 
         const result = await pool
             .request()
             .input(
                 "UserID",
                 sql.Int,
-                Number(req.user.userId)
+                userId
             )
             .input(
                 "CategoryID",
@@ -1014,6 +959,28 @@ const updateJob = async (req, res) => {
             });
         }
 
+        // ----------------------------------------------
+        // CHECK AUTHENTICATION
+        // ----------------------------------------------
+
+        if (
+            !req.user ||
+            !req.user.userId
+        ) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Authentication required",
+            });
+        }
+
+        const userId =
+            Number(req.user.userId);
+
+        // ----------------------------------------------
+        // GET DATA
+        // ----------------------------------------------
+
         const JobTitle =
             req.body.JobTitle ??
             req.body.jobTitle;
@@ -1038,6 +1005,10 @@ const updateJob = async (req, res) => {
             req.body.ApplicationDeadline ??
             req.body.applicationDeadline;
 
+        // ----------------------------------------------
+        // VALIDATE DATA
+        // ----------------------------------------------
+
         if (
             !JobTitle ||
             !CategoryID ||
@@ -1053,11 +1024,26 @@ const updateJob = async (req, res) => {
             });
         }
 
+        const categoryIdNumber =
+            Number(CategoryID);
+
+        if (
+            !Number.isInteger(
+                categoryIdNumber
+            )
+        ) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Invalid job category.",
+            });
+        }
+
         const pool = await connectDB();
 
-        // --------------------------------------------------
-        // CHECK OWNERSHIP
-        // --------------------------------------------------
+        // ----------------------------------------------
+        // CHECK THAT THIS EMPLOYER POSTED THE JOB
+        // ----------------------------------------------
 
         const ownershipResult =
             await pool
@@ -1070,35 +1056,31 @@ const updateJob = async (req, res) => {
                 .input(
                     "UserID",
                     sql.Int,
-                    Number(req.user.userId)
+                    userId
                 )
                 .query(`
-                    SELECT j.JobID
-
-                    FROM Job j
-
-                    INNER JOIN Company c
-                        ON j.CompanyID = c.CompanyID
-
-                    WHERE
-                        j.JobID = @JobID
-                        AND c.UserID = @UserID
+                    SELECT J.JobID
+                    FROM Job AS J
+                    INNER JOIN CompanyEmployer AS CE
+                        ON J.CompanyID = CE.CompanyID
+                    WHERE J.JobID = @JobID
+                      AND CE.UserID = @UserID
+                      AND J.PostedByUserID = @UserID
                 `);
 
         if (
-            ownershipResult.recordset
-                .length === 0
+            ownershipResult.recordset.length === 0
         ) {
             return res.status(403).json({
                 success: false,
                 message:
-                    "You are not authorized to update this job.",
+                    "You can only manage jobs that you posted.",
             });
         }
 
-        // --------------------------------------------------
+        // ----------------------------------------------
         // UPDATE JOB
-        // --------------------------------------------------
+        // ----------------------------------------------
 
         await pool
             .request()
@@ -1108,13 +1090,18 @@ const updateJob = async (req, res) => {
                 jobId
             )
             .input(
+                "UserID",
+                sql.Int,
+                userId
+            )
+            .input(
                 "CategoryID",
                 sql.Int,
-                Number(CategoryID)
+                categoryIdNumber
             )
             .input(
                 "JobTitle",
-                sql.NVarChar(255),
+                sql.NVarChar(200),
                 String(JobTitle).trim()
             )
             .input(
@@ -1124,7 +1111,7 @@ const updateJob = async (req, res) => {
             )
             .input(
                 "Location",
-                sql.NVarChar(255),
+                sql.NVarChar(200),
                 String(Location).trim()
             )
             .input(
@@ -1139,17 +1126,15 @@ const updateJob = async (req, res) => {
             )
             .query(`
                 UPDATE Job
-
                 SET
                     CategoryID = @CategoryID,
                     JobTitle = @JobTitle,
                     Description = @Description,
                     Location = @Location,
                     JobType = @JobType,
-                    ApplicationDeadline =
-                        @ApplicationDeadline
-
+                    ApplicationDeadline = @ApplicationDeadline
                 WHERE JobID = @JobID
+                  AND PostedByUserID = @UserID
             `);
 
         return res.json({
@@ -1221,7 +1206,9 @@ const closeJob = async (req, res) => {
                 sql.Int,
                 userId
             )
-            .execute("dbo.uspJobClose");
+            .execute(
+                "dbo.uspJobClose"
+            );
 
         const response =
             result.recordset[0];
@@ -1252,17 +1239,9 @@ const closeJob = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(
-            "Close job error:",
-            error
-        );
-
-        return res.status(500).json({
-            success: false,
-            message:
-                "Unable to close job",
-        });
-    }
+    console.error("Close job error:", error);
+    next(error);
+}
 };
 
 
@@ -1272,6 +1251,10 @@ const closeJob = async (req, res) => {
 
 const getEmployerJobs = async (req, res) => {
     try {
+        // ----------------------------------------------
+        // CHECK AUTHENTICATION
+        // ----------------------------------------------
+
         if (
             !req.user ||
             !req.user.userId
@@ -1286,11 +1269,22 @@ const getEmployerJobs = async (req, res) => {
         const userID =
             Number(req.user.userId);
 
+        if (
+            !Number.isInteger(userID) ||
+            userID <= 0
+        ) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Invalid authenticated user.",
+            });
+        }
+
         const pool = await connectDB();
 
-        // --------------------------------------------------
-        // DASHBOARD STATISTICS
-        // --------------------------------------------------
+        // ----------------------------------------------
+        // GET DASHBOARD STATISTICS
+        // ----------------------------------------------
 
         const dashboardResult =
             await pool
@@ -1305,11 +1299,11 @@ const getEmployerJobs = async (req, res) => {
                 );
 
         const statisticsResult =
-            dashboardResult.recordset[0];
+            dashboardResult.recordset[0] || {};
 
-        // --------------------------------------------------
-        // COMPANY
-        // --------------------------------------------------
+        // ----------------------------------------------
+        // GET COMPANY
+        // ----------------------------------------------
 
         const companyResult =
             await pool
@@ -1321,24 +1315,23 @@ const getEmployerJobs = async (req, res) => {
                 )
                 .query(`
                     SELECT
-                        CompanyID,
-                        CompanyName,
-                        Email,
-                        Phone,
-                        Address,
-                        Description,
-                        CompanyWebsite,
-                        CompanyLogo,
-                        Status
-
-                    FROM Company
-
-                    WHERE UserID = @UserID
+                        ce.CompanyID,
+                        c.CompanyName,
+                        c.Email,
+                        c.Phone,
+                        c.Address,
+                        c.Description,
+                        c.CompanyWebsite,
+                        c.CompanyLogo,
+                        c.Status
+                    FROM CompanyEmployer AS ce
+                    INNER JOIN Company AS c
+                        ON ce.CompanyID = c.CompanyID
+                    WHERE ce.UserID = @UserID
                 `);
 
         if (
-            companyResult.recordset
-                .length === 0
+            companyResult.recordset.length === 0
         ) {
             return res.status(404).json({
                 success: false,
@@ -1350,9 +1343,9 @@ const getEmployerJobs = async (req, res) => {
         const company =
             companyResult.recordset[0];
 
-        // --------------------------------------------------
-        // EMPLOYER JOBS
-        // --------------------------------------------------
+        // ----------------------------------------------
+        // GET ALL JOBS FROM THE COMPANY
+        // ----------------------------------------------
 
         const jobsResult =
             await pool
@@ -1369,35 +1362,46 @@ const getEmployerJobs = async (req, res) => {
         const jobs =
             jobsResult.recordset;
 
-        // --------------------------------------------------
+        // ----------------------------------------------
         // STATISTICS
-        // --------------------------------------------------
+        // ----------------------------------------------
 
         const totalJobs =
             Number(
-                statisticsResult?.TotalJobs ||
-                0
+                statisticsResult.TotalJobs || 0
             );
 
         const openJobs =
             Number(
-                statisticsResult?.OpenJobs ||
-                0
+                statisticsResult.OpenJobs || 0
             );
 
         const totalApplications =
             Number(
-                statisticsResult
-                    ?.TotalApplications ||
-                0
+                statisticsResult.TotalApplications || 0
             );
 
         const closedJobs =
             totalJobs - openJobs;
 
-        // --------------------------------------------------
+        // ----------------------------------------------
+        // DETERMINE WHICH JOBS THIS EMPLOYER
+        // CAN MANAGE
+        // ----------------------------------------------
+
+        const jobsWithPermissions =
+            jobs.map((job) => ({
+                ...job,
+
+                canManage:
+                    Number(
+                        job.PostedByUserID
+                    ) === userID,
+            }));
+
+        // ----------------------------------------------
         // RESPONSE
-        // --------------------------------------------------
+        // ----------------------------------------------
 
         return res.json({
             success: true,
@@ -1412,7 +1416,8 @@ const getEmployerJobs = async (req, res) => {
                     totalApplications,
                 },
 
-                jobs,
+                jobs:
+                    jobsWithPermissions,
             },
         });
 

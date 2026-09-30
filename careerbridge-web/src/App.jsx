@@ -1,19 +1,19 @@
 import { Routes, Route } from "react-router-dom";
 
+import PublicDashboard from "./pages/PublicDashboard";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Register from "./pages/Register";
 import Unauthorized from "./pages/Unauthorized";
-
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Dashboard from "./pages/JobSeekerDashboard";
 import EmployerDashboard from "./pages/EmployerDashboard";
-
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 import PublicCompanyProfile from "./pages/PublicCompanyProfile";
 import ApplyJob from "./pages/ApplyJob";
-
 import MyCVs from "./pages/MyCVs";
 import MyApplications from "./pages/MyApplications";
 import Profile from "./pages/Profile";
@@ -38,37 +38,45 @@ function App() {
         <Routes>
 
             {/* =========================
-                LOGIN
+                PUBLIC ROUTES
             ========================= */}
 
+            {/* Public CareerBridge landing page */}
             <Route
                 path="/"
-                element={<Login />}
+                element={<PublicDashboard />}
             />
 
+            {/* Authentication */}
             <Route
                 path="/login"
                 element={<Login />}
             />
 
+            <Route
+                path="/forgot-password"
+                element={<ForgotPassword />}
+            />
 
-            {/* =========================
-                REGISTER
-            ========================= */}
+            <Route
+                path="/reset-password"
+                element={<ResetPassword />}
+            />
 
             <Route
                 path="/register"
                 element={<Register />}
             />
 
-
-            {/* =========================
-                UNAUTHORIZED
-            ========================= */}
-
             <Route
                 path="/unauthorized"
                 element={<Unauthorized />}
+            />
+
+            {/* Public job details */}
+            <Route
+                path="/jobs/:id"
+                element={<JobDetails />}
             />
 
 
@@ -85,20 +93,14 @@ function App() {
                 }
             />
 
-            <Route
-                path="/jobs"
-                element={
-                    <ProtectedRoute allowedRoles={["JobSeeker"]}>
-                        <Jobs />
-                    </ProtectedRoute>
-                }
-            />
+        <Route path="/jobs" element={<Jobs />} />
 
+            {/* Applying still requires Job Seeker login */}
             <Route
-                path="/jobs/:id"
+                path="/jobs/:id/apply"
                 element={
                     <ProtectedRoute allowedRoles={["JobSeeker"]}>
-                        <JobDetails />
+                        <ApplyJob />
                     </ProtectedRoute>
                 }
             />
@@ -108,15 +110,6 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <PublicCompanyProfile />
-                    </ProtectedRoute>
-                }
-            />
-
-            <Route
-                path="/jobs/:id/apply"
-                element={
-                    <ProtectedRoute allowedRoles={["JobSeeker"]}>
-                        <ApplyJob />
                     </ProtectedRoute>
                 }
             />
@@ -200,6 +193,15 @@ function App() {
 
             <Route
                 path="/employer/jobs/:id/applicants"
+                element={
+                    <ProtectedRoute allowedRoles={["Employer"]}>
+                        <EmployerApplicants />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/employer/applicants"
                 element={
                     <ProtectedRoute allowedRoles={["Employer"]}>
                         <EmployerApplicants />

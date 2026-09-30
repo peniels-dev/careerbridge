@@ -7,6 +7,7 @@ const app = express();
 
 const PORT = process.env.PORT || 5138;
 
+
 // =====================================================
 // ROUTES
 // =====================================================
@@ -19,6 +20,17 @@ const companyRoutes = require("./routes/companyRoutes");
 const jobSeekerRoutes = require("./routes/jobSeekerRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
+
+// =====================================================
+// ERROR MIDDLEWARE
+// =====================================================
+
+const {
+    errorHandler,
+    notFoundHandler
+} = require("./middleware/errorMiddleware");
+
+
 // =====================================================
 // MIDDLEWARE
 // =====================================================
@@ -26,6 +38,7 @@ const adminRoutes = require("./routes/adminRoutes");
 app.use(cors());
 
 app.use(express.json());
+
 
 // =====================================================
 // UPLOADED FILES
@@ -35,6 +48,7 @@ app.use(
     "/uploads",
     express.static(path.join(__dirname, "uploads"))
 );
+
 
 // =====================================================
 // HEALTH CHECK
@@ -47,11 +61,13 @@ app.get("/api/health", (req, res) => {
     });
 });
 
+
 // =====================================================
 // AUTH ROUTES
 // =====================================================
 
 app.use("/api/auth", authRoutes);
+
 
 // =====================================================
 // JOB ROUTES
@@ -62,12 +78,11 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/jobseeker", jobSeekerRoutes);
 
 
-
 // =====================================================
 // GET COMPANIES
 // =====================================================
 
-app.get("/api/companies", async (req, res) => {
+app.get("/api/companies", async (req, res, next) => {
     try {
         const pool = await connectDB();
 
@@ -82,14 +97,10 @@ app.get("/api/companies", async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Companies error:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to retrieve companies"
-        });
+        next(error);
     }
 });
+
 
 // =====================================================
 // COMPANY ROUTES
@@ -97,12 +108,13 @@ app.get("/api/companies", async (req, res) => {
 
 app.use("/api/companies", companyRoutes);
 
+
 // =====================================================
 // GET JOB CATEGORIES
-// IMPORTANT: THIS MUST COME BEFORE /api APPLICATION ROUTES
+// IMPORTANT: MUST COME BEFORE /api APPLICATION ROUTES
 // =====================================================
 
-app.get("/api/categories", async (req, res) => {
+app.get("/api/categories", async (req, res, next) => {
     try {
         const pool = await connectDB();
 
@@ -127,24 +139,33 @@ app.get("/api/categories", async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Categories error:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to retrieve categories"
-        });
+        next(error);
     }
 });
+
+
+// =====================================================
+// CV ROUTES
+// =====================================================
+
+app.use("/api/cvs", cvRoutes);
+
 
 // =====================================================
 // APPLICATION ROUTES
 // =====================================================
 
-app.use("/api/cvs", cvRoutes);
-
 app.use("/api/applications", applicationRoutes);
 
 app.use("/api", applicationRoutes);
+
+
+// =====================================================
+// ADMIN ROUTES
+// =====================================================
+
+app.use("/api/admin", adminRoutes);
+
 
 // =====================================================
 // HOME ROUTE
@@ -156,40 +177,22 @@ app.get("/", (req, res) => {
     });
 });
 
+
 // =====================================================
-// ERROR HANDLING
+// CONTROLLED 404 HANDLER
+// MUST COME AFTER ALL ROUTES
 // =====================================================
 
-app.use((err, req, res, next) => {
-    console.error("Server error:", err);
+app.use(notFoundHandler);
 
-    // CV is larger than 5 MB
-    if (err.code === "LIMIT_FILE_SIZE") {
-        return res.status(400).json({
-            success: false,
-            message: "CV file must not exceed 5 MB."
-        });
-    }
 
-    // Invalid CV file type
-    if (
-        err.message ===
-        "Only PDF, DOC, and DOCX files are allowed."
-    ) {
-        return res.status(400).json({
-            success: false,
-            message: err.message
-        });
-    }
+// =====================================================
+// CENTRALIZED ERROR HANDLER
+// MUST ALWAYS BE THE LAST MIDDLEWARE
+// =====================================================
 
-    // Other server errors
-    return res.status(500).json({
-        success: false,
-        message: "Something went wrong on the server."
-    });
-});
+app.use(errorHandler);
 
-app.use("/api/admin", adminRoutes);
 
 // =====================================================
 // START SERVER
@@ -200,4 +203,3 @@ app.listen(PORT, () => {
         `CareerBridge API running on port ${PORT}`
     );
 });
-

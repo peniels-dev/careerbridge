@@ -2,34 +2,29 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-    Box,
-    Typography,
-    Paper,
-    TextField,
-    Button,
-    Avatar,
-    Divider,
-    IconButton,
-    Tooltip,
     Alert,
+    Avatar,
+    Box,
+    Button,
     CircularProgress,
-    Chip
+    Divider,
+    Paper,
+    Stack,
+    TextField,
+    Typography,
 } from "@mui/material";
 
 import {
-    Dashboard,
-    Work,
-    Add,
-    People,
-    Business,
-    ExitToApp,
     ArrowBack,
+    Business,
+    CameraAlt,
+    Dashboard,
+    Description,
     Edit,
-    Language,
-    Email,
-    Phone,
-    LocationOn,
-    Save
+    ExitToApp,
+    People,
+    Save,
+    Work,
 } from "@mui/icons-material";
 
 import axiosAPI from "../api/axiosAPI";
@@ -37,8 +32,7 @@ import { useAuth } from "../context/AuthContext";
 
 const CompanyProfile = () => {
     const navigate = useNavigate();
-    const { logout } = useAuth();
-
+    const { user } = useAuth();
     const fileInputRef = useRef(null);
 
     const [company, setCompany] = useState(null);
@@ -49,7 +43,7 @@ const CompanyProfile = () => {
         Phone: "",
         Address: "",
         Description: "",
-        CompanyWebsite: ""
+        CompanyWebsite: "",
     });
 
     const [loading, setLoading] = useState(true);
@@ -61,13 +55,20 @@ const CompanyProfile = () => {
 
     const [logoPreview, setLogoPreview] = useState("");
 
+    const backendURL = "http://localhost:5138";
+
     // =====================================================
-    // BACKEND SERVER URL
+    // LOGOUT
     // =====================================================
 
-    const backendURL = "http://localhost:5138";
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login");
+    };
+
     // =====================================================
-    // GET LOGO URL
+    // LOGO URL
     // =====================================================
 
     const getLogoURL = (logoPath) => {
@@ -83,58 +84,65 @@ const CompanyProfile = () => {
     };
 
     // =====================================================
-    // FETCH COMPANY
+    // LOAD COMPANY
     // =====================================================
 
     const fetchCompany = async () => {
         try {
             setLoading(true);
             setError("");
+            setSuccess("");
 
             const response = await axiosAPI.get("/companies/me");
 
-            const companyData = response.data.data;
+            const data = response.data?.data;
 
-            setCompany(companyData);
+            if (data) {
+                setCompany(data);
 
-            setFormData({
-                CompanyName: companyData.CompanyName || "",
-                Email: companyData.Email || "",
-                Phone: companyData.Phone || "",
-                Address: companyData.Address || "",
-                Description: companyData.Description || "",
-                CompanyWebsite:
-                    companyData.CompanyWebsite || ""
-            });
+                setFormData({
+                    CompanyName: data.CompanyName || "",
+                    Email: data.Email || "",
+                    Phone: data.Phone || "",
+                    Address: data.Address || "",
+                    Description: data.Description || "",
+                    CompanyWebsite: data.CompanyWebsite || "",
+                });
 
-            if (companyData.CompanyLogo) {
-                setLogoPreview(
-                    getLogoURL(companyData.CompanyLogo)
+                if (data.CompanyLogo) {
+                    setLogoPreview(getLogoURL(data.CompanyLogo));
+                }
+            }
+        } catch (err) {
+            // 404 simply means this employer has not created
+            // a company profile yet.
+            if (err.response?.status === 404) {
+                setCompany(null);
+                setFormData({
+                    CompanyName: "",
+                    Email: user?.Email || "",
+                    Phone: "",
+                    Address: "",
+                    Description: "",
+                    CompanyWebsite: "",
+                });
+            } else {
+                setError(
+                    err.response?.data?.message ||
+                        "Unable to load company profile."
                 );
             }
-
-        } catch (err) {
-            console.error("Fetch company error:", err);
-
-            setError(
-                err.response?.data?.message ||
-                "Unable to load company profile."
-            );
         } finally {
             setLoading(false);
         }
     };
-
-    // =====================================================
-    // LOAD COMPANY WHEN PAGE OPENS
-    // =====================================================
 
     useEffect(() => {
         fetchCompany();
     }, []);
 
     // =====================================================
-    // HANDLE INPUT CHANGES
+    // FORM INPUT
     // =====================================================
 
     const handleChange = (event) => {
@@ -142,65 +150,82 @@ const CompanyProfile = () => {
 
         setFormData((previous) => ({
             ...previous,
-            [name]: value
+            [name]: value,
         }));
     };
 
     // =====================================================
-    // SAVE COMPANY DETAILS
+    // CREATE / UPDATE COMPANY
     // =====================================================
 
-    const handleSave = async (event) => {
-        event.preventDefault();
-
-        setError("");
-        setSuccess("");
-
-        if (!formData.CompanyName.trim()) {
-            setError("Company name is required.");
-            return;
-        }
-
-        if (!formData.Email.trim()) {
-            setError("Company email is required.");
-            return;
-        }
-
+    const handleSave = async () => {
         try {
             setSaving(true);
+            setError("");
+            setSuccess("");
 
-            const response = await axiosAPI.put(
-                "/companies/me",
-                formData
-            );
+            if (!formData.CompanyName.trim()) {
+                setError("Company name is required.");
+                setSaving(false);
+                return;
+            }
 
-            setCompany(response.data.data);
+            if (!formData.Email.trim()) {
+                setError("Company email is required.");
+                setSaving(false);
+                return;
+            }
 
-            setFormData({
-                CompanyName:
-                    response.data.data.CompanyName || "",
-                Email:
-                    response.data.data.Email || "",
-                Phone:
-                    response.data.data.Phone || "",
-                Address:
-                    response.data.data.Address || "",
-                Description:
-                    response.data.data.Description || "",
-                CompanyWebsite:
-                    response.data.data.CompanyWebsite || ""
-            });
+            let response;
+
+            if (company) {
+                // Existing company
+                response = await axiosAPI.put(
+                    "/companies/me",
+                    formData
+                );
+            } else {
+                // New company
+                response = await axiosAPI.post(
+                    "/companies/me",
+                    formData
+                );
+            }
+
+            const updatedCompany = response.data?.data;
+
+            if (updatedCompany) {
+                setCompany(updatedCompany);
+
+                setFormData({
+                    CompanyName: updatedCompany.CompanyName || "",
+                    Email: updatedCompany.Email || "",
+                    Phone: updatedCompany.Phone || "",
+                    Address: updatedCompany.Address || "",
+                    Description:
+                        updatedCompany.Description || "",
+                    CompanyWebsite:
+                        updatedCompany.CompanyWebsite || "",
+                });
+
+                if (updatedCompany.CompanyLogo) {
+                    setLogoPreview(
+                        getLogoURL(updatedCompany.CompanyLogo)
+                    );
+                }
+            }
 
             setSuccess(
-                "Company profile updated successfully."
+                company
+                    ? "Company profile updated successfully."
+                    : "Company profile created successfully."
             );
-
         } catch (err) {
-            console.error("Update company error:", err);
+            console.error("Save company error:", err);
 
             setError(
                 err.response?.data?.message ||
-                "Unable to update company profile."
+                    "Unable to save company profile."
             );
         } finally {
             setSaving(false);
@@ -208,15 +233,7 @@ const CompanyProfile = () => {
     };
 
     // =====================================================
-    // OPEN FILE SELECTOR
-    // =====================================================
-
-    const handleChooseLogo = () => {
-        fileInputRef.current?.click();
-    };
-
-    // =====================================================
-    // UPLOAD COMPANY LOGO
+    // LOGO UPLOAD
     // =====================================================
 
     const handleLogoChange = async (event) => {
@@ -233,12 +250,12 @@ const CompanyProfile = () => {
             "image/png",
             "image/jpeg",
             "image/jpg",
-            "image/webp"
+            "image/webp",
         ];
 
         if (!allowedTypes.includes(file.type)) {
             setError(
-                "Please select a PNG, JPG, JPEG, or WEBP image."
+                "Only PNG, JPG, JPEG, and WEBP image files are allowed."
             );
 
             event.target.value = "";
@@ -246,92 +263,69 @@ const CompanyProfile = () => {
         }
 
         if (file.size > 2 * 1024 * 1024) {
-            setError(
-                "Company logo must be 2 MB or smaller."
-            );
+            setError("Company logo must be smaller than 2 MB.");
 
             event.target.value = "";
             return;
         }
 
+        // Show preview immediately
+        const previewURL = URL.createObjectURL(file);
+        setLogoPreview(previewURL);
+
+        const formDataToUpload = new FormData();
+
+        formDataToUpload.append("logo", file);
+
         try {
             setUploadingLogo(true);
 
-            const previewURL =
-                URL.createObjectURL(file);
-
-            setLogoPreview(previewURL);
-
-            const uploadData = new FormData();
-
-            uploadData.append("logo", file);
-
             const response = await axiosAPI.post(
                 "/companies/me/logo",
-                uploadData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    }
-                }
+                formDataToUpload
             );
 
-            const updatedCompany =
-                response.data.data;
+            const updatedCompany = response.data?.data;
 
-            setCompany(updatedCompany);
+            if (updatedCompany) {
+                setCompany(updatedCompany);
 
-            if (updatedCompany.CompanyLogo) {
-                setLogoPreview(
-                    getLogoURL(
-                        updatedCompany.CompanyLogo
-                    )
-                );
+                setFormData({
+                    CompanyName: updatedCompany.CompanyName || "",
+                    Email: updatedCompany.Email || "",
+                    Phone: updatedCompany.Phone || "",
+                    Address: updatedCompany.Address || "",
+                    Description:
+                        updatedCompany.Description || "",
+                    CompanyWebsite:
+                        updatedCompany.CompanyWebsite || "",
+                });
+
+                if (updatedCompany.CompanyLogo) {
+                    setLogoPreview(
+                        getLogoURL(updatedCompany.CompanyLogo)
+                    );
+                }
             }
 
-            setSuccess(
-                "Company logo updated successfully."
-            );
-
+            setSuccess("Company logo uploaded successfully.");
         } catch (err) {
-            console.error(
-                "Upload company logo error:",
-                err
-            );
+            console.error("Logo upload error:", err);
 
             setError(
                 err.response?.data?.message ||
-                "Unable to upload company logo."
+                    "Unable to upload company logo."
             );
 
-            if (company?.CompanyLogo) {
-                setLogoPreview(
-                    getLogoURL(
-                        company.CompanyLogo
-                    )
-                );
-            } else {
-                setLogoPreview("");
-            }
-
+            setLogoPreview("");
         } finally {
             setUploadingLogo(false);
-
             event.target.value = "";
         }
     };
 
     // =====================================================
-    // LOGOUT
-    // =====================================================
-
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    };
-
-    // =====================================================
-    // LOADING SCREEN
+    // LOADING
     // =====================================================
 
     if (loading) {
@@ -342,507 +336,451 @@ const CompanyProfile = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: "#f5f7fb"
+                    background: "#f5f7fb",
                 }}
             >
-                <Box sx={{ textAlign: "center" }}>
-                    <CircularProgress />
-
-                    <Typography
-                        sx={{
-                            mt: 2,
-                            color: "text.secondary"
-                        }}
-                    >
-                        Loading company profile...
-                    </Typography>
-                </Box>
+                <CircularProgress />
             </Box>
         );
     }
+
+    // =====================================================
+    // SIDEBAR
+    // =====================================================
+
+    const sidebarItem = (icon, label, path, active = false) => (
+        <Button
+            fullWidth
+            onClick={() => navigate(path)}
+            startIcon={icon}
+            sx={{
+                justifyContent: "flex-start",
+                textTransform: "none",
+                px: 2,
+                py: 1.4,
+                mb: 0.6,
+                borderRadius: 2,
+                color: active
+                    ? "#ffffff"
+                    : "rgba(255,255,255,0.72)",
+                backgroundColor: active
+                    ? "rgba(255,255,255,0.12)"
+                    : "transparent",
+                "&:hover": {
+                    backgroundColor:
+                        "rgba(255,255,255,0.09)",
+                    color: "#ffffff",
+                },
+            }}
+        >
+            {label}
+        </Button>
+    );
+
+    // =====================================================
+    // PAGE
+    // =====================================================
 
     return (
         <Box
             sx={{
                 minHeight: "100vh",
+                display: "flex",
                 backgroundColor: "#f5f7fb",
-                display: "flex"
             }}
         >
-
-            {/* =====================================================
+            {/* =================================================
                 SIDEBAR
-            ===================================================== */}
+            ================================================= */}
 
             <Box
                 sx={{
                     width: 250,
-                    backgroundColor: "#111827",
-                    color: "white",
-                    minHeight: "100vh",
+                    background:
+                        "linear-gradient(180deg, #111827 0%, #172033 100%)",
+                    color: "#ffffff",
+                    display: {
+                        xs: "none",
+                        md: "flex",
+                    },
+                    flexDirection: "column",
+                    p: 2,
                     position: "fixed",
                     left: 0,
                     top: 0,
                     bottom: 0,
-                    display: "flex",
-                    flexDirection: "column"
                 }}
             >
-
                 {/* Logo */}
+
                 <Box
                     sx={{
-                        px: 3,
-                        py: 3,
                         display: "flex",
                         alignItems: "center",
-                        gap: 1.5
+                        gap: 1.2,
+                        px: 1,
+                        py: 2,
+                        mb: 2,
                     }}
                 >
-                    <Avatar
+                    <Box
                         sx={{
                             width: 40,
                             height: 40,
-                            backgroundColor: "#2563eb"
+                            borderRadius: 2,
+                            background:
+                                "linear-gradient(135deg, #2563eb, #4f46e5)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: 800,
+                            fontSize: 20,
                         }}
                     >
-                        <Business />
-                    </Avatar>
+                        C
+                    </Box>
 
                     <Box>
                         <Typography
-                            sx={{
-                                fontWeight: 800,
-                                fontSize: 18
-                            }}
+                            fontWeight={800}
+                            fontSize={18}
                         >
                             CareerBridge
                         </Typography>
 
                         <Typography
-                            sx={{
-                                fontSize: 11,
-                                color: "#9ca3af"
-                            }}
+                            fontSize={11}
+                            color="rgba(255,255,255,0.55)"
                         >
                             Employer Portal
                         </Typography>
                     </Box>
                 </Box>
 
-                <Divider
+                <Typography
                     sx={{
-                        borderColor: "#374151"
-                    }}
-                />
-
-                {/* Navigation */}
-                <Box
-                    sx={{
-                        px: 2,
-                        py: 3,
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 1
+                        fontSize: 11,
+                        textTransform: "uppercase",
+                        letterSpacing: 1,
+                        color: "rgba(255,255,255,0.4)",
+                        px: 1,
+                        mb: 1,
                     }}
                 >
+                    Main Menu
+                </Typography>
 
-                    <Button
-                        startIcon={<Dashboard />}
-                        onClick={() =>
-                            navigate("/employer-dashboard")
-                        }
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "#d1d5db",
-                            textTransform: "none",
-                            px: 2,
-                            py: 1.3,
-                            borderRadius: 2,
-                            "&:hover": {
-                                backgroundColor: "#1f2937",
-                                color: "white"
-                            }
-                        }}
-                    >
-                        Dashboard
-                    </Button>
+                {sidebarItem(
+                    <Dashboard />,
+                    "Dashboard",
+                    "/employer-dashboard"
+                )}
 
-                    <Button
-                        startIcon={<Work />}
-                        onClick={() =>
-                            navigate("/employer/jobs")
-                        }
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "#d1d5db",
-                            textTransform: "none",
-                            px: 2,
-                            py: 1.3,
-                            borderRadius: 2,
-                            "&:hover": {
-                                backgroundColor: "#1f2937",
-                                color: "white"
-                            }
-                        }}
-                    >
-                        My Job Postings
-                    </Button>
+                {sidebarItem(
+                    <Work />,
+                    "My Job Postings",
+                    "/employer/jobs"
+                )}
 
-                    <Button
-                        startIcon={<Add />}
-                        onClick={() =>
-                            navigate("/employer/post-job")
-                        }
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "#d1d5db",
-                            textTransform: "none",
-                            px: 2,
-                            py: 1.3,
-                            borderRadius: 2,
-                            "&:hover": {
-                                backgroundColor: "#1f2937",
-                                color: "white"
-                            }
-                        }}
-                    >
-                        Post a Job
-                    </Button>
+                {sidebarItem(
+                    <Description />,
+                    "Post a Job",
+                    "/employer/post-job"
+                )}
 
-                    <Button
-                        startIcon={<People />}
-                        onClick={() =>
-                            navigate("/employer/jobs")
-                        }
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "#d1d5db",
-                            textTransform: "none",
-                            px: 2,
-                            py: 1.3,
-                            borderRadius: 2,
-                            "&:hover": {
-                                backgroundColor: "#1f2937",
-                                color: "white"
-                            }
-                        }}
-                    >
-                        Applicants
-                    </Button>
+                {sidebarItem(
+                    <People />,
+                    "Applicants",
+                    "/employer/jobs"
+                )}
 
-                    <Button
-                        startIcon={<Business />}
-                        onClick={() =>
-                            navigate("/company-profile")
-                        }
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "white",
-                            backgroundColor: "#1f2937",
-                            textTransform: "none",
-                            px: 2,
-                            py: 1.3,
-                            borderRadius: 2
-                        }}
-                    >
-                        Company Profile
-                    </Button>
-
-                </Box>
+                {sidebarItem(
+                    <Business />,
+                    "Company Profile",
+                    "/company-profile",
+                    true
+                )}
 
                 <Box sx={{ flexGrow: 1 }} />
 
-                <Box sx={{ px: 2, pb: 3 }}>
+                <Divider
+                    sx={{
+                        borderColor:
+                            "rgba(255,255,255,0.1)",
+                        mb: 1,
+                    }}
+                />
 
-                    <Button
-                        fullWidth
-                        startIcon={<ExitToApp />}
-                        onClick={handleLogout}
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "#fca5a5",
-                            textTransform: "none",
-                            px: 2,
-                            py: 1.3,
-                            borderRadius: 2,
-                            "&:hover": {
-                                backgroundColor: "#7f1d1d",
-                                color: "white"
-                            }
-                        }}
-                    >
+                {sidebarItem(
+                    <ExitToApp />,
+                    "Logout",
+                    "#"
+                )}
+
+                {/* Override logout navigation */}
+                <Box
+                    onClick={handleLogout}
+                    sx={{
+                        position: "absolute",
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                        height: 48,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        px: 2,
+                        borderRadius: 2,
+                        color: "rgba(255,255,255,0.72)",
+                        cursor: "pointer",
+                        "&:hover": {
+                            backgroundColor:
+                                "rgba(255,255,255,0.09)",
+                            color: "#ffffff",
+                        },
+                    }}
+                >
+                    <ExitToApp fontSize="small" />
+
+                    <Typography fontSize={14}>
                         Logout
-                    </Button>
-
+                    </Typography>
                 </Box>
-
             </Box>
 
-            {/* =====================================================
+            {/* =================================================
                 MAIN CONTENT
-            ===================================================== */}
+            ================================================= */}
 
             <Box
                 sx={{
-                    marginLeft: "250px",
-                    width: "calc(100% - 250px)",
-                    minHeight: "100vh",
-                    px: {
-                        xs: 3,
-                        md: 5
+                    flex: 1,
+                    ml: {
+                        xs: 0,
+                        md: "250px",
                     },
-                    py: 4
+                    p: {
+                        xs: 2,
+                        sm: 3,
+                        md: 4,
+                    },
                 }}
             >
-
                 {/* Header */}
+
                 <Box
                     sx={{
                         display: "flex",
-                        alignItems: "center",
+                        alignItems: {
+                            xs: "flex-start",
+                            sm: "center",
+                        },
                         justifyContent: "space-between",
-                        mb: 4
+                        gap: 2,
+                        mb: 4,
+                        flexDirection: {
+                            xs: "column",
+                            sm: "row",
+                        },
                     }}
                 >
+                    <Box>
+                        <Button
+                            startIcon={<ArrowBack />}
+                            onClick={() =>
+                                navigate(
+                                    "/employer-dashboard"
+                                )
+                            }
+                            sx={{
+                                textTransform: "none",
+                                mb: 1,
+                            }}
+                        >
+                            Back to Dashboard
+                        </Button>
 
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 2
-                        }}
-                    >
+                        <Typography
+                            variant="h4"
+                            fontWeight={800}
+                            color="#111827"
+                        >
+                            Company Profile
+                        </Typography>
 
-                        <Tooltip title="Back to dashboard">
-                            <IconButton
-                                onClick={() =>
-                                    navigate(
-                                        "/employer-dashboard"
-                                    )
-                                }
-                                sx={{
-                                    backgroundColor:
-                                        "white",
-                                    border:
-                                        "1px solid #e5e7eb"
-                                }}
-                            >
-                                <ArrowBack />
-                            </IconButton>
-                        </Tooltip>
-
-                        <Box>
-                            <Typography
-                                variant="h4"
-                                sx={{
-                                    fontWeight: 800,
-                                    color: "#111827"
-                                }}
-                            >
-                                Company Profile
-                            </Typography>
-
-                            <Typography
-                                sx={{
-                                    color: "#6b7280",
-                                    mt: 0.5
-                                }}
-                            >
-                                Manage your company information
-                                and branding.
-                            </Typography>
-                        </Box>
-
+                        <Typography
+                            color="text.secondary"
+                            sx={{ mt: 0.5 }}
+                        >
+                            {company
+                                ? "Manage your company information and branding."
+                                : "Create your company profile to start posting jobs."}
+                        </Typography>
                     </Box>
-
-                    <Chip
-                        icon={<Business />}
-                        label="Employer"
-                        sx={{
-                            fontWeight: 600
-                        }}
-                    />
-
                 </Box>
 
                 {/* Alerts */}
-                {error && (
-                    <Alert
-                        severity="error"
-                        onClose={() => setError("")}
-                        sx={{ mb: 3 }}
-                    >
-                        {error}
-                    </Alert>
-                )}
 
-                {success && (
-                    <Alert
-                        severity="success"
-                        onClose={() => setSuccess("")}
-                        sx={{ mb: 3 }}
-                    >
-                        {success}
-                    </Alert>
-                )}
+                <Stack spacing={2} sx={{ mb: 3 }}>
+                    {error && (
+                        <Alert
+                            severity="error"
+                            onClose={() => setError("")}
+                        >
+                            {error}
+                        </Alert>
+                    )}
 
-                {/* =====================================================
+                    {success && (
+                        <Alert
+                            severity="success"
+                            onClose={() =>
+                                setSuccess("")
+                            }
+                        >
+                            {success}
+                        </Alert>
+                    )}
+                </Stack>
+
+                {/* =================================================
                     PROFILE HEADER
-                ===================================================== */}
+                ================================================= */}
 
                 <Paper
                     elevation={0}
                     sx={{
                         borderRadius: 4,
                         border: "1px solid #e5e7eb",
+                        overflow: "hidden",
                         mb: 3,
-                        overflow: "hidden"
                     }}
                 >
-
                     <Box
                         sx={{
-                            height: 120,
+                            height: 150,
                             background:
-                                "linear-gradient(135deg, #1e3a8a, #2563eb)"
+                                "linear-gradient(135deg, #111827 0%, #2563eb 100%)",
                         }}
                     />
 
                     <Box
                         sx={{
                             px: {
-                                xs: 3,
-                                md: 5
+                                xs: 2,
+                                sm: 4,
                             },
-                            pb: 4
+                            pb: 3,
                         }}
                     >
-
                         <Box
                             sx={{
                                 display: "flex",
-                                alignItems: "flex-end",
-                                gap: 3,
-                                marginTop: -6
+                                alignItems: {
+                                    xs: "flex-start",
+                                    sm: "flex-end",
+                                },
+                                gap: 2,
+                                mt: -6,
+                                flexDirection: {
+                                    xs: "column",
+                                    sm: "row",
+                                },
                             }}
                         >
+                            {/* Logo */}
 
-                            <Box
-                                sx={{
-                                    position: "relative"
-                                }}
-                            >
-
+                            <Box sx={{ position: "relative" }}>
                                 <Avatar
                                     src={logoPreview}
                                     sx={{
-                                        width: 120,
-                                        height: 120,
-                                        backgroundColor:
-                                            "#eff6ff",
+                                        width: 110,
+                                        height: 110,
+                                        bgcolor: "#ffffff",
                                         color: "#2563eb",
                                         border:
-                                            "5px solid white",
+                                            "5px solid #ffffff",
                                         boxShadow:
-                                            "0 4px 15px rgba(0,0,0,0.12)",
-                                        fontSize: 48
+                                            "0 6px 20px rgba(0,0,0,0.15)",
+                                        fontSize: 40,
                                     }}
                                 >
-                                    {!logoPreview && (
-                                        <Business
-                                            fontSize="inherit"
-                                        />
-                                    )}
+                                    <Business fontSize="large" />
                                 </Avatar>
-
-                                <Tooltip title="Change company logo">
-                                    <IconButton
-                                        onClick={
-                                            handleChooseLogo
-                                        }
-                                        disabled={
-                                            uploadingLogo
-                                        }
-                                        sx={{
-                                            position:
-                                                "absolute",
-                                            right: -4,
-                                            bottom: -4,
-                                            backgroundColor:
-                                                "#2563eb",
-                                            color: "white",
-                                            width: 38,
-                                            height: 38,
-                                            border:
-                                                "3px solid white",
-                                            "&:hover": {
-                                                backgroundColor:
-                                                    "#1d4ed8"
-                                            }
-                                        }}
-                                    >
-                                        {uploadingLogo ? (
-                                            <CircularProgress
-                                                size={18}
-                                                color="inherit"
-                                            />
-                                        ) : (
-                                            <Edit
-                                                fontSize="small"
-                                            />
-                                        )}
-                                    </IconButton>
-                                </Tooltip>
 
                                 <input
                                     ref={fileInputRef}
                                     type="file"
+                                    hidden
                                     accept="image/png,image/jpeg,image/jpg,image/webp"
                                     onChange={
                                         handleLogoChange
                                     }
-                                    style={{
-                                        display: "none"
-                                    }}
                                 />
 
+                                <Button
+                                    onClick={() =>
+                                        fileInputRef.current?.click()
+                                    }
+                                    disabled={uploadingLogo}
+                                    sx={{
+                                        position: "absolute",
+                                        bottom: -8,
+                                        right: -8,
+                                        minWidth: 38,
+                                        width: 38,
+                                        height: 38,
+                                        borderRadius: "50%",
+                                        bgcolor: "#2563eb",
+                                        color: "#ffffff",
+                                        "&:hover": {
+                                            bgcolor: "#1d4ed8",
+                                        },
+                                    }}
+                                >
+                                    {uploadingLogo ? (
+                                        <CircularProgress
+                                            size={18}
+                                            sx={{
+                                                color: "#ffffff",
+                                            }}
+                                        />
+                                    ) : (
+                                        <CameraAlt fontSize="small" />
+                                    )}
+                                </Button>
                             </Box>
 
-                            <Box sx={{ pb: 1 }}>
-
+                            <Box
+                                sx={{
+                                    pb: 1,
+                                    flex: 1,
+                                }}
+                            >
                                 <Typography
                                     variant="h5"
-                                    sx={{
-                                        fontWeight: 800,
-                                        color: "#111827"
-                                    }}
+                                    fontWeight={800}
                                 >
                                     {company?.CompanyName ||
-                                        "Your Company"}
+                                        "Create Your Company Profile"}
                                 </Typography>
 
                                 <Typography
-                                    sx={{
-                                        color: "#6b7280",
-                                        mt: 0.5
-                                    }}
+                                    color="text.secondary"
+                                    sx={{ mt: 0.5 }}
                                 >
-                                    Manage your public
-                                    company information
+                                    {company
+                                        ? company.Email
+                                        : "Add your company information below"}
                                 </Typography>
-
                             </Box>
-
                         </Box>
-
                     </Box>
-
                 </Paper>
 
-                {/* =====================================================
-                    COMPANY INFORMATION FORM
-                ===================================================== */}
+                {/* =================================================
+                    COMPANY INFORMATION
+                ================================================= */}
 
                 <Paper
                     elevation={0}
@@ -850,236 +788,148 @@ const CompanyProfile = () => {
                         borderRadius: 4,
                         border: "1px solid #e5e7eb",
                         p: {
-                            xs: 3,
-                            md: 5
-                        }
+                            xs: 2,
+                            sm: 4,
+                        },
                     }}
                 >
-
-                    <Box sx={{ mb: 4 }}>
-
+                    <Box sx={{ mb: 3 }}>
                         <Typography
                             variant="h6"
-                            sx={{
-                                fontWeight: 800,
-                                color: "#111827"
-                            }}
+                            fontWeight={800}
                         >
                             Company Information
                         </Typography>
 
                         <Typography
-                            sx={{
-                                color: "#6b7280",
-                                mt: 0.5
-                            }}
+                            color="text.secondary"
+                            fontSize={14}
+                            sx={{ mt: 0.5 }}
                         >
-                            Keep your company details
-                            accurate so job seekers can
-                            learn more about your organization.
+                            {company
+                                ? "Keep your company information up to date."
+                                : "Enter your company details below to create your profile."}
                         </Typography>
-
                     </Box>
 
-                    <form onSubmit={handleSave}>
+                    <Divider sx={{ mb: 3 }} />
 
-                        <Box
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: {
-                                    xs: "1fr",
-                                    md: "1fr 1fr"
-                                },
-                                gap: 3
-                            }}
-                        >
-
-                            <TextField
-                                fullWidth
-                                label="Company Name"
-                                name="CompanyName"
-                                value={
-                                    formData.CompanyName
-                                }
-                                onChange={handleChange}
-                                required
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Company Email"
-                                name="Email"
-                                type="email"
-                                value={
-                                    formData.Email
-                                }
-                                onChange={handleChange}
-                                required
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Phone"
-                                name="Phone"
-                                value={
-                                    formData.Phone
-                                }
-                                onChange={handleChange}
-                                InputProps={{
-                                    startAdornment: (
-                                        <Phone
-                                            sx={{
-                                                mr: 1,
-                                                color:
-                                                    "text.secondary"
-                                            }}
-                                        />
-                                    )
-                                }}
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Address"
-                                name="Address"
-                                value={
-                                    formData.Address
-                                }
-                                onChange={handleChange}
-                                InputProps={{
-                                    startAdornment: (
-                                        <LocationOn
-                                            sx={{
-                                                mr: 1,
-                                                color:
-                                                    "text.secondary"
-                                            }}
-                                        />
-                                    )
-                                }}
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Company Website"
-                                name="CompanyWebsite"
-                                value={
-                                    formData.CompanyWebsite
-                                }
-                                onChange={handleChange}
-                                placeholder="https://example.com"
-                                InputProps={{
-                                    startAdornment: (
-                                        <Language
-                                            sx={{
-                                                mr: 1,
-                                                color:
-                                                    "text.secondary"
-                                            }}
-                                        />
-                                    )
-                                }}
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Contact Email"
-                                value={
-                                    formData.Email
-                                }
-                                disabled
-                                InputProps={{
-                                    startAdornment: (
-                                        <Email
-                                            sx={{
-                                                mr: 1,
-                                                color:
-                                                    "text.secondary"
-                                            }}
-                                        />
-                                    )
-                                }}
-                            />
-
-                        </Box>
-
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: {
+                                xs: "1fr",
+                                md: "1fr 1fr",
+                            },
+                            gap: 2.5,
+                        }}
+                    >
                         <TextField
-                            fullWidth
-                            multiline
-                            minRows={5}
-                            label="Company Description"
-                            name="Description"
-                            value={
-                                formData.Description
-                            }
+                            label="Company Name"
+                            name="CompanyName"
+                            value={formData.CompanyName}
                             onChange={handleChange}
-                            sx={{ mt: 3 }}
-                            placeholder="Tell job seekers about your company, what you do, and what makes your organization unique."
+                            fullWidth
+                            required
                         />
 
-                        <Divider sx={{ my: 4 }} />
+                        <TextField
+                            label="Company Email"
+                            name="Email"
+                            value={formData.Email}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                        />
 
-                        <Box
+                        <TextField
+                            label="Phone"
+                            name="Phone"
+                            value={formData.Phone}
+                            onChange={handleChange}
+                            fullWidth
+                        />
+
+                        <TextField
+                            label="Address"
+                            name="Address"
+                            value={formData.Address}
+                            onChange={handleChange}
+                            fullWidth
+                        />
+
+                        <TextField
+                            label="Company Website"
+                            name="CompanyWebsite"
+                            value={formData.CompanyWebsite}
+                            onChange={handleChange}
+                            fullWidth
+                            placeholder="https://example.com"
+                        />
+
+                        <TextField
+                            label="Company Description"
+                            name="Description"
+                            value={formData.Description}
+                            onChange={handleChange}
+                            fullWidth
+                            multiline
+                            minRows={4}
                             sx={{
-                                display: "flex",
-                                justifyContent:
-                                    "flex-end",
-                                gap: 2
+                                gridColumn: {
+                                    xs: "auto",
+                                    md: "1 / -1",
+                                },
+                            }}
+                        />
+                    </Box>
+
+                    {/* Save */}
+
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            mt: 4,
+                        }}
+                    >
+                        <Button
+                            variant="contained"
+                            size="large"
+                            startIcon={
+                                company ? (
+                                    <Save />
+                                ) : (
+                                    <Business />
+                                )
+                            }
+                            onClick={handleSave}
+                            disabled={saving}
+                            sx={{
+                                minWidth: 190,
+                                borderRadius: 2.5,
+                                textTransform: "none",
+                                fontWeight: 700,
+                                py: 1.3,
+                                boxShadow: "none",
                             }}
                         >
-
-                            <Button
-                                variant="outlined"
-                                onClick={() =>
-                                    navigate(
-                                        "/employer-dashboard"
-                                    )
-                                }
-                                sx={{
-                                    textTransform:
-                                        "none",
-                                    borderRadius: 2,
-                                    px: 3
-                                }}
-                            >
-                                Cancel
-                            </Button>
-
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                disabled={saving}
-                                startIcon={
-                                    saving ? (
-                                        <CircularProgress
-                                            size={18}
-                                            color="inherit"
-                                        />
-                                    ) : (
-                                        <Save />
-                                    )
-                                }
-                                sx={{
-                                    textTransform:
-                                        "none",
-                                    borderRadius: 2,
-                                    px: 3,
-                                    fontWeight: 700
-                                }}
-                            >
-                                {saving
-                                    ? "Saving..."
-                                    : "Save Changes"}
-                            </Button>
-
-                        </Box>
-
-                    </form>
-
+                            {saving ? (
+                                <CircularProgress
+                                    size={22}
+                                    sx={{
+                                        color: "#ffffff",
+                                    }}
+                                />
+                            ) : company ? (
+                                "Save Changes"
+                            ) : (
+                                "Create Company"
+                            )}
+                        </Button>
+                    </Box>
                 </Paper>
-
             </Box>
-
         </Box>
     );
 };

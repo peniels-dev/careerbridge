@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axiosAPI from "../api/axiosAPI";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -26,9 +26,13 @@ function AuthProvider({ children }) {
 
                 setUser(response.data.data);
             } catch (error) {
-                console.error("Unable to restore user:", error);
+                console.error(
+                    "Unable to restore user:",
+                    error
+                );
 
                 localStorage.removeItem("token");
+                localStorage.removeItem("user");
 
                 setToken(null);
                 setUser(null);
@@ -49,6 +53,7 @@ function AuthProvider({ children }) {
 
     const logout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
 
         setToken(null);
         setUser(null);

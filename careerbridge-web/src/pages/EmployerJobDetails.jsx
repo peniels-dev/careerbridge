@@ -42,16 +42,34 @@ const EmployerJobDetails = () => {
     const { user, logout } = useAuth();
 
     const [job, setJob] = useState(null);
-    const [company, setCompany] = useState(null);
-
     const [loading, setLoading] = useState(true);
     const [closing, setClosing] = useState(false);
-
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [openCloseDialog, setOpenCloseDialog] = useState(false);
 
-    const [openCloseDialog, setOpenCloseDialog] =
-        useState(false);
+    // =====================================================
+    // GET LOGGED-IN USER ID
+    // =====================================================
+
+    const loggedInUserId =
+        user?.UserID ??
+        user?.userId ??
+        user?.id ??
+        null;
+
+    // =====================================================
+    // CHECK WHETHER THIS EMPLOYER POSTED THE JOB
+    // =====================================================
+
+    const canManageJob =
+        job &&
+        loggedInUserId !== null &&
+        Number(job.PostedByUserID) === Number(loggedInUserId);
+
+    // =====================================================
+    // LOAD JOB
+    // =====================================================
 
     useEffect(() => {
         loadJob();
@@ -61,89 +79,123 @@ const EmployerJobDetails = () => {
         try {
             setLoading(true);
             setError("");
+            setSuccess("");
 
-            const response = await axiosAPI.get(
-                `/jobs/${id}`
-            );
+            const response = await axiosAPI.get(`/jobs/${id}`);
 
-            setJob(response.data.data);
+            const jobData = response.data?.data;
 
-            try {
-                const companyResponse =
-                    await axiosAPI.get(
-                        "/companies/me"
-                    );
+            if (!jobData) {
+                setError("Job information could not be found.");
+                return;
+            }
 
-                setCompany(
-                    companyResponse.data.data
-                );
-            } catch (companyError) {
-                console.error(
-                    "Unable to load company:",
-                    companyError
+            setJob(jobData);
+
+            console.log("EMPLOYER JOB PERMISSION CHECK:", {
+                jobID: jobData.JobID,
+                jobTitle: jobData.JobTitle,
+                postedByUserID: jobData.PostedByUserID,
+                postedByName: jobData.PostedByName,
+                loggedInUserID: loggedInUserId,
+                canManage:
+                    Number(jobData.PostedByUserID) ===
+                    Number(loggedInUserId),
+            });
+        } catch (err) {
+            console.error("Unable to load job:", err);
+
+            if (err.response?.status === 404) {
+                setError("This job could not be found.");
+            } else {
+                setError(
+                    err.response?.data?.message ||
+                        "Unable to load this job."
                 );
             }
-        } catch (err) {
-            console.error(
-                "Unable to load job:",
-                err
-            );
-
-            setError(
-                err.response?.data?.message ||
-                    "Unable to load this job."
-            );
         } finally {
             setLoading(false);
         }
     };
+
+    // =====================================================
+    // LOGOUT
+    // =====================================================
 
     const handleLogout = () => {
         logout();
         navigate("/login");
     };
 
+    // =====================================================
+    // FORMAT DATE
+    // =====================================================
+
     const formatDate = (date) => {
         if (!date) {
             return "—";
         }
 
-        return new Date(date).toLocaleDateString(
-            "en-US",
-            {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-            }
-        );
+        return new Date(date).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+        });
     };
+
+    // =====================================================
+    // JOB STATUS
+    // =====================================================
 
     const isOpen =
         job?.Status === true ||
         job?.Status === 1;
 
+    // =====================================================
+    // VIEW APPLICANTS
+    // =====================================================
+
     const handleViewApplicants = () => {
-        navigate(
-            `/employer/jobs/${id}/applicants`
-        );
+        if (!canManageJob) {
+            return;
+        }
+
+        navigate(`/employer/jobs/${id}/applicants`);
     };
+
+    // =====================================================
+    // EDIT JOB
+    // =====================================================
 
     const handleEditJob = () => {
-        navigate(
-            `/employer/jobs/${id}/edit`
-        );
+        if (!canManageJob) {
+            return;
+        }
+
+        navigate(`/employer/jobs/${id}/edit`);
     };
 
+    // =====================================================
+    // CLOSE JOB
+    // =====================================================
+
     const handleCloseJob = async () => {
+        if (!canManageJob) {
+            setError(
+                "You can only manage jobs that you posted."
+            );
+            setOpenCloseDialog(false);
+            return;
+        }
+
         try {
             setClosing(true);
             setError("");
             setSuccess("");
 
-            const response =
-                await axiosAPI.patch(
-                    `/jobs/${id}/close`
-                );
+            const response = await axiosAPI.patch(
+                `/jobs/${id}/close`
+            );
 
             setSuccess(
                 response.data?.message ||
@@ -173,6 +225,10 @@ const EmployerJobDetails = () => {
         }
     };
 
+    // =====================================================
+    // LOADING
+    // =====================================================
+
     if (loading) {
         return (
             <Box
@@ -200,6 +256,10 @@ const EmployerJobDetails = () => {
         );
     }
 
+    // =====================================================
+    // MAIN PAGE
+    // =====================================================
+
     return (
         <Box
             sx={{
@@ -208,7 +268,10 @@ const EmployerJobDetails = () => {
                 display: "flex",
             }}
         >
-            {/* SIDEBAR */}
+            {/* =================================================
+                SIDEBAR
+            ================================================= */}
+
             <Box
                 sx={{
                     width: 250,
@@ -219,10 +282,16 @@ const EmployerJobDetails = () => {
                     left: 0,
                     top: 0,
                     bottom: 0,
-                    display: "flex",
+                    display: {
+                        xs: "none",
+                        md: "flex",
+                    },
                     flexDirection: "column",
+                    zIndex: 1000,
                 }}
             >
+                {/* LOGO */}
+
                 <Box
                     sx={{
                         px: 3,
@@ -275,6 +344,8 @@ const EmployerJobDetails = () => {
                         mx: 2,
                     }}
                 />
+
+                {/* MENU */}
 
                 <Box sx={{ px: 2, mt: 3 }}>
                     <Typography
@@ -358,6 +429,8 @@ const EmployerJobDetails = () => {
 
                 <Box sx={{ flexGrow: 1 }} />
 
+                {/* LOGOUT */}
+
                 <Box sx={{ px: 2, pb: 2 }}>
                     <Button
                         fullWidth
@@ -384,14 +457,24 @@ const EmployerJobDetails = () => {
                 </Box>
             </Box>
 
-            {/* MAIN AREA */}
+            {/* =================================================
+                MAIN AREA
+            ================================================= */}
+
             <Box
                 sx={{
-                    marginLeft: "250px",
-                    width: "calc(100% - 250px)",
+                    marginLeft: {
+                        xs: 0,
+                        md: "250px",
+                    },
+                    width: {
+                        xs: "100%",
+                        md: "calc(100% - 250px)",
+                    },
                 }}
             >
                 {/* TOP BAR */}
+
                 <Box
                     sx={{
                         height: 72,
@@ -402,16 +485,21 @@ const EmployerJobDetails = () => {
                         alignItems: "center",
                         justifyContent:
                             "space-between",
-                        px: { xs: 3, md: 5 },
+                        px: {
+                            xs: 2,
+                            sm: 3,
+                            md: 5,
+                        },
                     }}
                 >
                     <Typography
                         sx={{
                             fontSize: 14,
                             color: "#667085",
+                            fontWeight: 600,
                         }}
                     >
-                        {company?.CompanyName ||
+                        {job?.CompanyName ||
                             "Your Company"}
                     </Typography>
 
@@ -441,24 +529,35 @@ const EmployerJobDetails = () => {
                             }}
                         >
                             {(
-                                (user?.firstName?.charAt(
+                                (user?.FirstName ||
+                                    user?.firstName ||
+                                    "").charAt(
                                     0
-                                ) || "") +
-                                (user?.lastName?.charAt(
+                                ) +
+                                (user?.LastName ||
+                                    user?.lastName ||
+                                    "").charAt(
                                     0
-                                ) || "")
-                            ).toUpperCase() ||
-                                "E"}
+                                )
+                            ).toUpperCase() || "E"}
                         </Box>
 
-                        <Box>
+                        <Box
+                            sx={{
+                                display: {
+                                    xs: "none",
+                                    sm: "block",
+                                },
+                            }}
+                        >
                             <Typography
                                 sx={{
                                     fontSize: 13,
                                     fontWeight: 700,
                                 }}
                             >
-                                {user?.firstName ||
+                                {user?.FirstName ||
+                                    user?.firstName ||
                                     "Employer"}
                             </Typography>
 
@@ -475,17 +574,24 @@ const EmployerJobDetails = () => {
                 </Box>
 
                 {/* CONTENT */}
+
                 <Box
                     sx={{
                         px: {
-                            xs: 3,
+                            xs: 2,
+                            sm: 3,
                             md: 5,
                         },
-                        py: 4,
+                        py: {
+                            xs: 2.5,
+                            sm: 4,
+                        },
                         maxWidth: 1200,
                         margin: "0 auto",
                     }}
                 >
+                    {/* BACK BUTTON */}
+
                     <Button
                         startIcon={<ArrowBack />}
                         onClick={() =>
@@ -498,10 +604,13 @@ const EmployerJobDetails = () => {
                                 "none",
                             color: "#667085",
                             mb: 3,
+                            fontWeight: 600,
                         }}
                     >
                         Back to My Job Postings
                     </Button>
+
+                    {/* ERROR */}
 
                     {error && (
                         <Alert
@@ -515,6 +624,8 @@ const EmployerJobDetails = () => {
                         </Alert>
                     )}
 
+                    {/* SUCCESS */}
+
                     {success && (
                         <Alert
                             severity="success"
@@ -527,20 +638,38 @@ const EmployerJobDetails = () => {
                         </Alert>
                     )}
 
-                    {!job && !error && (
-                        <Alert severity="info">
-                            Job not found.
-                        </Alert>
+                    {/* JOB NOT FOUND */}
+
+                    {!job && (
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                p: 4,
+                                borderRadius: 3,
+                                border:
+                                    "1px solid #e5e7eb",
+                            }}
+                        >
+                            <Alert severity="info">
+                                Job not found.
+                            </Alert>
+                        </Paper>
                     )}
+
+                    {/* JOB */}
 
                     {job && (
                         <>
-                            {/* JOB HEADER */}
+                            {/* =================================================
+                                JOB HEADER
+                            ================================================= */}
+
                             <Paper
                                 elevation={0}
                                 sx={{
                                     p: {
-                                        xs: 3,
+                                        xs: 2.5,
+                                        sm: 3,
                                         md: 4,
                                     },
                                     borderRadius: 3,
@@ -564,23 +693,28 @@ const EmployerJobDetails = () => {
                                             "wrap",
                                     }}
                                 >
-                                    <Box>
+                                    <Box
+                                        sx={{
+                                            minWidth: 0,
+                                            flex: 1,
+                                        }}
+                                    >
                                         <Typography
                                             sx={{
                                                 fontSize:
                                                     {
-                                                        xs: 26,
+                                                        xs: 25,
                                                         md: 32,
                                                     },
                                                 fontWeight:
                                                     800,
                                                 color:
                                                     "#101828",
+                                                overflowWrap:
+                                                    "anywhere",
                                             }}
                                         >
-                                            {
-                                                job.JobTitle
-                                            }
+                                            {job.JobTitle}
                                         </Typography>
 
                                         <Typography
@@ -591,8 +725,25 @@ const EmployerJobDetails = () => {
                                                 fontSize: 14,
                                             }}
                                         >
-                                            {company?.CompanyName ||
+                                            {job.CompanyName ||
                                                 "Your Company"}
+                                        </Typography>
+
+                                        {/* POSTED BY */}
+
+                                        <Typography
+                                            sx={{
+                                                mt: 1,
+                                                color:
+                                                    "#98a2b3",
+                                                fontSize: 12,
+                                            }}
+                                        >
+                                            Posted by{" "}
+                                            <strong>
+                                                {job.PostedByName ||
+                                                    "Unknown employer"}
+                                            </strong>
                                         </Typography>
                                     </Box>
 
@@ -680,12 +831,16 @@ const EmployerJobDetails = () => {
                                 </Box>
                             </Paper>
 
-                            {/* DESCRIPTION */}
+                            {/* =================================================
+                                DESCRIPTION
+                            ================================================= */}
+
                             <Paper
                                 elevation={0}
                                 sx={{
                                     p: {
-                                        xs: 3,
+                                        xs: 2.5,
+                                        sm: 3,
                                         md: 4,
                                     },
                                     borderRadius: 3,
@@ -720,7 +875,57 @@ const EmployerJobDetails = () => {
                                 </Typography>
                             </Paper>
 
-                            {/* CATEGORY */}
+                            {/* =================================================
+                                REQUIREMENTS
+                            ================================================= */}
+
+                            {job.Requirements && (
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: {
+                                            xs: 2.5,
+                                            sm: 3,
+                                            md: 4,
+                                        },
+                                        borderRadius: 3,
+                                        border:
+                                            "1px solid #e5e7eb",
+                                        backgroundColor:
+                                            "#fff",
+                                        mb: 3,
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            fontSize: 20,
+                                            fontWeight: 800,
+                                            mb: 2,
+                                        }}
+                                    >
+                                        Requirements
+                                    </Typography>
+
+                                    <Typography
+                                        sx={{
+                                            fontSize: 14,
+                                            lineHeight: 1.8,
+                                            color: "#475467",
+                                            whiteSpace:
+                                                "pre-line",
+                                        }}
+                                    >
+                                        {
+                                            job.Requirements
+                                        }
+                                    </Typography>
+                                </Paper>
+                            )}
+
+                            {/* =================================================
+                                CATEGORY
+                            ================================================= */}
+
                             {job.CategoryName && (
                                 <Paper
                                     elevation={0}
@@ -778,11 +983,17 @@ const EmployerJobDetails = () => {
                                 </Paper>
                             )}
 
-                            {/* MANAGEMENT */}
+                            {/* =================================================
+                                MANAGEMENT
+                            ================================================= */}
+
                             <Paper
                                 elevation={0}
                                 sx={{
-                                    p: 3,
+                                    p: {
+                                        xs: 2.5,
+                                        sm: 3,
+                                    },
                                     borderRadius: 3,
                                     border:
                                         "1px solid #e5e7eb",
@@ -824,91 +1035,31 @@ const EmployerJobDetails = () => {
                                                 mt: 0.5,
                                             }}
                                         >
-                                            Manage your job
-                                            posting and
-                                            applicants.
+                                            {canManageJob
+                                                ? "You posted this job and can manage it."
+                                                : "This job was posted by another employer in your company."}
                                         </Typography>
                                     </Box>
 
-                                    <Box
-                                        sx={{
-                                            display:
-                                                "flex",
-                                            gap: 1,
-                                            flexWrap:
-                                                "wrap",
-                                        }}
-                                    >
-                                        <Button
-                                            variant="outlined"
-                                            startIcon={
-                                                <People />
-                                            }
-                                            onClick={
-                                                handleViewApplicants
-                                            }
+                                    {/* ONLY THE ORIGINAL POSTER CAN MANAGE */}
+
+                                    {canManageJob ? (
+                                        <Box
                                             sx={{
-                                                textTransform:
-                                                    "none",
-                                                borderRadius:
-                                                    2,
-                                                fontWeight:
-                                                    700,
+                                                display:
+                                                    "flex",
+                                                gap: 1,
+                                                flexWrap:
+                                                    "wrap",
                                             }}
                                         >
-                                            View Applicants
-                                        </Button>
-
-                                        <Button
-                                            variant="contained"
-                                            startIcon={
-                                                <Edit />
-                                            }
-                                            onClick={
-                                                handleEditJob
-                                            }
-                                            sx={{
-                                                textTransform:
-                                                    "none",
-                                                borderRadius:
-                                                    2,
-                                                fontWeight:
-                                                    700,
-                                                boxShadow:
-                                                    "none",
-                                                "&:hover":
-                                                    {
-                                                        boxShadow:
-                                                            "none",
-                                                    },
-                                            }}
-                                        >
-                                            Edit Job
-                                        </Button>
-
-                                        {isOpen && (
                                             <Button
                                                 variant="outlined"
-                                                color="error"
                                                 startIcon={
-                                                    closing ? (
-                                                        <CircularProgress
-                                                            size={
-                                                                18
-                                                            }
-                                                            color="inherit"
-                                                        />
-                                                    ) : (
-                                                        <Lock />
-                                                    )
+                                                    <People />
                                                 }
-                                                onClick={() =>
-                                                    setOpenCloseDialog(
-                                                        true
-                                                    )
-                                                }
-                                                disabled={
-                                                    closing
+                                                onClick={
+                                                    handleViewApplicants
                                                 }
                                                 sx={{
                                                     textTransform:
@@ -919,12 +1070,85 @@ const EmployerJobDetails = () => {
                                                         700,
                                                 }}
                                             >
-                                                {closing
-                                                    ? "Closing..."
-                                                    : "Close Job"}
+                                                View Applicants
                                             </Button>
-                                        )}
-                                    </Box>
+
+                                            <Button
+                                                variant="contained"
+                                                startIcon={
+                                                    <Edit />
+                                                }
+                                                onClick={
+                                                    handleEditJob
+                                                }
+                                                sx={{
+                                                    textTransform:
+                                                        "none",
+                                                    borderRadius:
+                                                        2,
+                                                    fontWeight:
+                                                        700,
+                                                    boxShadow:
+                                                        "none",
+                                                    "&:hover":
+                                                        {
+                                                            boxShadow:
+                                                                "none",
+                                                        },
+                                                }}
+                                            >
+                                                Edit Job
+                                            </Button>
+
+                                            {isOpen && (
+                                                <Button
+                                                    variant="outlined"
+                                                    color="error"
+                                                    startIcon={
+                                                        closing ? (
+                                                            <CircularProgress
+                                                                size={
+                                                                    18
+                                                                }
+                                                                color="inherit"
+                                                            />
+                                                        ) : (
+                                                            <Lock />
+                                                        )
+                                                    }
+                                                    onClick={() =>
+                                                        setOpenCloseDialog(
+                                                            true
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        closing
+                                                    }
+                                                    sx={{
+                                                        textTransform:
+                                                            "none",
+                                                        borderRadius:
+                                                            2,
+                                                        fontWeight:
+                                                            700,
+                                                    }}
+                                                >
+                                                    {closing
+                                                        ? "Closing..."
+                                                        : "Close Job"}
+                                                </Button>
+                                            )}
+                                        </Box>
+                                    ) : (
+                                        <Chip
+                                            label="View only"
+                                            variant="outlined"
+                                            sx={{
+                                                fontWeight: 700,
+                                                color: "#667085",
+                                            }}
+                                        />
+                                    )}
                                 </Box>
                             </Paper>
                         </>
@@ -932,7 +1156,10 @@ const EmployerJobDetails = () => {
                 </Box>
             </Box>
 
-            {/* CLOSE JOB CONFIRMATION */}
+            {/* =================================================
+                CLOSE JOB DIALOG
+            ================================================= */}
+
             <Dialog
                 open={openCloseDialog}
                 onClose={() =>
@@ -1008,6 +1235,10 @@ const EmployerJobDetails = () => {
     );
 };
 
+// =====================================================
+// SIDEBAR ITEM
+// =====================================================
+
 const SidebarItem = ({
     icon,
     text,
@@ -1051,6 +1282,10 @@ const SidebarItem = ({
     );
 };
 
+// =====================================================
+// DETAIL ITEM
+// =====================================================
+
 const DetailItem = ({
     icon,
     label,
@@ -1063,6 +1298,7 @@ const DetailItem = ({
                 borderRadius: 2,
                 backgroundColor:
                     "#f9fafb",
+                minWidth: 0,
             }}
         >
             <Box
@@ -1093,6 +1329,8 @@ const DetailItem = ({
                     fontSize: 13,
                     fontWeight: 700,
                     color: "#101828",
+                    overflowWrap:
+                        "anywhere",
                 }}
             >
                 {value}
