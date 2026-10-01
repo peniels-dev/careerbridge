@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-
 import {
     Alert,
-    Avatar,
     Box,
     Button,
     Chip,
@@ -10,22 +8,14 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
+    IconButton,
     InputAdornment,
     MenuItem,
     Paper,
     Select,
     Snackbar,
-    Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
     TextField,
-    Tooltip,
     Typography,
 } from "@mui/material";
 
@@ -41,7 +31,6 @@ import {
 
 import axiosAPI from "../../api/axiosAPI";
 
-
 function AdminJobs() {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -52,7 +41,6 @@ function AdminJobs() {
     const [jobTypeFilter, setJobTypeFilter] = useState("all");
 
     const [selectedJob, setSelectedJob] = useState(null);
-    const [closeDialogOpen, setCloseDialogOpen] = useState(false);
     const [closing, setClosing] = useState(false);
 
     const [snackbar, setSnackbar] = useState({
@@ -60,7 +48,6 @@ function AdminJobs() {
         message: "",
         severity: "success",
     });
-
 
     const fetchJobs = async () => {
         try {
@@ -70,40 +57,41 @@ function AdminJobs() {
             const response = await axiosAPI.get("/admin/jobs");
 
             setJobs(response.data.data || []);
-        } catch (error) {
-            console.error("Admin jobs error:", error);
+        } catch (err) {
+            console.error("Failed to fetch admin jobs:", err);
 
             setError(
-                error.response?.data?.message ||
-                    "Failed to load jobs."
+                err.response?.data?.message ||
+                    "Unable to load jobs. Please try again."
             );
         } finally {
             setLoading(false);
         }
     };
 
-
     useEffect(() => {
         fetchJobs();
     }, []);
 
-
     const filteredJobs = useMemo(() => {
-        const searchValue = search.trim().toLowerCase();
-
         return jobs.filter((job) => {
+            const searchText = search.toLowerCase().trim();
+
             const matchesSearch =
-                !searchValue ||
-                job.JobTitle?.toLowerCase().includes(searchValue) ||
-                job.CompanyName?.toLowerCase().includes(searchValue) ||
-                job.Location?.toLowerCase().includes(searchValue);
+                !searchText ||
+                job.JobTitle?.toLowerCase().includes(searchText) ||
+                job.CompanyName?.toLowerCase().includes(searchText) ||
+                job.Location?.toLowerCase().includes(searchText);
+
+            const isActive =
+                job.Status === true ||
+                job.Status === 1 ||
+                job.Status === "1";
 
             const matchesStatus =
                 statusFilter === "all" ||
-                (statusFilter === "active" &&
-                    Boolean(job.Status)) ||
-                (statusFilter === "closed" &&
-                    !Boolean(job.Status));
+                (statusFilter === "active" && isActive) ||
+                (statusFilter === "closed" && !isActive);
 
             const matchesJobType =
                 jobTypeFilter === "all" ||
@@ -117,29 +105,27 @@ function AdminJobs() {
         });
     }, [jobs, search, statusFilter, jobTypeFilter]);
 
-
-    const jobTypes = useMemo(() => {
-        return [
-            ...new Set(
-                jobs
-                    .map((job) => job.JobType)
-                    .filter(Boolean)
-            ),
-        ];
-    }, [jobs]);
-
+    const totalJobs = jobs.length;
 
     const activeJobs = jobs.filter(
-        (job) => Boolean(job.Status)
+        (job) =>
+            job.Status === true ||
+            job.Status === 1 ||
+            job.Status === "1"
     ).length;
 
-    const closedJobs = jobs.length - activeJobs;
+    const closedJobs = totalJobs - activeJobs;
 
+    const jobTypes = useMemo(() => {
+        const types = jobs
+            .map((job) => job.JobType)
+            .filter(Boolean);
+
+        return [...new Set(types)];
+    }, [jobs]);
 
     const formatDate = (date) => {
-        if (!date) {
-            return "—";
-        }
+        if (!date) return "—";
 
         const parsedDate = new Date(date);
 
@@ -147,48 +133,28 @@ function AdminJobs() {
             return "—";
         }
 
-        return parsedDate.toLocaleDateString(
-            "en-GB",
-            {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-            }
+        return parsedDate.toLocaleDateString("en-GH", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+        });
+    };
+
+    const isJobActive = (job) => {
+        return (
+            job.Status === true ||
+            job.Status === 1 ||
+            job.Status === "1"
         );
     };
 
-
-   const openCloseDialog = (job) => {
-    // Remove focus from the button before opening the dialog.
-    // This prevents the focused button from being inside
-    // an aria-hidden ancestor while the dialog opens.
-    if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-    }
-
-    setSelectedJob(job);
-    setCloseDialogOpen(true);
-};
-
-    const closeCloseDialog = () => {
-        if (closing) {
-            return;
-        }
-
-        setCloseDialogOpen(false);
-        setSelectedJob(null);
-    };
-
-
     const handleCloseJob = async () => {
-        if (!selectedJob) {
-            return;
-        }
+        if (!selectedJob) return;
 
         try {
             setClosing(true);
 
-            const response = await axiosAPI.patch(
+            await axiosAPI.patch(
                 `/admin/jobs/${selectedJob.JobID}/close`
             );
 
@@ -205,25 +171,19 @@ function AdminJobs() {
 
             setSnackbar({
                 open: true,
-                message:
-                    response.data.message ||
-                    "Job closed successfully.",
+                message: "Job posting closed successfully.",
                 severity: "success",
             });
 
-            setCloseDialogOpen(false);
             setSelectedJob(null);
-        } catch (error) {
-            console.error(
-                "Close admin job error:",
-                error
-            );
+        } catch (err) {
+            console.error("Failed to close job:", err);
 
             setSnackbar({
                 open: true,
                 message:
-                    error.response?.data?.message ||
-                    "Failed to close job.",
+                    err.response?.data?.message ||
+                    "Unable to close this job.",
                 severity: "error",
             });
         } finally {
@@ -231,27 +191,95 @@ function AdminJobs() {
         }
     };
 
+    const clearFilters = () => {
+        setSearch("");
+        setStatusFilter("all");
+        setJobTypeFilter("all");
+    };
 
-    return (
-        <Box>
-            {/* Page Header */}
+    if (loading) {
+        return (
             <Box
                 sx={{
-                    mb: 4,
+                    minHeight: "100%",
+                    backgroundColor: "#FFF8EF",
                     display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    p: 4,
+                }}
+            >
+                <Box sx={{ textAlign: "center" }}>
+                    <CircularProgress
+                        size={38}
+                        sx={{ color: "#E76F51", mb: 2 }}
+                    />
+
+                    <Typography
+                        sx={{
+                            color: "#5F554D",
+                            fontWeight: 600,
+                        }}
+                    >
+                        Loading jobs...
+                    </Typography>
+                </Box>
+            </Box>
+        );
+    }
+
+    return (
+        <Box
+            sx={{
+                minHeight: "100%",
+                backgroundColor: "#FFF8EF",
+                p: {
+                    xs: 2,
+                    sm: 3,
+                    md: 4,
+                },
+            }}
+        >
+            {/* HEADER */}
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: {
+                        xs: "column",
+                        sm: "row",
+                    },
                     justifyContent: "space-between",
-                    alignItems: "flex-start",
+                    alignItems: {
+                        xs: "flex-start",
+                        sm: "center",
+                    },
                     gap: 2,
-                    flexWrap: "wrap",
+                    mb: 3,
                 }}
             >
                 <Box>
                     <Typography
-                        variant="h4"
                         sx={{
+                            fontSize: 13,
                             fontWeight: 800,
-                            color: "#0f172a",
-                            letterSpacing: "-0.02em",
+                            letterSpacing: 1.4,
+                            color: "#E76F51",
+                            mb: 0.7,
+                        }}
+                    >
+                        CAREERBRIDGE ADMIN
+                    </Typography>
+
+                    <Typography
+                        component="h1"
+                        sx={{
+                            fontSize: {
+                                xs: 28,
+                                sm: 34,
+                            },
+                            fontWeight: 900,
+                            color: "#293241",
+                            letterSpacing: "-0.8px",
                         }}
                     >
                         Jobs
@@ -259,12 +287,12 @@ function AdminJobs() {
 
                     <Typography
                         sx={{
-                            mt: 0.8,
-                            color: "#64748b",
+                            color: "#766C64",
+                            mt: 0.5,
+                            fontSize: 15,
                         }}
                     >
-                        Monitor and manage jobs posted
-                        across CareerBridge.
+                        Review and manage job postings on CareerBridge.
                     </Typography>
                 </Box>
 
@@ -272,17 +300,17 @@ function AdminJobs() {
                     variant="outlined"
                     startIcon={<Refresh />}
                     onClick={fetchJobs}
-                    disabled={loading}
                     sx={{
-                        borderRadius: 2.5,
+                        borderColor: "#DCCFC2",
+                        color: "#293241",
+                        backgroundColor: "#FFFDF9",
                         textTransform: "none",
                         fontWeight: 700,
-                        borderColor: "#dbe2ea",
-                        color: "#334155",
+                        borderRadius: 2,
                         px: 2,
                         "&:hover": {
-                            borderColor: "#94a3b8",
-                            backgroundColor: "#f8fafc",
+                            borderColor: "#E76F51",
+                            backgroundColor: "#FFF1D6",
                         },
                     }}
                 >
@@ -290,8 +318,20 @@ function AdminJobs() {
                 </Button>
             </Box>
 
+            {/* ERROR */}
+            {error && (
+                <Alert
+                    severity="error"
+                    sx={{
+                        mb: 3,
+                        borderRadius: 2,
+                    }}
+                >
+                    {error}
+                </Alert>
+            )}
 
-            {/* Summary Cards */}
+            {/* STAT CARDS */}
             <Box
                 sx={{
                     display: "grid",
@@ -303,39 +343,47 @@ function AdminJobs() {
                     mb: 3,
                 }}
             >
+                {/* TOTAL */}
                 <Paper
                     elevation={0}
                     sx={{
                         p: 2.5,
+                        backgroundColor: "#FFFDF9",
+                        border: "1px solid #E9DED0",
                         borderRadius: 3,
-                        border: "1px solid #e5e7eb",
-                        backgroundColor: "#ffffff",
                     }}
                 >
-                    <Stack
-                        direction="row"
-                        spacing={2}
+                    <Box
                         sx={{
+                            display: "flex",
                             alignItems: "center",
+                            gap: 1.5,
                         }}
                     >
-                        <Avatar
+                        <Box
                             sx={{
                                 width: 46,
                                 height: 46,
-                                borderRadius: 2.5,
-                                backgroundColor: "#eff6ff",
-                                color: "#2563eb",
+                                borderRadius: 2,
+                                backgroundColor: "#FFF1D6",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                             }}
                         >
-                            <Work />
-                        </Avatar>
+                            <Work
+                                sx={{
+                                    color: "#F4A261",
+                                    fontSize: 24,
+                                }}
+                            />
+                        </Box>
 
                         <Box>
                             <Typography
-                                variant="body2"
                                 sx={{
-                                    color: "#64748b",
+                                    fontSize: 13,
+                                    color: "#766C64",
                                     fontWeight: 600,
                                 }}
                             >
@@ -343,53 +391,60 @@ function AdminJobs() {
                             </Typography>
 
                             <Typography
-                                variant="h5"
                                 sx={{
-                                    mt: 0.3,
-                                    fontWeight: 800,
-                                    color: "#0f172a",
+                                    fontSize: 28,
+                                    fontWeight: 900,
+                                    color: "#293241",
+                                    lineHeight: 1.1,
                                 }}
                             >
-                                {jobs.length}
+                                {totalJobs}
                             </Typography>
                         </Box>
-                    </Stack>
+                    </Box>
                 </Paper>
 
-
+                {/* ACTIVE */}
                 <Paper
                     elevation={0}
                     sx={{
                         p: 2.5,
+                        backgroundColor: "#FFFDF9",
+                        border: "1px solid #E9DED0",
                         borderRadius: 3,
-                        border: "1px solid #e5e7eb",
-                        backgroundColor: "#ffffff",
                     }}
                 >
-                    <Stack
-                        direction="row"
-                        spacing={2}
+                    <Box
                         sx={{
+                            display: "flex",
                             alignItems: "center",
+                            gap: 1.5,
                         }}
                     >
-                        <Avatar
+                        <Box
                             sx={{
                                 width: 46,
                                 height: 46,
-                                borderRadius: 2.5,
-                                backgroundColor: "#ecfdf5",
-                                color: "#059669",
+                                borderRadius: 2,
+                                backgroundColor: "#EDF4E8",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                             }}
                         >
-                            <CheckCircle />
-                        </Avatar>
+                            <CheckCircle
+                                sx={{
+                                    color: "#6A994E",
+                                    fontSize: 24,
+                                }}
+                            />
+                        </Box>
 
                         <Box>
                             <Typography
-                                variant="body2"
                                 sx={{
-                                    color: "#64748b",
+                                    fontSize: 13,
+                                    color: "#766C64",
                                     fontWeight: 600,
                                 }}
                             >
@@ -397,53 +452,60 @@ function AdminJobs() {
                             </Typography>
 
                             <Typography
-                                variant="h5"
                                 sx={{
-                                    mt: 0.3,
-                                    fontWeight: 800,
-                                    color: "#0f172a",
+                                    fontSize: 28,
+                                    fontWeight: 900,
+                                    color: "#293241",
+                                    lineHeight: 1.1,
                                 }}
                             >
                                 {activeJobs}
                             </Typography>
                         </Box>
-                    </Stack>
+                    </Box>
                 </Paper>
 
-
+                {/* CLOSED */}
                 <Paper
                     elevation={0}
                     sx={{
                         p: 2.5,
+                        backgroundColor: "#FFFDF9",
+                        border: "1px solid #E9DED0",
                         borderRadius: 3,
-                        border: "1px solid #e5e7eb",
-                        backgroundColor: "#ffffff",
                     }}
                 >
-                    <Stack
-                        direction="row"
-                        spacing={2}
+                    <Box
                         sx={{
+                            display: "flex",
                             alignItems: "center",
+                            gap: 1.5,
                         }}
                     >
-                        <Avatar
+                        <Box
                             sx={{
                                 width: 46,
                                 height: 46,
-                                borderRadius: 2.5,
-                                backgroundColor: "#f8fafc",
-                                color: "#64748b",
+                                borderRadius: 2,
+                                backgroundColor: "#F3ECE6",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                             }}
                         >
-                            <Close />
-                        </Avatar>
+                            <Close
+                                sx={{
+                                    color: "#8A7F76",
+                                    fontSize: 24,
+                                }}
+                            />
+                        </Box>
 
                         <Box>
                             <Typography
-                                variant="body2"
                                 sx={{
-                                    color: "#64748b",
+                                    fontSize: 13,
+                                    color: "#766C64",
                                     fontWeight: 600,
                                 }}
                             >
@@ -451,76 +513,110 @@ function AdminJobs() {
                             </Typography>
 
                             <Typography
-                                variant="h5"
                                 sx={{
-                                    mt: 0.3,
-                                    fontWeight: 800,
-                                    color: "#0f172a",
+                                    fontSize: 28,
+                                    fontWeight: 900,
+                                    color: "#293241",
+                                    lineHeight: 1.1,
                                 }}
                             >
                                 {closedJobs}
                             </Typography>
                         </Box>
-                    </Stack>
+                    </Box>
                 </Paper>
             </Box>
 
-
-            {/* Filters */}
+            {/* FILTERS */}
             <Paper
                 elevation={0}
                 sx={{
-                    p: 2,
+                    p: {
+                        xs: 2,
+                        sm: 2.5,
+                    },
                     mb: 3,
+                    backgroundColor: "#FFFDF9",
+                    border: "1px solid #E9DED0",
                     borderRadius: 3,
-                    border: "1px solid #e5e7eb",
-                    backgroundColor: "#ffffff",
                 }}
             >
+                <Typography
+                    sx={{
+                        fontWeight: 800,
+                        color: "#293241",
+                        mb: 1.5,
+                    }}
+                >
+                    Find a job
+                </Typography>
+
                 <Box
                     sx={{
                         display: "grid",
                         gridTemplateColumns: {
                             xs: "1fr",
-                            md: "2fr 1fr 1fr",
+                            md: "2fr 1fr 1fr auto",
                         },
-                        gap: 2,
+                        gap: 1.5,
+                        alignItems: "center",
                     }}
                 >
                     <TextField
                         fullWidth
                         size="small"
-                        placeholder="Search by job title, company or location..."
+                        placeholder="Search by job, company or location..."
                         value={search}
                         onChange={(event) =>
                             setSearch(event.target.value)
                         }
-                        slotProps={{
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <Search
-                                            sx={{
-                                                color: "#94a3b8",
-                                            }}
-                                        />
-                                    </InputAdornment>
-                                ),
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Search
+                                        sx={{
+                                            color: "#E76F51",
+                                        }}
+                                    />
+                                </InputAdornment>
+                            ),
+                        }}
+                        sx={{
+                            "& .MuiOutlinedInput-root": {
+                                backgroundColor: "#FFFDF9",
+                                borderRadius: 2,
+                                "& fieldset": {
+                                    borderColor: "#DCCFC2",
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: "#E76F51",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#E76F51",
+                                },
                             },
                         }}
                     />
 
-
                     <Select
-                        fullWidth
                         size="small"
                         value={statusFilter}
                         onChange={(event) =>
-                            setStatusFilter(
-                                event.target.value
-                            )
+                            setStatusFilter(event.target.value)
                         }
-                        displayEmpty
+                        sx={{
+                            backgroundColor: "#FFFDF9",
+                            borderRadius: 2,
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#DCCFC2",
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#E76F51",
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#E76F51",
+                            },
+                        }}
                     >
                         <MenuItem value="all">
                             All Statuses
@@ -535,594 +631,555 @@ function AdminJobs() {
                         </MenuItem>
                     </Select>
 
-
                     <Select
-                        fullWidth
                         size="small"
                         value={jobTypeFilter}
                         onChange={(event) =>
-                            setJobTypeFilter(
-                                event.target.value
-                            )
+                            setJobTypeFilter(event.target.value)
                         }
-                        displayEmpty
+                        sx={{
+                            backgroundColor: "#FFFDF9",
+                            borderRadius: 2,
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#DCCFC2",
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#E76F51",
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#E76F51",
+                            },
+                        }}
                     >
                         <MenuItem value="all">
                             All Job Types
                         </MenuItem>
 
-                        {jobTypes.map((jobType) => (
+                        {jobTypes.map((type) => (
                             <MenuItem
-                                key={jobType}
-                                value={jobType}
+                                key={type}
+                                value={type}
                             >
-                                {jobType}
+                                {type}
                             </MenuItem>
                         ))}
                     </Select>
+
+                    <Button
+                        variant="text"
+                        onClick={clearFilters}
+                        sx={{
+                            color: "#E76F51",
+                            textTransform: "none",
+                            fontWeight: 700,
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        Clear
+                    </Button>
                 </Box>
             </Paper>
 
-
-            {/* Error */}
-            {error && (
-                <Alert
-                    severity="error"
+            {/* RESULTS COUNT */}
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 1.5,
+                    px: 0.5,
+                }}
+            >
+                <Typography
                     sx={{
-                        mb: 3,
-                        borderRadius: 2.5,
+                        color: "#5F554D",
+                        fontSize: 14,
+                        fontWeight: 700,
                     }}
                 >
-                    {error}
-                </Alert>
-            )}
+                    {filteredJobs.length}{" "}
+                    {filteredJobs.length === 1
+                        ? "job"
+                        : "jobs"}{" "}
+                    found
+                </Typography>
+            </Box>
 
-
-            {/* Jobs Table */}
+            {/* JOBS TABLE */}
             <Paper
                 elevation={0}
                 sx={{
+                    backgroundColor: "#FFFDF9",
+                    border: "1px solid #E9DED0",
                     borderRadius: 3,
-                    border: "1px solid #e5e7eb",
                     overflow: "hidden",
-                    backgroundColor: "#ffffff",
                 }}
             >
-                <Box
-                    sx={{
-                        px: 3,
-                        py: 2.5,
-                        borderBottom:
-                            "1px solid #e5e7eb",
-                        display: "flex",
-                        justifyContent:
-                            "space-between",
-                        alignItems: "center",
-                        gap: 2,
-                        flexWrap: "wrap",
-                    }}
-                >
-                    <Box>
-                        <Typography
-                            sx={{
-                                fontWeight: 800,
-                                color: "#0f172a",
-                            }}
-                        >
-                            All Jobs
-                        </Typography>
-
-                        <Typography
-                            variant="body2"
-                            sx={{
-                                mt: 0.3,
-                                color: "#94a3b8",
-                            }}
-                        >
-                            {filteredJobs.length} job
-                            {filteredJobs.length !== 1
-                                ? "s"
-                                : ""}{" "}
-                            displayed
-                        </Typography>
-                    </Box>
-                </Box>
-
-
-                {loading ? (
+                {filteredJobs.length === 0 ? (
                     <Box
                         sx={{
-                            minHeight: 300,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                    >
-                        <CircularProgress />
-                    </Box>
-                ) : filteredJobs.length === 0 ? (
-                    <Box
-                        sx={{
-                            minHeight: 300,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            px: 3,
                             textAlign: "center",
+                            py: 8,
+                            px: 3,
                         }}
                     >
-                        <Box>
+                        <Box
+                            sx={{
+                                width: 64,
+                                height: 64,
+                                borderRadius: "50%",
+                                backgroundColor: "#FFF1D6",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                mx: "auto",
+                                mb: 2,
+                            }}
+                        >
                             <Work
                                 sx={{
-                                    fontSize: 48,
-                                    color: "#cbd5e1",
-                                    mb: 1,
+                                    fontSize: 30,
+                                    color: "#E76F51",
                                 }}
                             />
-
-                            <Typography
-                                sx={{
-                                    fontWeight: 700,
-                                    color: "#334155",
-                                }}
-                            >
-                                No jobs found
-                            </Typography>
-
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    mt: 0.5,
-                                    color: "#94a3b8",
-                                }}
-                            >
-                                Try changing your search
-                                or filters.
-                            </Typography>
                         </Box>
+
+                        <Typography
+                            sx={{
+                                fontSize: 18,
+                                fontWeight: 800,
+                                color: "#293241",
+                                mb: 0.5,
+                            }}
+                        >
+                            No jobs found
+                        </Typography>
+
+                        <Typography
+                            sx={{
+                                color: "#766C64",
+                                fontSize: 14,
+                            }}
+                        >
+                            Try changing your search or filters.
+                        </Typography>
                     </Box>
                 ) : (
-                    <TableContainer>
-                        <Table>
-                            <TableHead>
-                                <TableRow
+                    <Box
+                        sx={{
+                            overflowX: "auto",
+                        }}
+                    >
+                        <Box
+                            component="table"
+                            sx={{
+                                width: "100%",
+                                minWidth: 950,
+                                borderCollapse: "collapse",
+                            }}
+                        >
+                            <Box component="thead">
+                                <Box
+                                    component="tr"
                                     sx={{
-                                        backgroundColor:
-                                            "#f8fafc",
+                                        backgroundColor: "#FFF1D6",
                                     }}
                                 >
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Job
-                                    </TableCell>
+                                    {[
+                                        "Job",
+                                        "Company",
+                                        "Location",
+                                        "Type",
+                                        "Posted",
+                                        "Deadline",
+                                        "Status",
+                                        "Action",
+                                    ].map((heading) => (
+                                        <Box
+                                            component="th"
+                                            key={heading}
+                                            sx={{
+                                                textAlign: "left",
+                                                px: 2,
+                                                py: 1.7,
+                                                fontSize: 12,
+                                                fontWeight: 800,
+                                                color: "#5F554D",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
+                                                whiteSpace: "nowrap",
+                                            }}
+                                        >
+                                            {heading}
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </Box>
 
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Company
-                                    </TableCell>
+                            <Box component="tbody">
+                                {filteredJobs.map((job) => {
+                                    const active =
+                                        isJobActive(job);
 
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Location
-                                    </TableCell>
-
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Type
-                                    </TableCell>
-
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Posted
-                                    </TableCell>
-
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Deadline
-                                    </TableCell>
-
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Status
-                                    </TableCell>
-
-                                    <TableCell
-                                        align="right"
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Action
-                                    </TableCell>
-                                </TableRow>
-                            </TableHead>
-
-
-                            <TableBody>
-                                {filteredJobs.map(
-                                    (job) => {
-                                        const isActive =
-                                            Boolean(
-                                                job.Status
-                                            );
-
-                                        return (
-                                            <TableRow
-                                                key={
-                                                    job.JobID
-                                                }
-                                                hover
+                                    return (
+                                        <Box
+                                            component="tr"
+                                            key={job.JobID}
+                                            sx={{
+                                                "&:hover": {
+                                                    backgroundColor:
+                                                        "#FFF8EF",
+                                                },
+                                            }}
+                                        >
+                                            {/* JOB */}
+                                            <Box
+                                                component="td"
                                                 sx={{
-                                                    "&:last-child td":
-                                                        {
-                                                            borderBottom: 0,
-                                                        },
+                                                    px: 2,
+                                                    py: 2,
+                                                    borderBottom:
+                                                        "1px solid #EFE5DC",
+                                                    verticalAlign:
+                                                        "top",
                                                 }}
                                             >
-                                                <TableCell>
-                                                    <Box
+                                                <Typography
+                                                    sx={{
+                                                        fontWeight: 800,
+                                                        color: "#293241",
+                                                        fontSize: 14,
+                                                        maxWidth: 190,
+                                                    }}
+                                                >
+                                                    {job.JobTitle ||
+                                                        "Untitled Job"}
+                                                </Typography>
+                                            </Box>
+
+                                            {/* COMPANY */}
+                                            <Box
+                                                component="td"
+                                                sx={{
+                                                    px: 2,
+                                                    py: 2,
+                                                    borderBottom:
+                                                        "1px solid #EFE5DC",
+                                                }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems:
+                                                            "center",
+                                                        gap: 1,
+                                                    }}
+                                                >
+                                                    <Business
                                                         sx={{
-                                                            minWidth: 180,
-                                                        }}
-                                                    >
-                                                        <Typography
-                                                            sx={{
-                                                                fontWeight: 700,
-                                                                color: "#0f172a",
-                                                            }}
-                                                        >
-                                                            {
-                                                                job.JobTitle
-                                                            }
-                                                        </Typography>
-
-                                                        <Typography
-                                                            variant="caption"
-                                                            sx={{
-                                                                color: "#94a3b8",
-                                                            }}
-                                                        >
-                                                            Job
-                                                            #
-                                                            {
-                                                                job.JobID
-                                                            }
-                                                        </Typography>
-                                                    </Box>
-                                                </TableCell>
-
-
-                                                <TableCell>
-                                                    <Stack
-                                                        direction="row"
-                                                        spacing={
-                                                            1
-                                                        }
-                                                        sx={{
-                                                            alignItems:
-                                                                "center",
-                                                            minWidth: 150,
-                                                        }}
-                                                    >
-                                                        <Avatar
-                                                            sx={{
-                                                                width: 34,
-                                                                height: 34,
-                                                                borderRadius: 2,
-                                                                backgroundColor:
-                                                                    "#eff6ff",
-                                                                color: "#2563eb",
-                                                                fontSize:
-                                                                    "0.85rem",
-                                                                fontWeight: 800,
-                                                            }}
-                                                        >
-                                                            {job.CompanyName?.charAt(
-                                                                0
-                                                            ) ||
-                                                                "C"}
-                                                        </Avatar>
-
-                                                        <Typography
-                                                            sx={{
-                                                                fontWeight: 600,
-                                                                color: "#334155",
-                                                            }}
-                                                        >
-                                                            {
-                                                                job.CompanyName
-                                                            }
-                                                        </Typography>
-                                                    </Stack>
-                                                </TableCell>
-
-
-                                                <TableCell>
-                                                    <Stack
-                                                        direction="row"
-                                                        spacing={
-                                                            0.7
-                                                        }
-                                                        sx={{
-                                                            alignItems:
-                                                                "center",
-                                                            minWidth: 130,
-                                                        }}
-                                                    >
-                                                        <LocationOn
-                                                            sx={{
-                                                                fontSize: 17,
-                                                                color: "#94a3b8",
-                                                            }}
-                                                        />
-
-                                                        <Typography
-                                                            variant="body2"
-                                                            sx={{
-                                                                color: "#475569",
-                                                            }}
-                                                        >
-                                                            {job.Location ||
-                                                                "—"}
-                                                        </Typography>
-                                                    </Stack>
-                                                </TableCell>
-
-
-                                                <TableCell>
-                                                    <Chip
-                                                        label={
-                                                            job.JobType ||
-                                                            "—"
-                                                        }
-                                                        size="small"
-                                                        sx={{
-                                                            borderRadius: 1.5,
-                                                            fontWeight: 600,
-                                                            backgroundColor:
-                                                                "#f1f5f9",
-                                                            color: "#475569",
+                                                            fontSize: 18,
+                                                            color: "#E76F51",
                                                         }}
                                                     />
-                                                </TableCell>
 
-
-                                                <TableCell>
                                                     <Typography
-                                                        variant="body2"
                                                         sx={{
-                                                            color: "#475569",
-                                                            whiteSpace:
-                                                                "nowrap",
+                                                            fontSize: 14,
+                                                            color: "#5F554D",
+                                                            fontWeight: 600,
                                                         }}
                                                     >
-                                                        {formatDate(
-                                                            job.PostedDate
-                                                        )}
+                                                        {job.CompanyName ||
+                                                            "—"}
                                                     </Typography>
-                                                </TableCell>
+                                                </Box>
+                                            </Box>
 
-
-                                                <TableCell>
-                                                    <Typography
-                                                        variant="body2"
+                                            {/* LOCATION */}
+                                            <Box
+                                                component="td"
+                                                sx={{
+                                                    px: 2,
+                                                    py: 2,
+                                                    borderBottom:
+                                                        "1px solid #EFE5DC",
+                                                }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems:
+                                                            "center",
+                                                        gap: 0.8,
+                                                    }}
+                                                >
+                                                    <LocationOn
                                                         sx={{
-                                                            color: "#475569",
-                                                            whiteSpace:
-                                                                "nowrap",
+                                                            fontSize: 17,
+                                                            color: "#6A994E",
+                                                        }}
+                                                    />
+
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: 14,
+                                                            color: "#5F554D",
                                                         }}
                                                     >
-                                                        {formatDate(
-                                                            job.ApplicationDeadline
-                                                        )}
+                                                        {job.Location ||
+                                                            "—"}
                                                     </Typography>
-                                                </TableCell>
+                                                </Box>
+                                            </Box>
 
+                                            {/* TYPE */}
+                                            <Box
+                                                component="td"
+                                                sx={{
+                                                    px: 2,
+                                                    py: 2,
+                                                    borderBottom:
+                                                        "1px solid #EFE5DC",
+                                                }}
+                                            >
+                                                <Chip
+                                                    label={
+                                                        job.JobType ||
+                                                        "—"
+                                                    }
+                                                    size="small"
+                                                    sx={{
+                                                        backgroundColor:
+                                                            "#F3ECE6",
+                                                        color: "#5F554D",
+                                                        fontWeight: 700,
+                                                        borderRadius: 1.5,
+                                                    }}
+                                                />
+                                            </Box>
 
-                                                <TableCell>
-                                                    <Chip
-                                                        icon={
-                                                            isActive ? (
-                                                                <CheckCircle />
-                                                            ) : (
-                                                                <Close />
+                                            {/* POSTED */}
+                                            <Box
+                                                component="td"
+                                                sx={{
+                                                    px: 2,
+                                                    py: 2,
+                                                    borderBottom:
+                                                        "1px solid #EFE5DC",
+                                                    color: "#766C64",
+                                                    fontSize: 13,
+                                                }}
+                                            >
+                                                {formatDate(
+                                                    job.PostedDate
+                                                )}
+                                            </Box>
+
+                                            {/* DEADLINE */}
+                                            <Box
+                                                component="td"
+                                                sx={{
+                                                    px: 2,
+                                                    py: 2,
+                                                    borderBottom:
+                                                        "1px solid #EFE5DC",
+                                                    color: "#766C64",
+                                                    fontSize: 13,
+                                                }}
+                                            >
+                                                {formatDate(
+                                                    job.ApplicationDeadline
+                                                )}
+                                            </Box>
+
+                                            {/* STATUS */}
+                                            <Box
+                                                component="td"
+                                                sx={{
+                                                    px: 2,
+                                                    py: 2,
+                                                    borderBottom:
+                                                        "1px solid #EFE5DC",
+                                                }}
+                                            >
+                                                <Chip
+                                                    label={
+                                                        active
+                                                            ? "Active"
+                                                            : "Closed"
+                                                    }
+                                                    size="small"
+                                                    sx={{
+                                                        backgroundColor:
+                                                            active
+                                                                ? "#EDF4E8"
+                                                                : "#F3ECE6",
+                                                        color: active
+                                                            ? "#557F3D"
+                                                            : "#766C64",
+                                                        fontWeight: 800,
+                                                        borderRadius: 1.5,
+                                                    }}
+                                                />
+                                            </Box>
+
+                                            {/* ACTION */}
+                                            <Box
+                                                component="td"
+                                                sx={{
+                                                    px: 2,
+                                                    py: 2,
+                                                    borderBottom:
+                                                        "1px solid #EFE5DC",
+                                                }}
+                                            >
+                                                {active ? (
+                                                    <Button
+                                                        size="small"
+                                                        variant="outlined"
+                                                        onClick={() =>
+                                                            setSelectedJob(
+                                                                job
                                                             )
                                                         }
-                                                        label={
-                                                            isActive
-                                                                ? "Active"
-                                                                : "Closed"
-                                                        }
-                                                        size="small"
                                                         sx={{
-                                                            borderRadius: 1.5,
+                                                            textTransform:
+                                                                "none",
                                                             fontWeight: 700,
-                                                            backgroundColor:
-                                                                isActive
-                                                                    ? "#ecfdf5"
-                                                                    : "#f1f5f9",
-                                                            color:
-                                                                isActive
-                                                                    ? "#047857"
-                                                                    : "#64748b",
-                                                            "& .MuiChip-icon":
-                                                                {
-                                                                    color:
-                                                                        "inherit",
-                                                                    fontSize: 16,
-                                                                },
+                                                            color: "#C8553D",
+                                                            borderColor:
+                                                                "#E9B7A9",
+                                                            borderRadius: 1.5,
+                                                            "&:hover": {
+                                                                backgroundColor:
+                                                                    "#FFF0EC",
+                                                                borderColor:
+                                                                    "#E76F51",
+                                                            },
                                                         }}
-                                                    />
-                                                </TableCell>
-
-
-                                                <TableCell align="right">
-                                                    {isActive ? (
-                                                        <Tooltip title="Close job">
-                                                            <Button
-                                                                size="small"
-                                                                variant="outlined"
-                                                                startIcon={
-                                                                    <Close />
-                                                                }
-                                                                onClick={() =>
-                                                                    openCloseDialog(
-                                                                        job
-                                                                    )
-                                                                }
-                                                                sx={{
-                                                                    borderRadius: 2,
-                                                                    textTransform:
-                                                                        "none",
-                                                                    fontWeight: 700,
-                                                                    borderColor:
-                                                                        "#fecaca",
-                                                                    color: "#dc2626",
-                                                                    whiteSpace:
-                                                                        "nowrap",
-                                                                    "&:hover":
-                                                                        {
-                                                                            borderColor:
-                                                                                "#f87171",
-                                                                            backgroundColor:
-                                                                                "#fef2f2",
-                                                                        },
-                                                                }}
-                                                            >
-                                                                Close
-                                                            </Button>
-                                                        </Tooltip>
-                                                    ) : (
-                                                        <Typography
-                                                            variant="body2"
-                                                            sx={{
-                                                                color: "#94a3b8",
-                                                                fontWeight: 600,
-                                                            }}
-                                                        >
-                                                            Closed
-                                                        </Typography>
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    }
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                                    >
+                                                        Close Job
+                                                    </Button>
+                                                ) : (
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: 13,
+                                                            color: "#9A8F87",
+                                                        }}
+                                                    >
+                                                        No action
+                                                    </Typography>
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    );
+                                })}
+                            </Box>
+                        </Box>
+                    </Box>
                 )}
             </Paper>
 
-
-            {/* Close Job Confirmation */}
+            {/* CLOSE JOB DIALOG */}
             <Dialog
-                open={closeDialogOpen}
-                onClose={closeCloseDialog}
+                open={Boolean(selectedJob)}
+                onClose={() =>
+                    !closing && setSelectedJob(null)
+                }
                 fullWidth
-                maxWidth="sm"
+                maxWidth="xs"
+                PaperProps={{
+                    sx: {
+                        backgroundColor: "#FFFDF9",
+                        borderRadius: 3,
+                        border: "1px solid #E9DED0",
+                    },
+                }}
             >
                 <DialogTitle
                     sx={{
-                        fontWeight: 800,
-                        color: "#0f172a",
+                        color: "#293241",
+                        fontWeight: 900,
+                        pb: 1,
                     }}
                 >
                     Close this job?
                 </DialogTitle>
 
                 <DialogContent>
-                    <DialogContentText
+                    <Typography
                         sx={{
-                            color: "#64748b",
+                            color: "#5F554D",
+                            lineHeight: 1.7,
                         }}
                     >
                         Are you sure you want to close{" "}
-                        <strong>
+                        <Box
+                            component="span"
+                            sx={{
+                                fontWeight: 800,
+                                color: "#293241",
+                            }}
+                        >
                             {selectedJob?.JobTitle}
-                        </strong>
-                        ? The job will no longer be active
-                        for job seekers.
-                    </DialogContentText>
+                        </Box>
+                        ? Applicants will no longer be able to
+                        apply for this job.
+                    </Typography>
                 </DialogContent>
 
                 <DialogActions
                     sx={{
                         px: 3,
-                        pb: 2.5,
+                        pb: 3,
+                        gap: 1,
                     }}
                 >
                     <Button
-                        onClick={closeCloseDialog}
+                        onClick={() =>
+                            setSelectedJob(null)
+                        }
                         disabled={closing}
                         sx={{
+                            color: "#5F554D",
                             textTransform: "none",
                             fontWeight: 700,
-                            color: "#475569",
                         }}
                     >
                         Cancel
                     </Button>
 
                     <Button
+                        variant="contained"
                         onClick={handleCloseJob}
                         disabled={closing}
-                        variant="contained"
-                        color="error"
-                        startIcon={
-                            closing ? (
-                                <CircularProgress
-                                    size={17}
-                                    color="inherit"
-                                />
-                            ) : (
-                                <Close />
-                            )
-                        }
                         sx={{
+                            backgroundColor: "#E76F51",
+                            color: "#fff",
                             textTransform: "none",
-                            fontWeight: 700,
+                            fontWeight: 800,
                             borderRadius: 2,
+                            px: 2.5,
+                            "&:hover": {
+                                backgroundColor: "#D85F43",
+                            },
                         }}
                     >
-                        {closing
-                            ? "Closing..."
-                            : "Close Job"}
+                        {closing ? (
+                            <CircularProgress
+                                size={20}
+                                sx={{
+                                    color: "#fff",
+                                }}
+                            />
+                        ) : (
+                            "Close Job"
+                        )}
                     </Button>
                 </DialogActions>
             </Dialog>
 
-
-            {/* Snackbar */}
+            {/* SNACKBAR */}
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={4000}

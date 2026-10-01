@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
     Alert,
     Avatar,
     Box,
     Button,
-    Card,
     Chip,
     CircularProgress,
     Dialog,
@@ -14,6 +13,7 @@ import {
     DialogTitle,
     Divider,
     IconButton,
+    Paper,
     Stack,
     Table,
     TableBody,
@@ -26,15 +26,15 @@ import {
 } from "@mui/material";
 
 import {
-    ArrowBackRounded,
-    BusinessRounded,
-    CloseRounded,
-    DescriptionRounded,
-    EmailRounded,
-    PersonRounded,
-    RefreshRounded,
-    VisibilityRounded,
-    WorkRounded,
+    ArrowBack,
+    Business,
+    Close,
+    Description,
+    Email,
+    Person,
+    Refresh,
+    Visibility,
+    Work,
 } from "@mui/icons-material";
 
 import axiosAPI from "../../api/axiosAPI";
@@ -43,8 +43,10 @@ function AdminApplications() {
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
     const [selectedApplication, setSelectedApplication] =
         useState(null);
+
     const [detailsOpen, setDetailsOpen] = useState(false);
 
     const fetchApplications = async () => {
@@ -54,11 +56,6 @@ function AdminApplications() {
 
             const response = await axiosAPI.get(
                 "/admin/applications"
-            );
-
-            console.log(
-                "Admin applications response:",
-                response.data
             );
 
             setApplications(response.data.data || []);
@@ -82,11 +79,6 @@ function AdminApplications() {
     }, []);
 
     const openDetails = (application) => {
-        console.log(
-            "Application selected:",
-            application
-        );
-
         setSelectedApplication(application);
         setDetailsOpen(true);
     };
@@ -94,28 +86,6 @@ function AdminApplications() {
     const closeDetails = () => {
         setDetailsOpen(false);
         setSelectedApplication(null);
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case "Submitted":
-                return "info";
-
-            case "Reviewed":
-                return "warning";
-
-            case "Shortlisted":
-                return "success";
-
-            case "Accepted":
-                return "success";
-
-            case "Rejected":
-                return "error";
-
-            default:
-                return "default";
-        }
     };
 
     const formatDate = (date) => {
@@ -156,6 +126,73 @@ function AdminApplications() {
         });
     };
 
+    const getStatusSx = (status) => {
+        switch (status) {
+            case "Submitted":
+                return {
+                    color: "#A65F00",
+                    backgroundColor: "#FFF1D6",
+                };
+
+            case "Reviewed":
+                return {
+                    color: "#5F554D",
+                    backgroundColor: "#F1ECE7",
+                };
+
+            case "Shortlisted":
+                return {
+                    color: "#477A35",
+                    backgroundColor: "#EDF4E8",
+                };
+
+            case "Accepted":
+                return {
+                    color: "#477A35",
+                    backgroundColor: "#DDEBD6",
+                };
+
+            case "Rejected":
+                return {
+                    color: "#B96868",
+                    backgroundColor: "#FBE9E6",
+                };
+
+            default:
+                return {
+                    color: "#5F554D",
+                    backgroundColor: "#F1ECE7",
+                };
+        }
+    };
+
+    const totalApplications = applications.length;
+
+    const uniqueApplicants = useMemo(() => {
+        const applicants = applications
+            .map(
+                (application) =>
+                    application.JobSeekerID ||
+                    application.ApplicantEmail ||
+                    application.ApplicantName
+            )
+            .filter(Boolean);
+
+        return new Set(applicants).size;
+    }, [applications]);
+
+    const jobsWithApplications = useMemo(() => {
+        const jobs = applications
+            .map(
+                (application) =>
+                    application.JobID ||
+                    application.JobTitle
+            )
+            .filter(Boolean);
+
+        return new Set(jobs).size;
+    }, [applications]);
+
     if (loading) {
         return (
             <Box
@@ -164,6 +201,7 @@ function AdminApplications() {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
+                    backgroundColor: "#FFF8EF",
                 }}
             >
                 <Stack
@@ -172,11 +210,16 @@ function AdminApplications() {
                         alignItems: "center",
                     }}
                 >
-                    <CircularProgress size={42} />
+                    <CircularProgress
+                        size={42}
+                        sx={{
+                            color: "#E76F51",
+                        }}
+                    />
 
                     <Typography
                         sx={{
-                            color: "#64748b",
+                            color: "#7A7068",
                             fontWeight: 600,
                         }}
                     >
@@ -188,8 +231,14 @@ function AdminApplications() {
     }
 
     return (
-        <Box>
+        <Box
+            sx={{
+                minHeight: "100%",
+                backgroundColor: "#FFF8EF",
+            }}
+        >
             {/* PAGE HEADER */}
+
             <Box
                 sx={{
                     mb: 4,
@@ -210,9 +259,9 @@ function AdminApplications() {
                     <Typography
                         variant="h4"
                         sx={{
-                            fontWeight: 800,
-                            color: "#0f172a",
-                            letterSpacing: "-0.5px",
+                            fontWeight: 900,
+                            color: "#293241",
+                            letterSpacing: "-0.8px",
                         }}
                     >
                         Applications
@@ -220,8 +269,8 @@ function AdminApplications() {
 
                     <Typography
                         sx={{
-                            mt: 0.7,
-                            color: "#64748b",
+                            mt: 0.75,
+                            color: "#7A7068",
                         }}
                     >
                         Monitor job applications submitted
@@ -231,17 +280,22 @@ function AdminApplications() {
 
                 <Button
                     variant="outlined"
-                    startIcon={<RefreshRounded />}
+                    startIcon={<Refresh />}
                     onClick={fetchApplications}
+                    disabled={loading}
                     sx={{
-                        borderRadius: 2.5,
+                        borderRadius: 2,
                         textTransform: "none",
                         fontWeight: 700,
-                        borderColor: "#dbe2ea",
-                        color: "#334155",
+                        borderColor: "#DCCFC2",
+                        color: "#5F554D",
+                        px: 2.2,
+                        backgroundColor: "#FFFDF9",
+
                         "&:hover": {
-                            borderColor: "#94a3b8",
-                            backgroundColor: "#f8fafc",
+                            borderColor: "#E76F51",
+                            color: "#E76F51",
+                            backgroundColor: "#FFF8EF",
                         },
                     }}
                 >
@@ -250,12 +304,13 @@ function AdminApplications() {
             </Box>
 
             {/* ERROR */}
+
             {error && (
                 <Alert
                     severity="error"
                     sx={{
                         mb: 3,
-                        borderRadius: 3,
+                        borderRadius: 2,
                     }}
                     action={
                         <Button
@@ -272,6 +327,7 @@ function AdminApplications() {
             )}
 
             {/* SUMMARY CARDS */}
+
             <Box
                 sx={{
                     display: "grid",
@@ -284,191 +340,198 @@ function AdminApplications() {
                     mb: 3,
                 }}
             >
-                <Card
+                <Paper
                     elevation={0}
                     sx={{
+                        p: 2.5,
                         borderRadius: 3,
-                        border: "1px solid #e5e7eb",
+                        border: "1px solid #E9DED0",
+                        backgroundColor: "#FFFDF9",
                     }}
                 >
-                    <Box sx={{ p: 2.5 }}>
-                        <Stack
-                            direction="row"
-                            spacing={2}
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{
+                            alignItems: "center",
+                        }}
+                    >
+                        <Box
                             sx={{
+                                width: 46,
+                                height: 46,
+                                borderRadius: 2,
+                                display: "flex",
                                 alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "#FFF1D6",
+                                color: "#E76F51",
                             }}
                         >
-                            <Avatar
+                            <Description />
+                        </Box>
+
+                        <Box>
+                            <Typography
+                                variant="body2"
                                 sx={{
-                                    width: 46,
-                                    height: 46,
-                                    backgroundColor: "#eff6ff",
-                                    color: "#2563eb",
+                                    color: "#7A7068",
+                                    fontWeight: 600,
                                 }}
                             >
-                                <DescriptionRounded />
-                            </Avatar>
+                                Total Applications
+                            </Typography>
 
-                            <Box>
-                                <Typography
-                                    variant="body2"
-                                    sx={{
-                                        color: "#64748b",
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    Total Applications
-                                </Typography>
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    mt: 0.3,
+                                    fontWeight: 900,
+                                    color: "#293241",
+                                }}
+                            >
+                                {totalApplications}
+                            </Typography>
+                        </Box>
+                    </Stack>
+                </Paper>
 
-                                <Typography
-                                    variant="h5"
-                                    sx={{
-                                        mt: 0.3,
-                                        fontWeight: 800,
-                                        color: "#0f172a",
-                                    }}
-                                >
-                                    {applications.length}
-                                </Typography>
-                            </Box>
-                        </Stack>
-                    </Box>
-                </Card>
-
-                <Card
+                <Paper
                     elevation={0}
                     sx={{
+                        p: 2.5,
                         borderRadius: 3,
-                        border: "1px solid #e5e7eb",
+                        border: "1px solid #E9DED0",
+                        backgroundColor: "#FFFDF9",
                     }}
                 >
-                    <Box sx={{ p: 2.5 }}>
-                        <Stack
-                            direction="row"
-                            spacing={2}
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{
+                            alignItems: "center",
+                        }}
+                    >
+                        <Box
                             sx={{
+                                width: 46,
+                                height: 46,
+                                borderRadius: 2,
+                                display: "flex",
                                 alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "#EDF4E8",
+                                color: "#6A994E",
                             }}
                         >
-                            <Avatar
+                            <Person />
+                        </Box>
+
+                        <Box>
+                            <Typography
+                                variant="body2"
                                 sx={{
-                                    width: 46,
-                                    height: 46,
-                                    backgroundColor: "#ecfdf5",
-                                    color: "#059669",
+                                    color: "#7A7068",
+                                    fontWeight: 600,
                                 }}
                             >
-                                <PersonRounded />
-                            </Avatar>
+                                Applicants
+                            </Typography>
 
-                            <Box>
-                                <Typography
-                                    variant="body2"
-                                    sx={{
-                                        color: "#64748b",
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    Applicants
-                                </Typography>
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    mt: 0.3,
+                                    fontWeight: 900,
+                                    color: "#293241",
+                                }}
+                            >
+                                {uniqueApplicants}
+                            </Typography>
+                        </Box>
+                    </Stack>
+                </Paper>
 
-                                <Typography
-                                    variant="h5"
-                                    sx={{
-                                        mt: 0.3,
-                                        fontWeight: 800,
-                                        color: "#0f172a",
-                                    }}
-                                >
-                                    {
-                                        new Set(
-                                            applications.map(
-                                                (application) =>
-                                                    application.ApplicationID
-                                            )
-                                        ).size
-                                    }
-                                </Typography>
-                            </Box>
-                        </Stack>
-                    </Box>
-                </Card>
-
-                <Card
+                <Paper
                     elevation={0}
                     sx={{
+                        p: 2.5,
                         borderRadius: 3,
-                        border: "1px solid #e5e7eb",
+                        border: "1px solid #E9DED0",
+                        backgroundColor: "#FFFDF9",
                     }}
                 >
-                    <Box sx={{ p: 2.5 }}>
-                        <Stack
-                            direction="row"
-                            spacing={2}
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{
+                            alignItems: "center",
+                        }}
+                    >
+                        <Box
                             sx={{
+                                width: 46,
+                                height: 46,
+                                borderRadius: 2,
+                                display: "flex",
                                 alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "#FFE5CC",
+                                color: "#D9822B",
                             }}
                         >
-                            <Avatar
+                            <Work />
+                        </Box>
+
+                        <Box>
+                            <Typography
+                                variant="body2"
                                 sx={{
-                                    width: 46,
-                                    height: 46,
-                                    backgroundColor: "#f5f3ff",
-                                    color: "#7c3aed",
+                                    color: "#7A7068",
+                                    fontWeight: 600,
                                 }}
                             >
-                                <WorkRounded />
-                            </Avatar>
+                                Jobs With Applications
+                            </Typography>
 
-                            <Box>
-                                <Typography
-                                    variant="body2"
-                                    sx={{
-                                        color: "#64748b",
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    Jobs With Applications
-                                </Typography>
-
-                                <Typography
-                                    variant="h5"
-                                    sx={{
-                                        mt: 0.3,
-                                        fontWeight: 800,
-                                        color: "#0f172a",
-                                    }}
-                                >
-                                    {
-                                        new Set(
-                                            applications.map(
-                                                (application) =>
-                                                    application.JobTitle
-                                            )
-                                        ).size
-                                    }
-                                </Typography>
-                            </Box>
-                        </Stack>
-                    </Box>
-                </Card>
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    mt: 0.3,
+                                    fontWeight: 900,
+                                    color: "#293241",
+                                }}
+                            >
+                                {jobsWithApplications}
+                            </Typography>
+                        </Box>
+                    </Stack>
+                </Paper>
             </Box>
 
             {/* APPLICATION TABLE */}
-            <Card
+
+            <Paper
                 elevation={0}
                 sx={{
-                    borderRadius: 4,
-                    border: "1px solid #e5e7eb",
+                    borderRadius: 3,
+                    border: "1px solid #E9DED0",
                     overflow: "hidden",
+                    backgroundColor: "#FFFDF9",
                 }}
             >
-                <Box sx={{ p: 3 }}>
+                <Box
+                    sx={{
+                        p: {
+                            xs: 2,
+                            sm: 3,
+                        },
+                    }}
+                >
                     <Typography
                         sx={{
-                            fontWeight: 800,
-                            color: "#0f172a",
+                            fontWeight: 900,
+                            color: "#293241",
                         }}
                     >
                         All Applications
@@ -478,15 +541,19 @@ function AdminApplications() {
                         variant="body2"
                         sx={{
                             mt: 0.5,
-                            color: "#64748b",
+                            color: "#7A7068",
                         }}
                     >
-                        Review applications submitted by
-                        job seekers.
+                        Review applications submitted by job
+                        seekers.
                     </Typography>
                 </Box>
 
-                <Divider />
+                <Divider
+                    sx={{
+                        borderColor: "#E9DED0",
+                    }}
+                />
 
                 {applications.length === 0 ? (
                     <Box
@@ -496,24 +563,32 @@ function AdminApplications() {
                             textAlign: "center",
                         }}
                     >
-                        <Avatar
+                        <Box
                             sx={{
                                 width: 64,
                                 height: 64,
                                 mx: "auto",
                                 mb: 2,
-                                backgroundColor: "#f1f5f9",
-                                color: "#64748b",
+                                borderRadius: "50%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "#FFF1D6",
+                                color: "#E76F51",
                             }}
                         >
-                            <DescriptionRounded />
-                        </Avatar>
+                            <Description
+                                sx={{
+                                    fontSize: 30,
+                                }}
+                            />
+                        </Box>
 
                         <Typography
                             variant="h6"
                             sx={{
-                                fontWeight: 800,
-                                color: "#334155",
+                                fontWeight: 900,
+                                color: "#293241",
                             }}
                         >
                             No applications yet
@@ -522,73 +597,55 @@ function AdminApplications() {
                         <Typography
                             sx={{
                                 mt: 0.7,
-                                color: "#64748b",
+                                color: "#7A7068",
                             }}
                         >
-                            Applications will appear here
-                            when job seekers apply for jobs.
+                            Applications will appear here when
+                            job seekers apply for jobs.
                         </Typography>
                     </Box>
                 ) : (
-                    <TableContainer>
+                    <TableContainer
+                        sx={{
+                            overflowX: "auto",
+                        }}
+                    >
                         <Table>
                             <TableHead>
-                                <TableRow
-                                    sx={{
-                                        backgroundColor:
-                                            "#f8fafc",
-                                    }}
-                                >
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Applicant
-                                    </TableCell>
-
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Job
-                                    </TableCell>
-
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Company
-                                    </TableCell>
-
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Applied
-                                    </TableCell>
-
-                                    <TableCell
-                                        sx={{
-                                            fontWeight: 800,
-                                            color: "#475569",
-                                        }}
-                                    >
-                                        Status
-                                    </TableCell>
+                                <TableRow>
+                                    {[
+                                        "Applicant",
+                                        "Job",
+                                        "Company",
+                                        "Applied",
+                                        "Status",
+                                    ].map((heading) => (
+                                        <TableCell
+                                            key={heading}
+                                            sx={{
+                                                fontWeight: 800,
+                                                color: "#5F554D",
+                                                backgroundColor:
+                                                    "#FFF8EF",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
+                                                whiteSpace:
+                                                    "nowrap",
+                                            }}
+                                        >
+                                            {heading}
+                                        </TableCell>
+                                    ))}
 
                                     <TableCell
                                         align="right"
                                         sx={{
                                             fontWeight: 800,
-                                            color: "#475569",
+                                            color: "#5F554D",
+                                            backgroundColor:
+                                                "#FFF8EF",
+                                            borderBottom:
+                                                "1px solid #E9DED0",
                                         }}
                                     >
                                         Action
@@ -604,7 +661,20 @@ function AdminApplications() {
                                                 application.ApplicationID
                                             }
                                             hover
+                                            sx={{
+                                                "&:last-child td": {
+                                                    borderBottom:
+                                                        "none",
+                                                },
+
+                                                "&:hover": {
+                                                    backgroundColor:
+                                                        "#FFFBF6",
+                                                },
+                                            }}
                                         >
+                                            {/* APPLICANT */}
+
                                             <TableCell>
                                                 <Stack
                                                     direction="row"
@@ -612,6 +682,7 @@ function AdminApplications() {
                                                     sx={{
                                                         alignItems:
                                                             "center",
+                                                        minWidth: 190,
                                                     }}
                                                 >
                                                     <Avatar
@@ -620,9 +691,10 @@ function AdminApplications() {
                                                             height: 40,
                                                             fontSize:
                                                                 "0.9rem",
-                                                            fontWeight: 700,
-                                                            background:
-                                                                "linear-gradient(135deg, #2563eb, #4f46e5)",
+                                                            fontWeight: 800,
+                                                            backgroundColor:
+                                                                "#E76F51",
+                                                            color: "#fff",
                                                         }}
                                                     >
                                                         {application.ApplicantName
@@ -635,8 +707,8 @@ function AdminApplications() {
                                                     <Box>
                                                         <Typography
                                                             sx={{
-                                                                fontWeight: 700,
-                                                                color: "#1e293b",
+                                                                fontWeight: 800,
+                                                                color: "#293241",
                                                             }}
                                                         >
                                                             {
@@ -647,7 +719,7 @@ function AdminApplications() {
                                                         <Typography
                                                             variant="body2"
                                                             sx={{
-                                                                color: "#64748b",
+                                                                color: "#7A7068",
                                                             }}
                                                         >
                                                             {
@@ -658,6 +730,8 @@ function AdminApplications() {
                                                 </Stack>
                                             </TableCell>
 
+                                            {/* JOB */}
+
                                             <TableCell>
                                                 <Stack
                                                     direction="row"
@@ -665,19 +739,20 @@ function AdminApplications() {
                                                     sx={{
                                                         alignItems:
                                                             "center",
+                                                        minWidth: 170,
                                                     }}
                                                 >
-                                                    <WorkRounded
+                                                    <Work
                                                         sx={{
-                                                            fontSize: 20,
-                                                            color: "#64748b",
+                                                            fontSize: 19,
+                                                            color: "#E76F51",
                                                         }}
                                                     />
 
                                                     <Typography
                                                         sx={{
                                                             fontWeight: 700,
-                                                            color: "#334155",
+                                                            color: "#293241",
                                                         }}
                                                     >
                                                         {
@@ -687,6 +762,8 @@ function AdminApplications() {
                                                 </Stack>
                                             </TableCell>
 
+                                            {/* COMPANY */}
+
                                             <TableCell>
                                                 <Stack
                                                     direction="row"
@@ -694,19 +771,20 @@ function AdminApplications() {
                                                     sx={{
                                                         alignItems:
                                                             "center",
+                                                        minWidth: 150,
                                                     }}
                                                 >
-                                                    <BusinessRounded
+                                                    <Business
                                                         sx={{
                                                             fontSize: 19,
-                                                            color: "#64748b",
+                                                            color: "#6A994E",
                                                         }}
                                                     />
 
                                                     <Typography
                                                         variant="body2"
                                                         sx={{
-                                                            color: "#64748b",
+                                                            color: "#5F554D",
                                                         }}
                                                     >
                                                         {
@@ -716,11 +794,15 @@ function AdminApplications() {
                                                 </Stack>
                                             </TableCell>
 
+                                            {/* APPLIED */}
+
                                             <TableCell>
                                                 <Typography
                                                     variant="body2"
                                                     sx={{
-                                                        color: "#64748b",
+                                                        color: "#7A7068",
+                                                        whiteSpace:
+                                                            "nowrap",
                                                     }}
                                                 >
                                                     {formatDate(
@@ -729,21 +811,25 @@ function AdminApplications() {
                                                 </Typography>
                                             </TableCell>
 
+                                            {/* STATUS */}
+
                                             <TableCell>
                                                 <Chip
                                                     label={
                                                         application.Status ||
                                                         "Unknown"
                                                     }
-                                                    color={getStatusColor(
-                                                        application.Status
-                                                    )}
                                                     size="small"
                                                     sx={{
-                                                        fontWeight: 700,
+                                                        ...getStatusSx(
+                                                            application.Status
+                                                        ),
+                                                        fontWeight: 800,
                                                     }}
                                                 />
                                             </TableCell>
+
+                                            {/* ACTION */}
 
                                             <TableCell align="right">
                                                 <Tooltip title="View application">
@@ -755,17 +841,19 @@ function AdminApplications() {
                                                             )
                                                         }
                                                         sx={{
-                                                            border: "1px solid #e2e8f0",
-                                                            borderRadius: 2,
-                                                            color: "#2563eb",
+                                                            color: "#E76F51",
+                                                            backgroundColor:
+                                                                "#FFF1D6",
+                                                            border: "1px solid #F4D3B5",
+
                                                             "&:hover":
                                                                 {
                                                                     backgroundColor:
-                                                                        "#eff6ff",
+                                                                        "#FFE5CC",
                                                                 },
                                                         }}
                                                     >
-                                                        <VisibilityRounded fontSize="small" />
+                                                        <Visibility fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
                                             </TableCell>
@@ -776,9 +864,10 @@ function AdminApplications() {
                         </Table>
                     </TableContainer>
                 )}
-            </Card>
+            </Paper>
 
             {/* APPLICATION DETAILS DIALOG */}
+
             <Dialog
                 open={detailsOpen}
                 onClose={closeDetails}
@@ -786,8 +875,9 @@ function AdminApplications() {
                 maxWidth="sm"
                 PaperProps={{
                     sx: {
-                        borderRadius: 4,
+                        borderRadius: 3,
                         overflow: "hidden",
+                        backgroundColor: "#FFFDF9",
                     },
                 }}
             >
@@ -795,10 +885,12 @@ function AdminApplications() {
                     <>
                         <DialogTitle
                             sx={{
-                                p: 3,
-                                background:
-                                    "linear-gradient(135deg, #0f172a, #1e3a8a)",
-                                color: "#ffffff",
+                                p: {
+                                    xs: 2.5,
+                                    sm: 3,
+                                },
+                                backgroundColor: "#293241",
+                                color: "#fff",
                             }}
                         >
                             <Box
@@ -807,13 +899,14 @@ function AdminApplications() {
                                     justifyContent:
                                         "space-between",
                                     alignItems: "center",
+                                    gap: 2,
                                 }}
                             >
                                 <Box>
                                     <Typography
                                         variant="h6"
                                         sx={{
-                                            fontWeight: 800,
+                                            fontWeight: 900,
                                         }}
                                     >
                                         Application Details
@@ -823,7 +916,7 @@ function AdminApplications() {
                                         variant="body2"
                                         sx={{
                                             mt: 0.5,
-                                            color: "#cbd5e1",
+                                            color: "rgba(255,255,255,0.65)",
                                         }}
                                     >
                                         Application #
@@ -837,25 +930,34 @@ function AdminApplications() {
                                     onClick={closeDetails}
                                     aria-label="Close application details"
                                     sx={{
-                                        color: "#ffffff",
+                                        color: "#fff",
+
                                         "&:hover": {
                                             backgroundColor:
                                                 "rgba(255,255,255,0.1)",
                                         },
                                     }}
                                 >
-                                    <CloseRounded />
+                                    <Close />
                                 </IconButton>
                             </Box>
                         </DialogTitle>
 
-                        <DialogContent sx={{ p: 3 }}>
+                        <DialogContent
+                            sx={{
+                                p: {
+                                    xs: 2.5,
+                                    sm: 3,
+                                },
+                            }}
+                        >
                             {/* APPLICANT */}
+
                             <Box sx={{ mb: 3 }}>
                                 <Typography
                                     variant="overline"
                                     sx={{
-                                        color: "#64748b",
+                                        color: "#9A8F86",
                                         fontWeight: 800,
                                         letterSpacing: 1,
                                     }}
@@ -877,8 +979,9 @@ function AdminApplications() {
                                             height: 56,
                                             fontSize: "1.2rem",
                                             fontWeight: 800,
-                                            background:
-                                                "linear-gradient(135deg, #2563eb, #4f46e5)",
+                                            backgroundColor:
+                                                "#E76F51",
+                                            color: "#fff",
                                         }}
                                     >
                                         {selectedApplication.ApplicantName
@@ -886,12 +989,12 @@ function AdminApplications() {
                                             ?.toUpperCase()}
                                     </Avatar>
 
-                                    <Box>
+                                    <Box sx={{ minWidth: 0 }}>
                                         <Typography
                                             variant="h6"
                                             sx={{
-                                                fontWeight: 800,
-                                                color: "#0f172a",
+                                                fontWeight: 900,
+                                                color: "#293241",
                                             }}
                                         >
                                             {
@@ -908,17 +1011,19 @@ function AdminApplications() {
                                                 mt: 0.3,
                                             }}
                                         >
-                                            <EmailRounded
+                                            <Email
                                                 sx={{
                                                     fontSize: 17,
-                                                    color: "#64748b",
+                                                    color: "#7A7068",
                                                 }}
                                             />
 
                                             <Typography
                                                 variant="body2"
                                                 sx={{
-                                                    color: "#64748b",
+                                                    color: "#7A7068",
+                                                    wordBreak:
+                                                        "break-word",
                                                 }}
                                             >
                                                 {
@@ -930,14 +1035,20 @@ function AdminApplications() {
                                 </Stack>
                             </Box>
 
-                            <Divider sx={{ mb: 3 }} />
+                            <Divider
+                                sx={{
+                                    mb: 3,
+                                    borderColor: "#E9DED0",
+                                }}
+                            />
 
-                            {/* JOB */}
+                            {/* POSITION */}
+
                             <Box sx={{ mb: 3 }}>
                                 <Typography
                                     variant="overline"
                                     sx={{
-                                        color: "#64748b",
+                                        color: "#9A8F86",
                                         fontWeight: 800,
                                         letterSpacing: 1,
                                     }}
@@ -945,15 +1056,16 @@ function AdminApplications() {
                                     Position
                                 </Typography>
 
-                                <Card
+                                <Paper
                                     elevation={0}
                                     sx={{
                                         mt: 1,
                                         p: 2,
-                                        borderRadius: 3,
+                                        borderRadius: 2.5,
                                         backgroundColor:
-                                            "#f8fafc",
-                                        border: "1px solid #e2e8f0",
+                                            "#FFF8EF",
+                                        border:
+                                            "1px solid #E9DED0",
                                     }}
                                 >
                                     <Stack
@@ -964,23 +1076,30 @@ function AdminApplications() {
                                                 "center",
                                         }}
                                     >
-                                        <Avatar
+                                        <Box
                                             sx={{
                                                 width: 44,
                                                 height: 44,
+                                                borderRadius: 2,
+                                                display: "flex",
+                                                alignItems:
+                                                    "center",
+                                                justifyContent:
+                                                    "center",
                                                 backgroundColor:
-                                                    "#eff6ff",
-                                                color: "#2563eb",
+                                                    "#FFF1D6",
+                                                color: "#E76F51",
+                                                flexShrink: 0,
                                             }}
                                         >
-                                            <WorkRounded />
-                                        </Avatar>
+                                            <Work />
+                                        </Box>
 
-                                        <Box>
+                                        <Box sx={{ minWidth: 0 }}>
                                             <Typography
                                                 sx={{
-                                                    fontWeight: 800,
-                                                    color: "#1e293b",
+                                                    fontWeight: 900,
+                                                    color: "#293241",
                                                 }}
                                             >
                                                 {
@@ -997,17 +1116,17 @@ function AdminApplications() {
                                                     mt: 0.3,
                                                 }}
                                             >
-                                                <BusinessRounded
+                                                <Business
                                                     sx={{
                                                         fontSize: 17,
-                                                        color: "#64748b",
+                                                        color: "#6A994E",
                                                     }}
                                                 />
 
                                                 <Typography
                                                     variant="body2"
                                                     sx={{
-                                                        color: "#64748b",
+                                                        color: "#7A7068",
                                                     }}
                                                 >
                                                     {
@@ -1017,15 +1136,16 @@ function AdminApplications() {
                                             </Stack>
                                         </Box>
                                     </Stack>
-                                </Card>
+                                </Paper>
                             </Box>
 
                             {/* APPLICATION INFORMATION */}
+
                             <Box>
                                 <Typography
                                     variant="overline"
                                     sx={{
-                                        color: "#64748b",
+                                        color: "#9A8F86",
                                         fontWeight: 800,
                                         letterSpacing: 1,
                                     }}
@@ -1036,8 +1156,10 @@ function AdminApplications() {
                                 <Box
                                     sx={{
                                         display: "grid",
-                                        gridTemplateColumns:
-                                            "repeat(2, minmax(0, 1fr))",
+                                        gridTemplateColumns: {
+                                            xs: "1fr",
+                                            sm: "repeat(2, minmax(0, 1fr))",
+                                        },
                                         gap: 2,
                                         mt: 1,
                                     }}
@@ -1045,16 +1167,17 @@ function AdminApplications() {
                                     <Box
                                         sx={{
                                             p: 2,
-                                            borderRadius: 3,
+                                            borderRadius: 2.5,
                                             backgroundColor:
-                                                "#f8fafc",
-                                            border: "1px solid #e2e8f0",
+                                                "#FFF8EF",
+                                            border:
+                                                "1px solid #E9DED0",
                                         }}
                                     >
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color: "#64748b",
+                                                color: "#7A7068",
                                             }}
                                         >
                                             Status
@@ -1066,12 +1189,12 @@ function AdminApplications() {
                                                     selectedApplication.Status ||
                                                     "Unknown"
                                                 }
-                                                color={getStatusColor(
-                                                    selectedApplication.Status
-                                                )}
                                                 size="small"
                                                 sx={{
-                                                    fontWeight: 700,
+                                                    ...getStatusSx(
+                                                        selectedApplication.Status
+                                                    ),
+                                                    fontWeight: 800,
                                                 }}
                                             />
                                         </Box>
@@ -1080,16 +1203,17 @@ function AdminApplications() {
                                     <Box
                                         sx={{
                                             p: 2,
-                                            borderRadius: 3,
+                                            borderRadius: 2.5,
                                             backgroundColor:
-                                                "#f8fafc",
-                                            border: "1px solid #e2e8f0",
+                                                "#FFF8EF",
+                                            border:
+                                                "1px solid #E9DED0",
                                         }}
                                     >
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color: "#64748b",
+                                                color: "#7A7068",
                                             }}
                                         >
                                             Applied On
@@ -1098,8 +1222,8 @@ function AdminApplications() {
                                         <Typography
                                             sx={{
                                                 mt: 1,
-                                                fontWeight: 700,
-                                                color: "#1e293b",
+                                                fontWeight: 800,
+                                                color: "#293241",
                                             }}
                                         >
                                             {formatDate(
@@ -1113,16 +1237,17 @@ function AdminApplications() {
                                     sx={{
                                         mt: 2,
                                         p: 2,
-                                        borderRadius: 3,
+                                        borderRadius: 2.5,
                                         backgroundColor:
-                                            "#f8fafc",
-                                        border: "1px solid #e2e8f0",
+                                            "#FFF8EF",
+                                        border:
+                                            "1px solid #E9DED0",
                                     }}
                                 >
                                     <Typography
                                         variant="body2"
                                         sx={{
-                                            color: "#64748b",
+                                            color: "#7A7068",
                                         }}
                                     >
                                         Submitted
@@ -1131,8 +1256,8 @@ function AdminApplications() {
                                     <Typography
                                         sx={{
                                             mt: 0.5,
-                                            fontWeight: 700,
-                                            color: "#1e293b",
+                                            fontWeight: 800,
+                                            color: "#293241",
                                         }}
                                     >
                                         {formatDateTime(
@@ -1145,18 +1270,29 @@ function AdminApplications() {
 
                         <DialogActions
                             sx={{
-                                p: 2.5,
+                                p: {
+                                    xs: 2,
+                                    sm: 2.5,
+                                },
                                 borderTop:
-                                    "1px solid #e5e7eb",
+                                    "1px solid #E9DED0",
+                                backgroundColor: "#FFFDF9",
                             }}
                         >
                             <Button
                                 onClick={closeDetails}
-                                startIcon={<ArrowBackRounded />}
+                                startIcon={<ArrowBack />}
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,
-                                    borderRadius: 2.5,
+                                    borderRadius: 2,
+                                    color: "#5F554D",
+
+                                    "&:hover": {
+                                        backgroundColor:
+                                            "#FFF8EF",
+                                        color: "#E76F51",
+                                    },
                                 }}
                             >
                                 Back to Applications

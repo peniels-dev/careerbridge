@@ -18,9 +18,29 @@ import {
     Typography,
 } from "@mui/material";
 
-import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
+import BusinessCenter from "@mui/icons-material/BusinessCenter";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import Check from "@mui/icons-material/Check";
 
 import axiosAPI from "../api/axiosAPI";
+
+const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+        backgroundColor: "#FFFDF9",
+        "&.Mui-focused fieldset": {
+            borderColor: "#E76F51",
+        },
+    },
+    "& .MuiInputLabel-root.Mui-focused": {
+        color: "#E76F51",
+    },
+};
+
+const sectionTitleSx = {
+    fontWeight: 800,
+    color: "#293241",
+    mb: 2.5,
+};
 
 function Register() {
     const navigate = useNavigate();
@@ -28,10 +48,8 @@ function Register() {
     const [firstName, setFirstName] = useState("");
     const [middleName, setMiddleName] = useState("");
     const [lastName, setLastName] = useState("");
-
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -45,7 +63,8 @@ function Register() {
     const [companyEmail, setCompanyEmail] = useState("");
     const [companyPhone, setCompanyPhone] = useState("");
     const [companyAddress, setCompanyAddress] = useState("");
-    const [companyDescription, setCompanyDescription] = useState("");
+    const [companyDescription, setCompanyDescription] =
+        useState("");
     const [companyWebsite, setCompanyWebsite] = useState("");
 
     const [loadingCompanies, setLoadingCompanies] = useState(false);
@@ -56,7 +75,6 @@ function Register() {
 
     const [registrationComplete, setRegistrationComplete] =
         useState(false);
-
     const [registeredRole, setRegisteredRole] = useState("");
 
     useEffect(() => {
@@ -68,7 +86,10 @@ function Register() {
 
                 setCompanies(response.data?.data || []);
             } catch (error) {
-                console.error("Unable to load companies:", error);
+                console.error(
+                    "Unable to load companies:",
+                    error
+                );
 
                 setError(
                     "Unable to load companies. Please refresh the page and try again."
@@ -212,34 +233,43 @@ function Register() {
         setLoading(true);
 
         try {
-            const response = await axiosAPI.post("/auth/register", {
-                firstName: firstName.trim(),
-                middleName: middleName.trim() || null,
-                lastName: lastName.trim(),
-                email: email.trim(),
-                phone: phone.trim(),
-                password,
-                role,
+            const response = await axiosAPI.post(
+                "/auth/register",
+                {
+                    firstName: firstName.trim(),
+                    middleName:
+                        middleName.trim() || null,
+                    lastName: lastName.trim(),
+                    email: email.trim(),
+                    phone: phone.trim(),
+                    password,
+                    role,
 
-                companyId:
-                    role === "Employer" && !newCompany
-                        ? Number(companyId)
-                        : null,
+                    companyId:
+                        role === "Employer" && !newCompany
+                            ? Number(companyId)
+                            : null,
 
-                newCompany:
-                    role === "Employer" && newCompany
-                        ? {
-                              companyName: companyName.trim(),
-                              companyEmail: companyEmail.trim(),
-                              companyPhone: companyPhone.trim(),
-                              companyAddress: companyAddress.trim(),
-                              companyDescription:
-                                  companyDescription.trim(),
-                              companyWebsite:
-                                  companyWebsite.trim() || null,
-                          }
-                        : null,
-            });
+                    newCompany:
+                        role === "Employer" && newCompany
+                            ? {
+                                  companyName:
+                                      companyName.trim(),
+                                  companyEmail:
+                                      companyEmail.trim(),
+                                  companyPhone:
+                                      companyPhone.trim(),
+                                  companyAddress:
+                                      companyAddress.trim(),
+                                  companyDescription:
+                                      companyDescription.trim(),
+                                  companyWebsite:
+                                      companyWebsite.trim() ||
+                                      null,
+                              }
+                            : null,
+                }
+            );
 
             setRegisteredRole(role);
             setRegistrationComplete(true);
@@ -259,7 +289,9 @@ function Register() {
 
             if (backendMessage) {
                 setError(backendMessage);
-            } else if (error.response?.data?.errors?.length) {
+            } else if (
+                error.response?.data?.errors?.length
+            ) {
                 setError(
                     error.response.data.errors
                         .map((item) => item.message)
@@ -275,12 +307,7 @@ function Register() {
         }
     };
 
-    /*
-     * ---------------------------------------------------------
-     * REGISTRATION SUCCESS SCREEN
-     * ---------------------------------------------------------
-     */
-
+    /* Registration success screen */
     if (registrationComplete) {
         const isEmployer = registeredRole === "Employer";
 
@@ -288,59 +315,103 @@ function Register() {
             <Box
                 sx={{
                     minHeight: "100vh",
-                    background:
-                        "linear-gradient(135deg, #f8fafc 0%, #eef4ff 100%)",
+                    backgroundColor: "#FFF8EF",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     px: 2,
                     py: 5,
+                    position: "relative",
+                    overflow: "hidden",
                 }}
             >
-                <Container maxWidth="sm">
+                <Box
+                    sx={{
+                        position: "absolute",
+                        width: 280,
+                        height: 280,
+                        borderRadius: "50%",
+                        backgroundColor: "#FFE5CC",
+                        top: -120,
+                        right: -100,
+                    }}
+                />
+
+                <Box
+                    sx={{
+                        position: "absolute",
+                        width: 190,
+                        height: 190,
+                        borderRadius: "50%",
+                        backgroundColor: "#EDF4E8",
+                        bottom: -80,
+                        left: -60,
+                    }}
+                />
+
+                <Container
+                    maxWidth="sm"
+                    sx={{
+                        position: "relative",
+                        zIndex: 1,
+                    }}
+                >
                     <Card
                         elevation={0}
                         sx={{
-                            borderRadius: 4,
-                            border: "1px solid",
-                            borderColor: "divider",
+                            backgroundColor: "#FFFDF9",
+                            border: "1px solid #E9DED0",
+                            borderRadius: 3,
                             overflow: "hidden",
+                            boxShadow:
+                                "0 18px 45px rgba(75, 61, 48, 0.10)",
                         }}
                     >
+                        <Box
+                            sx={{
+                                height: 6,
+                                backgroundColor: "#6A994E",
+                            }}
+                        />
+
                         <CardContent
                             sx={{
                                 p: {
-                                    xs: 4,
-                                    sm: 6,
+                                    xs: 3,
+                                    sm: 5,
                                 },
                                 textAlign: "center",
                             }}
                         >
-                            {/* Success circle */}
                             <Box
                                 sx={{
-                                    width: 90,
-                                    height: 90,
+                                    width: 82,
+                                    height: 82,
                                     borderRadius: "50%",
-                                    backgroundColor: "success.light",
-                                    color: "success.dark",
+                                    backgroundColor: "#EDF4E8",
+                                    color: "#6A994E",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
                                     mx: "auto",
                                     mb: 3,
-                                    fontSize: "3.5rem",
-                                    fontWeight: 800,
                                 }}
                             >
-                                ✓
+                                <Check
+                                    sx={{
+                                        fontSize: 44,
+                                        fontWeight: 700,
+                                    }}
+                                />
                             </Box>
 
                             <Typography
                                 variant="h4"
-                                fontWeight={800}
                                 sx={{
+                                    fontWeight: 900,
+                                    color: "#293241",
                                     mb: 1.5,
+                                    letterSpacing: "-0.7px",
                                 }}
                             >
                                 {isEmployer
@@ -352,34 +423,34 @@ function Register() {
                                 <>
                                     <Typography
                                         variant="h6"
-                                        fontWeight={600}
                                         sx={{
+                                            fontWeight: 700,
+                                            color: "#293241",
                                             mb: 2,
                                         }}
                                     >
-                                        Your employer registration is pending
-                                        approval.
+                                        Your employer registration is
+                                        pending approval.
                                     </Typography>
 
                                     <Typography
                                         variant="body1"
-                                        color="text.secondary"
                                         sx={{
+                                            color: "#7A7068",
                                             lineHeight: 1.8,
                                             mb: 3,
                                         }}
                                     >
-                                        Your registration request has been
-                                        successfully submitted to the
-                                        administrator for review.
+                                        Your registration request has
+                                        been successfully submitted to
+                                        the administrator for review.
                                     </Typography>
 
                                     <Box
                                         sx={{
-                                            backgroundColor: "#F8FAFC",
-                                            border: "1px solid",
-                                            borderColor: "divider",
-                                            borderRadius: 3,
+                                            backgroundColor: "#FFF1D6",
+                                            border: "1px solid #E9DED0",
+                                            borderRadius: 2,
                                             p: 3,
                                             mb: 4,
                                             textAlign: "left",
@@ -387,8 +458,9 @@ function Register() {
                                     >
                                         <Typography
                                             variant="subtitle1"
-                                            fontWeight={700}
                                             sx={{
+                                                fontWeight: 800,
+                                                color: "#293241",
                                                 mb: 1.5,
                                             }}
                                         >
@@ -397,22 +469,24 @@ function Register() {
 
                                         <Typography
                                             variant="body2"
-                                            color="text.secondary"
                                             sx={{
+                                                color: "#655B53",
                                                 lineHeight: 1.8,
                                             }}
                                         >
-                                            1. An administrator will review
-                                            your employer registration.
+                                            1. An administrator will
+                                            review your employer
+                                            registration.
                                             <br />
                                             <br />
-                                            2. If your request is approved,
-                                            your employer account will be
-                                            activated.
+                                            2. If your request is
+                                            approved, your employer
+                                            account will be activated.
                                             <br />
                                             <br />
-                                            3. You can then sign in and access
-                                            the employer dashboard.
+                                            3. You can then sign in and
+                                            access the employer
+                                            dashboard.
                                         </Typography>
                                     </Box>
                                 </>
@@ -420,8 +494,9 @@ function Register() {
                                 <>
                                     <Typography
                                         variant="h6"
-                                        fontWeight={600}
                                         sx={{
+                                            fontWeight: 700,
+                                            color: "#293241",
                                             mb: 2,
                                         }}
                                     >
@@ -430,15 +505,15 @@ function Register() {
 
                                     <Typography
                                         variant="body1"
-                                        color="text.secondary"
                                         sx={{
+                                            color: "#7A7068",
                                             lineHeight: 1.8,
                                             mb: 4,
                                         }}
                                     >
                                         Your account has been created
-                                        successfully. You can now sign in and
-                                        start using CareerBridge.
+                                        successfully. You can now sign
+                                        in and start using CareerBridge.
                                     </Typography>
                                 </>
                             )}
@@ -448,12 +523,20 @@ function Register() {
                                 size="large"
                                 fullWidth
                                 onClick={() => navigate("/login")}
+                                endIcon={<ArrowForward />}
                                 sx={{
                                     py: 1.5,
-                                    borderRadius: 2.5,
+                                    backgroundColor: "#E76F51",
+                                    color: "#FFFFFF",
+                                    borderRadius: 2,
                                     textTransform: "none",
                                     fontSize: "1rem",
-                                    fontWeight: 700,
+                                    fontWeight: 800,
+                                    boxShadow: "none",
+                                    "&:hover": {
+                                        backgroundColor: "#D85F43",
+                                        boxShadow: "none",
+                                    },
                                 }}
                             >
                                 Go to Login
@@ -469,7 +552,9 @@ function Register() {
                                 }}
                                 sx={{
                                     mt: 1.5,
+                                    color: "#6F6259",
                                     textTransform: "none",
+                                    fontWeight: 700,
                                 }}
                             >
                                 Back to Registration
@@ -481,21 +566,15 @@ function Register() {
         );
     }
 
-    /*
-     * ---------------------------------------------------------
-     * REGISTRATION FORM
-     * ---------------------------------------------------------
-     */
-
+    /* Registration form */
     return (
         <Box
             sx={{
                 minHeight: "100vh",
-                background:
-                    "linear-gradient(135deg, #f8fafc 0%, #eef4ff 100%)",
+                backgroundColor: "#FFF8EF",
                 py: {
-                    xs: 4,
-                    sm: 6,
+                    xs: 3,
+                    sm: 5,
                 },
                 px: 2,
             }}
@@ -504,18 +583,19 @@ function Register() {
                 <Card
                     elevation={0}
                     sx={{
-                        borderRadius: 4,
-                        border: "1px solid",
-                        borderColor: "divider",
+                        backgroundColor: "#FFFDF9",
+                        border: "1px solid #E9DED0",
+                        borderRadius: 3,
                         overflow: "hidden",
+                        boxShadow:
+                            "0 18px 45px rgba(75, 61, 48, 0.09)",
                     }}
                 >
                     {/* Header */}
                     <Box
                         sx={{
-                            background:
-                                "linear-gradient(135deg, #1976d2 0%, #1257a6 100%)",
-                            color: "white",
+                            backgroundColor: "#293241",
+                            color: "#FFFFFF",
                             px: {
                                 xs: 3,
                                 sm: 5,
@@ -524,28 +604,47 @@ function Register() {
                                 xs: 4,
                                 sm: 5,
                             },
+                            position: "relative",
+                            overflow: "hidden",
                         }}
                     >
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                width: 150,
+                                height: 150,
+                                borderRadius: "50%",
+                                backgroundColor:
+                                    "rgba(231,111,81,0.18)",
+                                right: -45,
+                                top: -65,
+                            }}
+                        />
+
                         <Stack
                             direction="row"
                             spacing={2}
                             alignItems="center"
+                            sx={{
+                                position: "relative",
+                                zIndex: 1,
+                            }}
                         >
                             <Box
                                 sx={{
-                                    width: 52,
-                                    height: 52,
-                                    borderRadius: 2.5,
-                                    backgroundColor:
-                                        "rgba(255,255,255,0.16)",
+                                    width: 54,
+                                    height: 54,
+                                    borderRadius: 2,
+                                    backgroundColor: "#E76F51",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
+                                    flexShrink: 0,
                                 }}
                             >
-                                <BusinessCenterOutlinedIcon
+                                <BusinessCenter
                                     sx={{
-                                        fontSize: 30,
+                                        fontSize: 29,
                                     }}
                                 />
                             </Box>
@@ -553,7 +652,10 @@ function Register() {
                             <Box>
                                 <Typography
                                     variant="h4"
-                                    fontWeight={800}
+                                    sx={{
+                                        fontWeight: 900,
+                                        letterSpacing: "-0.7px",
+                                    }}
                                 >
                                     Create your account
                                 </Typography>
@@ -562,11 +664,11 @@ function Register() {
                                     variant="body1"
                                     sx={{
                                         mt: 0.5,
-                                        opacity: 0.9,
+                                        color: "#E8E0D8",
                                     }}
                                 >
-                                    Join CareerBridge and take the next step
-                                    in your career.
+                                    Join CareerBridge and take the next
+                                    step in your career.
                                 </Typography>
                             </Box>
                         </Stack>
@@ -575,7 +677,7 @@ function Register() {
                     <CardContent
                         sx={{
                             p: {
-                                xs: 3,
+                                xs: 2.5,
                                 sm: 5,
                             },
                         }}
@@ -608,13 +710,10 @@ function Register() {
                             component="form"
                             onSubmit={handleSubmit}
                         >
-                            {/* Personal information */}
+                            {/* Personal Information */}
                             <Typography
                                 variant="h6"
-                                fontWeight={800}
-                                sx={{
-                                    mb: 2.5,
-                                }}
+                                sx={sectionTitleSx}
                             >
                                 Personal Information
                             </Typography>
@@ -637,6 +736,7 @@ function Register() {
                                         }
                                         required
                                         fullWidth
+                                        sx={fieldSx}
                                     />
 
                                     <TextField
@@ -648,6 +748,7 @@ function Register() {
                                             )
                                         }
                                         fullWidth
+                                        sx={fieldSx}
                                     />
 
                                     <TextField
@@ -660,6 +761,7 @@ function Register() {
                                         }
                                         required
                                         fullWidth
+                                        sx={fieldSx}
                                     />
                                 </Stack>
 
@@ -679,6 +781,7 @@ function Register() {
                                         }
                                         required
                                         fullWidth
+                                        sx={fieldSx}
                                     />
 
                                     <TextField
@@ -689,6 +792,7 @@ function Register() {
                                         }
                                         required
                                         fullWidth
+                                        sx={fieldSx}
                                     />
                                 </Stack>
 
@@ -711,6 +815,7 @@ function Register() {
                                         required
                                         fullWidth
                                         helperText="8–20 characters, including uppercase, lowercase, number and special character."
+                                        sx={fieldSx}
                                     />
 
                                     <TextField
@@ -724,23 +829,26 @@ function Register() {
                                         }
                                         required
                                         fullWidth
+                                        sx={fieldSx}
                                     />
                                 </Stack>
                             </Stack>
 
-                            {/* Account type */}
+                            {/* Account Type */}
                             <Typography
                                 variant="h6"
-                                fontWeight={800}
                                 sx={{
+                                    ...sectionTitleSx,
                                     mt: 5,
-                                    mb: 2.5,
                                 }}
                             >
                                 Account Type
                             </Typography>
 
-                            <FormControl fullWidth>
+                            <FormControl
+                                fullWidth
+                                sx={fieldSx}
+                            >
                                 <InputLabel>
                                     Account Type
                                 </InputLabel>
@@ -775,8 +883,8 @@ function Register() {
                                 <>
                                     <Typography
                                         variant="h6"
-                                        fontWeight={800}
                                         sx={{
+                                            ...sectionTitleSx,
                                             mt: 5,
                                             mb: 1,
                                         }}
@@ -786,14 +894,16 @@ function Register() {
 
                                     <Typography
                                         variant="body2"
-                                        color="text.secondary"
                                         sx={{
+                                            color: "#7A7068",
                                             mb: 2.5,
+                                            lineHeight: 1.7,
                                         }}
                                     >
-                                        Select your company. If your company
-                                        is not listed, you can submit its
-                                        details for administrator review.
+                                        Select your company. If your
+                                        company is not listed, you can
+                                        submit its details for
+                                        administrator review.
                                     </Typography>
 
                                     {!newCompany ? (
@@ -801,6 +911,7 @@ function Register() {
                                             <FormControl
                                                 fullWidth
                                                 sx={{
+                                                    ...fieldSx,
                                                     mb: 2,
                                                 }}
                                             >
@@ -814,12 +925,12 @@ function Register() {
                                                     disabled={
                                                         loadingCompanies
                                                     }
-                                                    onChange={(e) => {
+                                                    onChange={(e) =>
                                                         setCompanyId(
                                                             e.target
                                                                 .value
-                                                        );
-                                                    }}
+                                                        )
+                                                    }
                                                 >
                                                     {loadingCompanies ? (
                                                         <MenuItem
@@ -861,9 +972,19 @@ function Register() {
                                                     setCompanyId("");
                                                 }}
                                                 sx={{
+                                                    borderColor:
+                                                        "#E76F51",
+                                                    color: "#E76F51",
                                                     textTransform:
                                                         "none",
+                                                    fontWeight: 700,
                                                     borderRadius: 2,
+                                                    "&:hover": {
+                                                        borderColor:
+                                                            "#D85F43",
+                                                        backgroundColor:
+                                                            "#FFF1D6",
+                                                    },
                                                 }}
                                             >
                                                 My company isn't listed
@@ -878,9 +999,10 @@ function Register() {
                                                     borderRadius: 2,
                                                 }}
                                             >
-                                                Your company information will
-                                                be submitted together with
-                                                your employer registration for
+                                                Your company information
+                                                will be submitted together
+                                                with your employer
+                                                registration for
                                                 administrator review.
                                             </Alert>
 
@@ -898,6 +1020,7 @@ function Register() {
                                                     }
                                                     required
                                                     fullWidth
+                                                    sx={fieldSx}
                                                 />
 
                                                 <Stack
@@ -913,9 +1036,7 @@ function Register() {
                                                         value={
                                                             companyEmail
                                                         }
-                                                        onChange={(
-                                                            e
-                                                        ) =>
+                                                        onChange={(e) =>
                                                             setCompanyEmail(
                                                                 e
                                                                     .target
@@ -924,6 +1045,7 @@ function Register() {
                                                         }
                                                         required
                                                         fullWidth
+                                                        sx={fieldSx}
                                                     />
 
                                                     <TextField
@@ -931,9 +1053,7 @@ function Register() {
                                                         value={
                                                             companyPhone
                                                         }
-                                                        onChange={(
-                                                            e
-                                                        ) =>
+                                                        onChange={(e) =>
                                                             setCompanyPhone(
                                                                 e
                                                                     .target
@@ -942,6 +1062,7 @@ function Register() {
                                                         }
                                                         required
                                                         fullWidth
+                                                        sx={fieldSx}
                                                     />
                                                 </Stack>
 
@@ -958,6 +1079,7 @@ function Register() {
                                                     }
                                                     required
                                                     fullWidth
+                                                    sx={fieldSx}
                                                 />
 
                                                 <TextField
@@ -973,6 +1095,7 @@ function Register() {
                                                         )
                                                     }
                                                     fullWidth
+                                                    sx={fieldSx}
                                                 />
 
                                                 <TextField
@@ -990,6 +1113,7 @@ function Register() {
                                                     fullWidth
                                                     multiline
                                                     rows={4}
+                                                    sx={fieldSx}
                                                 />
                                             </Stack>
 
@@ -1000,10 +1124,7 @@ function Register() {
                                                     setNewCompany(
                                                         false
                                                     );
-
-                                                    setCompanyName(
-                                                        ""
-                                                    );
+                                                    setCompanyName("");
                                                     setCompanyEmail(
                                                         ""
                                                     );
@@ -1022,8 +1143,12 @@ function Register() {
                                                 }}
                                                 sx={{
                                                     mt: 2,
+                                                    borderColor:
+                                                        "#DCCFC2",
+                                                    color: "#6F6259",
                                                     textTransform:
                                                         "none",
+                                                    fontWeight: 700,
                                                     borderRadius: 2,
                                                 }}
                                             >
@@ -1041,13 +1166,25 @@ function Register() {
                                 size="large"
                                 fullWidth
                                 disabled={loading}
+                                endIcon={
+                                    !loading ? (
+                                        <ArrowForward />
+                                    ) : null
+                                }
                                 sx={{
                                     mt: 5,
                                     py: 1.5,
-                                    borderRadius: 2.5,
+                                    backgroundColor: "#E76F51",
+                                    color: "#FFFFFF",
+                                    borderRadius: 2,
                                     textTransform: "none",
                                     fontSize: "1rem",
-                                    fontWeight: 700,
+                                    fontWeight: 800,
+                                    boxShadow: "none",
+                                    "&:hover": {
+                                        backgroundColor: "#D85F43",
+                                        boxShadow: "none",
+                                    },
                                 }}
                             >
                                 {loading ? (
@@ -1060,6 +1197,7 @@ function Register() {
                                             size={22}
                                             color="inherit"
                                         />
+
                                         <span>
                                             Creating Account...
                                         </span>
@@ -1069,20 +1207,19 @@ function Register() {
                                 )}
                             </Button>
 
-                            {/* Login link */}
                             <Typography
                                 align="center"
-                                color="text.secondary"
                                 sx={{
                                     mt: 3,
+                                    color: "#7A7068",
                                 }}
                             >
                                 Already have an account?{" "}
                                 <Link
                                     to="/login"
                                     style={{
-                                        color: "#1976d2",
-                                        fontWeight: 700,
+                                        color: "#E76F51",
+                                        fontWeight: 800,
                                         textDecoration: "none",
                                     }}
                                 >
@@ -1092,10 +1229,21 @@ function Register() {
                         </Box>
                     </CardContent>
                 </Card>
+
+                <Typography
+                    variant="caption"
+                    sx={{
+                        display: "block",
+                        textAlign: "center",
+                        mt: 3,
+                        color: "#9A8F86",
+                    }}
+                >
+                    CareerBridge — connecting people with opportunities.
+                </Typography>
             </Container>
         </Box>
     );
 }
 
 export default Register;
-

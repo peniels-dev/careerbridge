@@ -43,7 +43,6 @@ const EmployerJobs = () => {
     const [company, setCompany] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
 
@@ -57,7 +56,6 @@ const EmployerJobs = () => {
             setError("");
 
             const response = await axiosAPI.get("/jobs/employer");
-
             const data = response.data.data;
 
             setJobs(data.jobs || []);
@@ -120,7 +118,6 @@ const EmployerJobs = () => {
             setError("");
 
             await axiosAPI.patch(`/jobs/${jobId}/close`);
-
             await loadJobs();
         } catch (err) {
             console.error("Unable to close job:", err);
@@ -170,16 +167,20 @@ const EmployerJobs = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: "#f6f8fb",
+                    backgroundColor: "#FFF8EF",
                 }}
             >
                 <Box sx={{ textAlign: "center" }}>
-                    <CircularProgress />
+                    <CircularProgress
+                        size={34}
+                        thickness={4}
+                        sx={{ color: "#E76F51" }}
+                    />
 
                     <Typography
                         sx={{
                             mt: 2,
-                            color: "#667085",
+                            color: "#7A7068",
                             fontSize: 14,
                         }}
                     >
@@ -194,7 +195,7 @@ const EmployerJobs = () => {
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f6f8fb",
+                backgroundColor: "#FFF8EF",
                 display: "flex",
             }}
         >
@@ -206,7 +207,7 @@ const EmployerJobs = () => {
                 sx={{
                     width: 250,
                     minHeight: "100vh",
-                    backgroundColor: "#111827",
+                    backgroundColor: "#293241",
                     color: "#fff",
                     position: "fixed",
                     left: 0,
@@ -242,7 +243,7 @@ const EmployerJobs = () => {
                             height: 38,
                             minWidth: 38,
                             borderRadius: 2,
-                            backgroundColor: "#2563eb",
+                            backgroundColor: "#E76F51",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -272,7 +273,7 @@ const EmployerJobs = () => {
                         <Typography
                             sx={{
                                 fontSize: 11,
-                                color: "#9ca3af",
+                                color: "#B9B7B2",
                             }}
                         >
                             Employer Portal
@@ -282,7 +283,7 @@ const EmployerJobs = () => {
 
                 <Divider
                     sx={{
-                        borderColor: "#273142",
+                        borderColor: "#3C4655",
                         mx: 2,
                     }}
                 />
@@ -294,7 +295,7 @@ const EmployerJobs = () => {
                         sx={{
                             fontSize: 10,
                             fontWeight: 700,
-                            color: "#6b7280",
+                            color: "#969BA3",
                             letterSpacing: 1,
                             px: 1.5,
                             mb: 1,
@@ -344,7 +345,7 @@ const EmployerJobs = () => {
                         sx={{
                             fontSize: 10,
                             fontWeight: 700,
-                            color: "#6b7280",
+                            color: "#969BA3",
                             letterSpacing: 1,
                             px: 1.5,
                             mt: 4,
@@ -378,7 +379,7 @@ const EmployerJobs = () => {
                         onClick={handleLogout}
                         sx={{
                             justifyContent: "flex-start",
-                            color: "#9ca3af",
+                            color: "#B9B7B2",
                             textTransform: "none",
                             borderRadius: 2,
                             px: 1.5,
@@ -398,7 +399,7 @@ const EmployerJobs = () => {
                             },
 
                             "&:hover": {
-                                backgroundColor: "#1f2937",
+                                backgroundColor: "#3C4655",
                                 color: "#fff",
                             },
                         }}
@@ -433,8 +434,8 @@ const EmployerJobs = () => {
                 <Box
                     sx={{
                         minHeight: 72,
-                        backgroundColor: "#fff",
-                        borderBottom: "1px solid #e5e7eb",
+                        backgroundColor: "#FFFDF9",
+                        borderBottom: "1px solid #E9DED0",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
@@ -446,7 +447,7 @@ const EmployerJobs = () => {
                         <Typography
                             sx={{
                                 fontSize: 14,
-                                color: "#667085",
+                                color: "#7A7068",
                             }}
                         >
                             {company?.CompanyName ||
@@ -466,12 +467,12 @@ const EmployerJobs = () => {
                                 width: 38,
                                 height: 38,
                                 borderRadius: "50%",
-                                backgroundColor: "#2563eb",
-                                color: "#fff",
+                                backgroundColor: "#F4A261",
+                                color: "#293241",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                fontWeight: 700,
+                                fontWeight: 800,
                                 fontSize: 13,
                             }}
                         >
@@ -494,6 +495,7 @@ const EmployerJobs = () => {
                                 sx={{
                                     fontSize: 13,
                                     fontWeight: 700,
+                                    color: "#293241",
                                 }}
                             >
                                 {user?.firstName || "Employer"}
@@ -502,7 +504,7 @@ const EmployerJobs = () => {
                             <Typography
                                 sx={{
                                     fontSize: 11,
-                                    color: "#98a2b3",
+                                    color: "#7A7068",
                                 }}
                             >
                                 Employer
@@ -511,9 +513,7 @@ const EmployerJobs = () => {
                     </Box>
                 </Box>
 
-                {/* =================================================
-                    PAGE CONTENT
-                ================================================== */}
+                {/* PAGE CONTENT */}
 
                 <Box
                     sx={{
@@ -532,13 +532,13 @@ const EmployerJobs = () => {
                         }
                         sx={{
                             textTransform: "none",
-                            color: "#667085",
+                            color: "#7A7068",
                             mb: 2,
                             px: 0,
 
                             "&:hover": {
                                 backgroundColor: "transparent",
-                                color: "#2563eb",
+                                color: "#E76F51",
                             },
                         }}
                     >
@@ -571,7 +571,7 @@ const EmployerJobs = () => {
                                         md: 32,
                                     },
                                     fontWeight: 800,
-                                    color: "#101828",
+                                    color: "#293241",
                                 }}
                             >
                                 My Job Postings
@@ -579,7 +579,7 @@ const EmployerJobs = () => {
 
                             <Typography
                                 sx={{
-                                    color: "#667085",
+                                    color: "#7A7068",
                                     fontSize: 14,
                                     mt: 0.7,
                                 }}
@@ -598,7 +598,8 @@ const EmployerJobs = () => {
                                 )
                             }
                             sx={{
-                                backgroundColor: "#2563eb",
+                                backgroundColor: "#E76F51",
+                                color: "#fff",
                                 textTransform: "none",
                                 borderRadius: 2,
                                 px: 2.5,
@@ -607,7 +608,7 @@ const EmployerJobs = () => {
                                 whiteSpace: "nowrap",
 
                                 "&:hover": {
-                                    backgroundColor: "#1d4ed8",
+                                    backgroundColor: "#D85F43",
                                     boxShadow: "none",
                                 },
                             }}
@@ -630,9 +631,7 @@ const EmployerJobs = () => {
                         </Alert>
                     )}
 
-                    {/* =================================================
-                        SUMMARY CARDS
-                    ================================================== */}
+                    {/* SUMMARY CARDS */}
 
                     <Box
                         sx={{
@@ -649,33 +648,37 @@ const EmployerJobs = () => {
                             title="Total Jobs"
                             value={totalJobs}
                             icon={<Work />}
+                            iconBackground="#FFF1D6"
+                            iconColor="#A65F00"
                         />
 
                         <SummaryCard
                             title="Open Jobs"
                             value={openJobs}
                             icon={<Visibility />}
+                            iconBackground="#EDF4E8"
+                            iconColor="#477A35"
                         />
 
                         <SummaryCard
                             title="Closed Jobs"
                             value={closedJobs}
                             icon={<Close />}
+                            iconBackground="#FBE9E6"
+                            iconColor="#B96868"
                         />
                     </Box>
 
-                    {/* =================================================
-                        SEARCH + FILTER
-                    ================================================== */}
+                    {/* SEARCH + FILTER */}
 
                     <Paper
                         elevation={0}
                         sx={{
                             p: 2,
                             mb: 3,
-                            borderRadius: 3,
-                            border: "1px solid #e5e7eb",
-                            backgroundColor: "#fff",
+                            borderRadius: 2.5,
+                            border: "1px solid #E9DED0",
+                            backgroundColor: "#FFFDF9",
                         }}
                     >
                         <Box
@@ -703,7 +706,7 @@ const EmployerJobs = () => {
                                         <InputAdornment position="start">
                                             <Search
                                                 sx={{
-                                                    color: "#98a2b3",
+                                                    color: "#A49A91",
                                                 }}
                                             />
                                         </InputAdornment>
@@ -712,6 +715,23 @@ const EmployerJobs = () => {
                                 sx={{
                                     "& .MuiOutlinedInput-root": {
                                         borderRadius: 2,
+                                        backgroundColor:
+                                            "#FFFCF8",
+
+                                        "& fieldset": {
+                                            borderColor:
+                                                "#E9DED0",
+                                        },
+
+                                        "&:hover fieldset": {
+                                            borderColor:
+                                                "#D8CABC",
+                                        },
+
+                                        "&.Mui-focused fieldset": {
+                                            borderColor:
+                                                "#E76F51",
+                                        },
                                     },
                                 }}
                             />
@@ -729,7 +749,29 @@ const EmployerJobs = () => {
                                 sx={{
                                     "& .MuiOutlinedInput-root": {
                                         borderRadius: 2,
+                                        backgroundColor:
+                                            "#FFFCF8",
+
+                                        "& fieldset": {
+                                            borderColor:
+                                                "#E9DED0",
+                                        },
+
+                                        "&:hover fieldset": {
+                                            borderColor:
+                                                "#D8CABC",
+                                        },
+
+                                        "&.Mui-focused fieldset": {
+                                            borderColor:
+                                                "#E76F51",
+                                        },
                                     },
+
+                                    "& .MuiInputLabel-root.Mui-focused":
+                                        {
+                                            color: "#E76F51",
+                                        },
                                 }}
                             >
                                 <MenuItem value="all">
@@ -747,25 +789,23 @@ const EmployerJobs = () => {
                         </Box>
                     </Paper>
 
-                    {/* =================================================
-                        JOB LIST
-                    ================================================== */}
+                    {/* JOB LIST */}
 
                     <Paper
                         elevation={0}
                         sx={{
-                            borderRadius: 3,
-                            border: "1px solid #e5e7eb",
-                            backgroundColor: "#fff",
+                            borderRadius: 2.5,
+                            border: "1px solid #E9DED0",
+                            backgroundColor: "#FFFDF9",
                             overflow: "hidden",
                         }}
                     >
-                        <Box sx={{ p: 3 }}>
+                        <Box sx={{ p: { xs: 2, md: 3 } }}>
                             <Typography
                                 sx={{
                                     fontSize: 18,
                                     fontWeight: 800,
-                                    color: "#101828",
+                                    color: "#293241",
                                 }}
                             >
                                 All Job Postings
@@ -774,7 +814,7 @@ const EmployerJobs = () => {
                             <Typography
                                 sx={{
                                     fontSize: 12,
-                                    color: "#98a2b3",
+                                    color: "#A49A91",
                                     mt: 0.5,
                                 }}
                             >
@@ -786,7 +826,7 @@ const EmployerJobs = () => {
                             </Typography>
                         </Box>
 
-                        <Divider />
+                        <Divider sx={{ borderColor: "#E9DED0" }} />
 
                         {/* NO RESULTS */}
 
@@ -804,7 +844,7 @@ const EmployerJobs = () => {
                                         height: 65,
                                         borderRadius: "50%",
                                         backgroundColor:
-                                            "#f2f4f7",
+                                            "#FFF1D6",
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent:
@@ -815,7 +855,7 @@ const EmployerJobs = () => {
                                 >
                                     <SearchOff
                                         sx={{
-                                            color: "#98a2b3",
+                                            color: "#A65F00",
                                             fontSize: 30,
                                         }}
                                     />
@@ -825,6 +865,7 @@ const EmployerJobs = () => {
                                     sx={{
                                         fontSize: 17,
                                         fontWeight: 800,
+                                        color: "#293241",
                                     }}
                                 >
                                     No job postings found
@@ -833,7 +874,7 @@ const EmployerJobs = () => {
                                 <Typography
                                     sx={{
                                         fontSize: 13,
-                                        color: "#98a2b3",
+                                        color: "#A49A91",
                                         mt: 0.7,
                                     }}
                                 >
@@ -842,7 +883,14 @@ const EmployerJobs = () => {
                                 </Typography>
                             </Box>
                         ) : (
-                            <Box sx={{ p: { xs: 1.5, md: 2 } }}>
+                            <Box
+                                sx={{
+                                    p: {
+                                        xs: 1.5,
+                                        md: 2,
+                                    },
+                                }}
+                            >
                                 {filteredJobs.map((job) => {
                                     const open = checkOpen(
                                         job.Status
@@ -862,16 +910,20 @@ const EmployerJobs = () => {
                                                 },
                                                 mb: 1.5,
                                                 border:
-                                                    "1px solid #eaecf0",
-                                                borderRadius: 2.5,
+                                                    "1px solid #E9DED0",
+                                                borderRadius: 2,
+                                                backgroundColor:
+                                                    "#FFFDF9",
                                                 transition:
                                                     "all 0.2s ease",
 
                                                 "&:hover": {
                                                     borderColor:
-                                                        "#bfdbfe",
+                                                        "#E2B9AA",
+                                                    backgroundColor:
+                                                        "#FFFCF8",
                                                     boxShadow:
-                                                        "0 4px 14px rgba(16,24,40,0.05)",
+                                                        "0 4px 14px rgba(92, 70, 55, 0.06)",
                                                 },
 
                                                 "&:last-child": {
@@ -891,8 +943,7 @@ const EmployerJobs = () => {
                                             >
                                                 <Box
                                                     sx={{
-                                                        display:
-                                                            "flex",
+                                                        display: "flex",
                                                         gap: 2,
                                                         minWidth: 0,
                                                     }}
@@ -904,8 +955,8 @@ const EmployerJobs = () => {
                                                             minWidth: 48,
                                                             borderRadius: 2,
                                                             backgroundColor:
-                                                                "#eff6ff",
-                                                            color: "#2563eb",
+                                                                "#FFF1D6",
+                                                            color: "#D9822B",
                                                             display:
                                                                 "flex",
                                                             alignItems:
@@ -926,7 +977,7 @@ const EmployerJobs = () => {
                                                             sx={{
                                                                 fontSize: 16,
                                                                 fontWeight: 800,
-                                                                color: "#101828",
+                                                                color: "#293241",
                                                                 wordBreak:
                                                                     "break-word",
                                                             }}
@@ -939,7 +990,7 @@ const EmployerJobs = () => {
                                                         <Typography
                                                             sx={{
                                                                 fontSize: 12,
-                                                                color: "#667085",
+                                                                color: "#7A7068",
                                                                 mt: 0.4,
                                                             }}
                                                         >
@@ -951,14 +1002,14 @@ const EmployerJobs = () => {
                                                         <Typography
                                                             sx={{
                                                                 fontSize: 12,
-                                                                color: "#98a2b3",
+                                                                color: "#A49A91",
                                                                 mt: 0.3,
                                                             }}
                                                         >
                                                             Posted by{" "}
                                                             <strong
                                                                 style={{
-                                                                    color: "#667085",
+                                                                    color: "#7A7068",
                                                                 }}
                                                             >
                                                                 {job.PostedByName ||
@@ -982,11 +1033,11 @@ const EmployerJobs = () => {
                                                         flexShrink: 0,
                                                         backgroundColor:
                                                             open
-                                                                ? "#ecfdf3"
-                                                                : "#f2f4f7",
+                                                                ? "#EDF4E8"
+                                                                : "#F1ECE7",
                                                         color: open
-                                                            ? "#027a48"
-                                                            : "#667085",
+                                                            ? "#477A35"
+                                                            : "#6E655D",
                                                     }}
                                                 />
                                             </Box>
@@ -1003,6 +1054,7 @@ const EmployerJobs = () => {
                                                         md: 3,
                                                     },
                                                     mt: 2,
+
                                                     ml: {
                                                         xs: 0,
                                                         md: 64,
@@ -1020,9 +1072,7 @@ const EmployerJobs = () => {
                                                 />
 
                                                 <InfoItem
-                                                    icon={
-                                                        <Work />
-                                                    }
+                                                    icon={<Work />}
                                                     text={
                                                         job.JobType ||
                                                         "Job type not specified"
@@ -1050,7 +1100,13 @@ const EmployerJobs = () => {
                                                 )}
                                             </Box>
 
-                                            <Divider sx={{ my: 2 }} />
+                                            <Divider
+                                                sx={{
+                                                    my: 2,
+                                                    borderColor:
+                                                        "#E9DED0",
+                                                }}
+                                            />
 
                                             {/* BOTTOM */}
 
@@ -1070,7 +1126,7 @@ const EmployerJobs = () => {
                                                     <Typography
                                                         sx={{
                                                             fontSize: 12,
-                                                            color: "#667085",
+                                                            color: "#7A7068",
                                                         }}
                                                     >
                                                         <strong>
@@ -1079,8 +1135,7 @@ const EmployerJobs = () => {
                                                         </strong>{" "}
                                                         application
                                                         {(job.applicationCount ||
-                                                            0) ===
-                                                        1
+                                                            0) === 1
                                                             ? ""
                                                             : "s"}
                                                     </Typography>
@@ -1089,7 +1144,7 @@ const EmployerJobs = () => {
                                                         <Typography
                                                             sx={{
                                                                 fontSize: 11,
-                                                                color: "#98a2b3",
+                                                                color: "#A49A91",
                                                                 mt: 0.4,
                                                             }}
                                                         >
@@ -1126,17 +1181,18 @@ const EmployerJobs = () => {
                                                             textTransform:
                                                                 "none",
                                                             fontWeight: 700,
-                                                            borderRadius: 2,
-                                                            color: "#2563eb",
+                                                            borderRadius: 1.5,
+                                                            color: "#D85F43",
                                                             borderColor:
-                                                                "#bfdbfe",
+                                                                "#E8B9AB",
 
-                                                            "&:hover": {
-                                                                borderColor:
-                                                                    "#2563eb",
-                                                                backgroundColor:
-                                                                    "#eff6ff",
-                                                            },
+                                                            "&:hover":
+                                                                {
+                                                                    borderColor:
+                                                                        "#E76F51",
+                                                                    backgroundColor:
+                                                                        "#FFF1D6",
+                                                                },
                                                         }}
                                                     >
                                                         View
@@ -1156,8 +1212,14 @@ const EmployerJobs = () => {
                                                             textTransform:
                                                                 "none",
                                                             fontWeight: 700,
-                                                            color: "#2563eb",
-                                                            borderRadius: 2,
+                                                            color: "#477A35",
+                                                            borderRadius: 1.5,
+
+                                                            "&:hover":
+                                                                {
+                                                                    backgroundColor:
+                                                                        "#EDF4E8",
+                                                                },
                                                         }}
                                                     >
                                                         Applicants
@@ -1182,9 +1244,14 @@ const EmployerJobs = () => {
                                                                         "none",
                                                                     fontWeight:
                                                                         700,
-                                                                    color: "#475467",
-                                                                    borderRadius:
-                                                                        2,
+                                                                    color: "#6E655D",
+                                                                    borderRadius: 1.5,
+
+                                                                    "&:hover":
+                                                                        {
+                                                                            backgroundColor:
+                                                                                "#F1ECE7",
+                                                                        },
                                                                 }}
                                                             >
                                                                 Edit
@@ -1206,14 +1273,13 @@ const EmployerJobs = () => {
                                                                             "none",
                                                                         fontWeight:
                                                                             700,
-                                                                        color: "#d92d20",
-                                                                        borderRadius:
-                                                                            2,
+                                                                        color: "#B96868",
+                                                                        borderRadius: 1.5,
 
                                                                         "&:hover":
                                                                             {
                                                                                 backgroundColor:
-                                                                                    "#fef3f2",
+                                                                                    "#FBE9E6",
                                                                             },
                                                                     }}
                                                                 >
@@ -1254,9 +1320,9 @@ const SidebarItem = ({
             sx={{
                 justifyContent: "flex-start",
                 textTransform: "none",
-                color: active ? "#fff" : "#9ca3af",
+                color: active ? "#fff" : "#B9B7B2",
                 backgroundColor: active
-                    ? "#1d4ed8"
+                    ? "#E76F51"
                     : "transparent",
                 borderRadius: 2,
                 px: 1.5,
@@ -1280,8 +1346,8 @@ const SidebarItem = ({
 
                 "&:hover": {
                     backgroundColor: active
-                        ? "#1d4ed8"
-                        : "#1f2937",
+                        ? "#E76F51"
+                        : "#3C4655",
                     color: "#fff",
                 },
             }}
@@ -1295,15 +1361,21 @@ const SidebarItem = ({
    SUMMARY CARD
 ============================================================ */
 
-const SummaryCard = ({ title, value, icon }) => {
+const SummaryCard = ({
+    title,
+    value,
+    icon,
+    iconBackground,
+    iconColor,
+}) => {
     return (
         <Paper
             elevation={0}
             sx={{
                 p: 2.5,
-                borderRadius: 3,
-                border: "1px solid #e5e7eb",
-                backgroundColor: "#fff",
+                borderRadius: 2.5,
+                border: "1px solid #E9DED0",
+                backgroundColor: "#FFFDF9",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -1313,7 +1385,7 @@ const SummaryCard = ({ title, value, icon }) => {
                 <Typography
                     sx={{
                         fontSize: 12,
-                        color: "#667085",
+                        color: "#7A7068",
                         fontWeight: 600,
                     }}
                 >
@@ -1325,7 +1397,7 @@ const SummaryCard = ({ title, value, icon }) => {
                         fontSize: 28,
                         fontWeight: 800,
                         mt: 0.7,
-                        color: "#101828",
+                        color: "#293241",
                     }}
                 >
                     {value}
@@ -1337,8 +1409,8 @@ const SummaryCard = ({ title, value, icon }) => {
                     width: 44,
                     height: 44,
                     borderRadius: 2,
-                    backgroundColor: "#eff6ff",
-                    color: "#2563eb",
+                    backgroundColor: iconBackground,
+                    color: iconColor,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -1365,7 +1437,7 @@ const InfoItem = ({ icon, text }) => {
         >
             <Box
                 sx={{
-                    color: "#98a2b3",
+                    color: "#B96868",
                     display: "flex",
 
                     "& svg": {
@@ -1379,7 +1451,7 @@ const InfoItem = ({ icon, text }) => {
             <Typography
                 sx={{
                     fontSize: 11,
-                    color: "#667085",
+                    color: "#7A7068",
                 }}
             >
                 {text}
@@ -1389,4 +1461,3 @@ const InfoItem = ({ icon, text }) => {
 };
 
 export default EmployerJobs;
-

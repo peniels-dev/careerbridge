@@ -10,7 +10,6 @@ import {
     Chip,
     Container,
     Divider,
-    Grid,
     Skeleton,
     Stack,
     Typography,
@@ -22,51 +21,59 @@ import {
     CalendarToday,
     LocationOn,
     Work,
+    Search,
+    ArrowForward,
 } from "@mui/icons-material";
 
 import axiosAPI from "../api/axiosAPI";
 
+// =====================================================
+// STATUS COLORS
+// =====================================================
 
 const getStatusColor = (status) => {
     switch (status) {
         case "Submitted":
             return {
-                backgroundColor: "#eff6ff",
-                color: "#2563eb",
+                backgroundColor: "#FFF1D6",
+                color: "#B86B00",
             };
 
         case "Reviewed":
             return {
-                backgroundColor: "#f3f4f6",
-                color: "#475467",
+                backgroundColor: "#F1EEE9",
+                color: "#625B54",
             };
 
         case "Shortlisted":
             return {
-                backgroundColor: "#ecfdf3",
-                color: "#027a48",
+                backgroundColor: "#EDF4E8",
+                color: "#527C3E",
             };
 
         case "Accepted":
             return {
-                backgroundColor: "#ecfdf3",
-                color: "#027a48",
+                backgroundColor: "#E8F3E3",
+                color: "#477235",
             };
 
         case "Rejected":
             return {
-                backgroundColor: "#fef3f2",
-                color: "#d92d20",
+                backgroundColor: "#FCE8E2",
+                color: "#C94F3B",
             };
 
         default:
             return {
-                backgroundColor: "#f2f4f7",
-                color: "#475467",
+                backgroundColor: "#F1EEE9",
+                color: "#625B54",
             };
     }
 };
 
+// =====================================================
+// DATE FORMATTER
+// =====================================================
 
 const formatDate = (date) => {
     if (!date) {
@@ -86,27 +93,45 @@ const formatDate = (date) => {
     });
 };
 
+// =====================================================
+// APPLICATION SKELETON
+// =====================================================
 
 const ApplicationSkeleton = () => {
     return (
         <Card
+            elevation={0}
             sx={{
                 borderRadius: 3,
-                border: "1px solid #eaecf0",
-                boxShadow:
-                    "0 2px 10px rgba(16, 24, 40, 0.04)",
+                border: "1px solid #E9DED0",
+                backgroundColor: "#FFFDF9",
             }}
         >
-            <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+            <CardContent
+                sx={{
+                    p: {
+                        xs: 2.5,
+                        sm: 3,
+                    },
+                }}
+            >
                 <Box
                     sx={{
                         display: "flex",
                         justifyContent: "space-between",
+                        alignItems: {
+                            xs: "flex-start",
+                            sm: "center",
+                        },
                         gap: 2,
+                        flexDirection: {
+                            xs: "column",
+                            sm: "row",
+                        },
                         mb: 2,
                     }}
                 >
-                    <Box sx={{ flex: 1 }}>
+                    <Box sx={{ flex: 1, width: "100%" }}>
                         <Skeleton
                             variant="text"
                             width="65%"
@@ -127,6 +152,13 @@ const ApplicationSkeleton = () => {
                     />
                 </Box>
 
+                <Divider
+                    sx={{
+                        my: 2,
+                        borderColor: "#E9DED0",
+                    }}
+                />
+
                 <Skeleton
                     variant="text"
                     width="45%"
@@ -139,8 +171,6 @@ const ApplicationSkeleton = () => {
                     height={24}
                 />
 
-                <Divider sx={{ my: 2 }} />
-
                 <Skeleton
                     variant="text"
                     width="35%"
@@ -151,6 +181,9 @@ const ApplicationSkeleton = () => {
     );
 };
 
+// =====================================================
+// APPLICATION DETAIL
+// =====================================================
 
 const ApplicationDetail = ({ icon, children }) => {
     return (
@@ -164,10 +197,14 @@ const ApplicationDetail = ({ icon, children }) => {
         >
             <Box
                 sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 1.5,
+                    backgroundColor: "#FFF1D6",
+                    color: "#E76F51",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "#667085",
                     flexShrink: 0,
                 }}
             >
@@ -176,7 +213,7 @@ const ApplicationDetail = ({ icon, children }) => {
 
             <Typography
                 sx={{
-                    color: "#475467",
+                    color: "#625B54",
                     fontSize: {
                         xs: 13,
                         sm: 14,
@@ -192,6 +229,9 @@ const ApplicationDetail = ({ icon, children }) => {
     );
 };
 
+// =====================================================
+// MAIN COMPONENT
+// =====================================================
 
 const MyApplications = () => {
     const navigate = useNavigate();
@@ -200,6 +240,9 @@ const MyApplications = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    // =================================================
+    // FETCH APPLICATIONS
+    // =================================================
 
     const fetchApplications = async () => {
         try {
@@ -232,22 +275,23 @@ const MyApplications = () => {
         }
     };
 
-
     useEffect(() => {
         fetchApplications();
     }, []);
 
+    // =================================================
+    // RETRY
+    // =================================================
 
     const handleRetry = () => {
         fetchApplications();
     };
 
-
     return (
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f8fafc",
+                backgroundColor: "#FFF8EF",
                 overflowX: "hidden",
             }}
         >
@@ -261,15 +305,20 @@ const MyApplications = () => {
                     },
                 }}
             >
-                {/* Header */}
+                {/* =================================================
+                    HEADER
+                ================================================= */}
+
                 <Box
                     sx={{
                         mb: {
-                            xs: 3,
-                            sm: 4,
+                            xs: 3.5,
+                            sm: 4.5,
                         },
                     }}
                 >
+                    {/* TOP NAVIGATION */}
+
                     <Box
                         sx={{
                             display: "flex",
@@ -287,7 +336,7 @@ const MyApplications = () => {
                             sx={{
                                 minHeight: 40,
                                 px: 1,
-                                color: "#475467",
+                                color: "#625B54",
                                 fontWeight: 700,
                                 fontSize: {
                                     xs: 13,
@@ -297,8 +346,8 @@ const MyApplications = () => {
                                 borderRadius: 2,
                                 "&:hover": {
                                     backgroundColor:
-                                        "#eef2f6",
-                                    color: "#2563eb",
+                                        "#FFF1D6",
+                                    color: "#E76F51",
                                 },
                             }}
                         >
@@ -307,7 +356,7 @@ const MyApplications = () => {
 
                         <Button
                             variant="contained"
-                            startIcon={<Work />}
+                            startIcon={<Search />}
                             onClick={() =>
                                 navigate("/jobs")
                             }
@@ -321,14 +370,15 @@ const MyApplications = () => {
                                     sm: 2.5,
                                 },
                                 borderRadius: 2,
-                                backgroundColor: "#2563eb",
+                                backgroundColor:
+                                    "#E76F51",
                                 fontWeight: 700,
                                 textTransform: "none",
-                                boxShadow:
-                                    "0 2px 6px rgba(37, 99, 235, 0.2)",
+                                boxShadow: "none",
                                 "&:hover": {
                                     backgroundColor:
-                                        "#1d4ed8",
+                                        "#D85F43",
+                                    boxShadow: "none",
                                 },
                             }}
                         >
@@ -336,18 +386,21 @@ const MyApplications = () => {
                         </Button>
                     </Box>
 
-                    <Box sx={{ mt: 3 }}>
+                    {/* TITLE */}
+
+                    <Box sx={{ mt: 3.5 }}>
                         <Typography
                             component="h1"
                             sx={{
                                 fontSize: {
-                                    xs: 26,
-                                    sm: 30,
-                                    md: 34,
+                                    xs: 29,
+                                    sm: 35,
+                                    md: 40,
                                 },
-                                fontWeight: 800,
-                                color: "#101828",
-                                lineHeight: 1.2,
+                                fontWeight: 900,
+                                color: "#293241",
+                                lineHeight: 1.15,
+                                letterSpacing: "-1px",
                             }}
                         >
                             My Applications
@@ -355,51 +408,50 @@ const MyApplications = () => {
 
                         <Typography
                             sx={{
-                                mt: 1,
-                                color: "#667085",
+                                mt: 1.2,
+                                color: "#6F665F",
                                 fontSize: {
                                     xs: 14,
-                                    sm: 16,
+                                    sm: 15,
                                 },
+                                lineHeight: 1.7,
+                                maxWidth: 650,
                             }}
                         >
-                            Track the jobs you have applied
-                            for and check their current
-                            status.
+                            Keep track of the jobs you've
+                            applied for and see where each
+                            application stands.
                         </Typography>
                     </Box>
                 </Box>
 
+                {/* =================================================
+                    LOADING
+                ================================================= */}
 
-                {/* Loading */}
                 {loading && (
-                    <Grid
-                        container
-                        spacing={{
-                            xs: 2,
-                            sm: 2.5,
-                            md: 3,
-                        }}
-                    >
+                    <Stack spacing={2.5}>
                         {[1, 2, 3].map((item) => (
-                            <Grid
-                                item
-                                xs={12}
+                            <ApplicationSkeleton
                                 key={item}
-                            >
-                                <ApplicationSkeleton />
-                            </Grid>
+                            />
                         ))}
-                    </Grid>
+                    </Stack>
                 )}
 
+                {/* =================================================
+                    ERROR
+                ================================================= */}
 
-                {/* Error */}
                 {!loading && error && (
                     <Alert
                         severity="error"
                         sx={{
                             borderRadius: 3,
+                            backgroundColor: "#FFFDF9",
+                            border:
+                                "1px solid #F0C8BF",
+                            color: "#7F3328",
                             alignItems: "center",
                             "& .MuiAlert-message": {
                                 flex: 1,
@@ -412,7 +464,8 @@ const MyApplications = () => {
                                 onClick={handleRetry}
                                 sx={{
                                     fontWeight: 700,
-                                    textTransform: "none",
+                                    textTransform:
+                                        "none",
                                 }}
                             >
                                 Try Again
@@ -423,17 +476,21 @@ const MyApplications = () => {
                     </Alert>
                 )}
 
+                {/* =================================================
+                    EMPTY STATE
+                ================================================= */}
 
-                {/* Empty state */}
                 {!loading &&
                     !error &&
                     applications.length === 0 && (
                         <Card
+                            elevation={0}
                             sx={{
-                                borderRadius: 4,
-                                border: "1px solid #eaecf0",
-                                boxShadow:
-                                    "0 4px 16px rgba(16, 24, 40, 0.04)",
+                                borderRadius: 3,
+                                border:
+                                    "1px solid #E9DED0",
+                                backgroundColor:
+                                    "#FFFDF9",
                             }}
                         >
                             <CardContent
@@ -448,14 +505,16 @@ const MyApplications = () => {
                             >
                                 <Box
                                     sx={{
-                                        width: 72,
-                                        height: 72,
-                                        borderRadius: "50%",
+                                        width: 76,
+                                        height: 76,
+                                        borderRadius:
+                                            "50%",
                                         backgroundColor:
-                                            "#eff6ff",
-                                        color: "#2563eb",
+                                            "#FFF1D6",
+                                        color: "#E76F51",
                                         display: "flex",
-                                        alignItems: "center",
+                                        alignItems:
+                                            "center",
                                         justifyContent:
                                             "center",
                                         mx: "auto",
@@ -464,7 +523,7 @@ const MyApplications = () => {
                                 >
                                     <Work
                                         sx={{
-                                            fontSize: 34,
+                                            fontSize: 35,
                                         }}
                                     />
                                 </Box>
@@ -472,11 +531,11 @@ const MyApplications = () => {
                                 <Typography
                                     sx={{
                                         fontSize: {
-                                            xs: 20,
-                                            sm: 23,
+                                            xs: 21,
+                                            sm: 24,
                                         },
-                                        fontWeight: 800,
-                                        color: "#101828",
+                                        fontWeight: 900,
+                                        color: "#293241",
                                     }}
                                 >
                                     No applications yet
@@ -485,25 +544,31 @@ const MyApplications = () => {
                                 <Typography
                                     sx={{
                                         mt: 1,
-                                        maxWidth: 500,
+                                        maxWidth: 520,
                                         mx: "auto",
-                                        color: "#667085",
+                                        color: "#6F665F",
                                         fontSize: 14,
-                                        lineHeight: 1.6,
+                                        lineHeight: 1.7,
                                     }}
                                 >
-                                    You haven't applied for
-                                    any jobs yet. Explore
-                                    available opportunities
-                                    and submit your first
+                                    You haven't applied
+                                    for any jobs yet.
+                                    Explore available
+                                    opportunities and
+                                    submit your first
                                     application.
                                 </Typography>
 
                                 <Button
                                     variant="contained"
-                                    startIcon={<Work />}
+                                    startIcon={<Search />}
+                                    endIcon={
+                                        <ArrowForward />
+                                    }
                                     onClick={() =>
-                                        navigate("/jobs")
+                                        navigate(
+                                            "/jobs"
+                                        )
                                     }
                                     sx={{
                                         mt: 3,
@@ -511,13 +576,17 @@ const MyApplications = () => {
                                         px: 3,
                                         borderRadius: 2,
                                         backgroundColor:
-                                            "#2563eb",
+                                            "#E76F51",
                                         fontWeight: 700,
                                         textTransform:
                                             "none",
+                                        boxShadow:
+                                            "none",
                                         "&:hover": {
                                             backgroundColor:
-                                                "#1d4ed8",
+                                                "#D85F43",
+                                            boxShadow:
+                                                "none",
                                         },
                                     }}
                                 >
@@ -527,8 +596,10 @@ const MyApplications = () => {
                         </Card>
                     )}
 
+                {/* =================================================
+                    APPLICATION LIST
+                ================================================= */}
 
-                {/* Applications */}
                 {!loading &&
                     !error &&
                     applications.length > 0 && (
@@ -576,21 +647,43 @@ const MyApplications = () => {
                                                 application.applicationId ||
                                                 `${application.JobID}-${createdDate}`
                                             }
+                                            elevation={0}
                                             sx={{
                                                 borderRadius: 3,
-                                                border: "1px solid #eaecf0",
-                                                boxShadow:
-                                                    "0 2px 10px rgba(16, 24, 40, 0.04)",
+                                                border:
+                                                    "1px solid #E9DED0",
+                                                backgroundColor:
+                                                    "#FFFDF9",
+                                                overflow:
+                                                    "hidden",
                                                 transition:
-                                                    "transform 0.2s ease, box-shadow 0.2s ease",
+                                                    "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
                                                 "&:hover": {
                                                     transform:
                                                         "translateY(-2px)",
+                                                    borderColor:
+                                                        "#E1CDBB",
                                                     boxShadow:
-                                                        "0 8px 24px rgba(16, 24, 40, 0.08)",
+                                                        "0 10px 26px rgba(91,72,56,0.08)",
                                                 },
                                             }}
                                         >
+                                            {/* TOP ACCENT */}
+
+                                            <Box
+                                                sx={{
+                                                    height: 4,
+                                                    backgroundColor:
+                                                        status ===
+                                                        "Rejected"
+                                                            ? "#D85F43"
+                                                            : status ===
+                                                              "Accepted"
+                                                            ? "#6A994E"
+                                                            : "#E76F51",
+                                                }}
+                                            />
+
                                             <CardContent
                                                 sx={{
                                                     p: {
@@ -606,6 +699,8 @@ const MyApplications = () => {
                                                         },
                                                 }}
                                             >
+                                                {/* JOB TITLE + STATUS */}
+
                                                 <Box
                                                     sx={{
                                                         display:
@@ -636,10 +731,10 @@ const MyApplications = () => {
                                                                 fontSize:
                                                                     {
                                                                         xs: 18,
-                                                                        sm: 20,
+                                                                        sm: 21,
                                                                     },
                                                                 fontWeight: 800,
-                                                                color: "#101828",
+                                                                color: "#293241",
                                                                 lineHeight: 1.3,
                                                                 wordBreak:
                                                                     "break-word",
@@ -657,22 +752,23 @@ const MyApplications = () => {
                                                                 alignItems:
                                                                     "center",
                                                                 gap: 0.75,
-                                                                mt: 0.75,
+                                                                mt: 0.8,
                                                                 minWidth: 0,
                                                             }}
                                                         >
                                                             <Business
                                                                 sx={{
                                                                     fontSize: 17,
-                                                                    color: "#667085",
+                                                                    color: "#6A994E",
                                                                     flexShrink: 0,
                                                                 }}
                                                             />
 
                                                             <Typography
                                                                 sx={{
-                                                                    color: "#475467",
+                                                                    color: "#625B54",
                                                                     fontSize: 14,
+                                                                    fontWeight: 600,
                                                                     overflow:
                                                                         "hidden",
                                                                     textOverflow:
@@ -695,21 +791,27 @@ const MyApplications = () => {
                                                         size="small"
                                                         sx={{
                                                             ...statusStyle,
-                                                            fontWeight: 700,
+                                                            fontWeight: 800,
                                                             borderRadius: 2,
-                                                            height: 30,
+                                                            height: 31,
                                                             flexShrink: 0,
+                                                            "& .MuiChip-label":
+                                                                {
+                                                                    px: 1.4,
+                                                                },
                                                         }}
                                                     />
                                                 </Box>
 
-
                                                 <Divider
                                                     sx={{
                                                         my: 2.5,
+                                                        borderColor:
+                                                            "#E9DED0",
                                                     }}
                                                 />
 
+                                                {/* DETAILS */}
 
                                                 <Box
                                                     sx={{

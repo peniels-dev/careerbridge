@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import {
     useNavigate,
     useParams,
@@ -40,20 +41,13 @@ import { useAuth } from "../context/AuthContext";
 
 const EmployerApplicantProfile = () => {
     const { jobId, applicationId } = useParams();
-
     const navigate = useNavigate();
-
     const { logout } = useAuth();
 
     const [job, setJob] = useState(null);
-    const [applicant, setApplicant] =
-        useState(null);
-
-    const [loading, setLoading] =
-        useState(true);
-
-    const [error, setError] =
-        useState("");
+    const [applicant, setApplicant] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     // =====================================================
     // LOAD APPLICANT
@@ -64,24 +58,20 @@ const EmployerApplicantProfile = () => {
             setLoading(true);
             setError("");
 
-            const response =
-                await axiosAPI.get(
-                    `/jobs/${jobId}/applicants`
-                );
+            const response = await axiosAPI.get(
+                `/jobs/${jobId}/applicants`
+            );
 
             const jobData =
                 response.data?.data?.job;
 
             const applicants =
-                response.data?.data?.applicants ||
-                [];
+                response.data?.data?.applicants || [];
 
             const selectedApplicant =
                 applicants.find(
                     (item) =>
-                        Number(
-                            item.applicationId
-                        ) ===
+                        Number(item.applicationId) ===
                         Number(applicationId)
                 );
 
@@ -93,9 +83,7 @@ const EmployerApplicantProfile = () => {
             }
 
             setJob(jobData);
-            setApplicant(
-                selectedApplicant
-            );
+            setApplicant(selectedApplicant);
         } catch (err) {
             console.error(
                 "Load applicant profile error:",
@@ -134,18 +122,16 @@ const EmployerApplicantProfile = () => {
         try {
             setError("");
 
-            const response =
-                await axiosAPI.get(
-                    `/applications/${applicationId}/cv`,
-                    {
-                        responseType: "blob",
-                    }
-                );
+            const response = await axiosAPI.get(
+                `/applications/${applicationId}/cv`,
+                {
+                    responseType: "blob",
+                }
+            );
 
             const contentType =
-                response.headers[
-                    "content-type"
-                ] || "application/pdf";
+                response.headers["content-type"] ||
+                "application/pdf";
 
             const blob = new Blob(
                 [response.data],
@@ -155,9 +141,7 @@ const EmployerApplicantProfile = () => {
             );
 
             const url =
-                window.URL.createObjectURL(
-                    blob
-                );
+                window.URL.createObjectURL(blob);
 
             window.open(
                 url,
@@ -166,9 +150,7 @@ const EmployerApplicantProfile = () => {
             );
 
             setTimeout(() => {
-                window.URL.revokeObjectURL(
-                    url
-                );
+                window.URL.revokeObjectURL(url);
             }, 60000);
         } catch (err) {
             console.error(
@@ -202,25 +184,40 @@ const EmployerApplicantProfile = () => {
     };
 
     // =====================================================
-    // STATUS COLOR
+    // STATUS STYLE
     // =====================================================
 
-    const getStatusColor = (status) => {
+    const getStatusStyle = (status) => {
         switch (status) {
             case "Accepted":
-                return "success";
+                return {
+                    backgroundColor: "#EDF4E8",
+                    color: "#477A35",
+                };
 
             case "Rejected":
-                return "error";
+                return {
+                    backgroundColor: "#FBE9E6",
+                    color: "#A94B3C",
+                };
 
             case "Shortlisted":
-                return "info";
+                return {
+                    backgroundColor: "#FFF1D6",
+                    color: "#A65F00",
+                };
 
             case "Reviewed":
-                return "warning";
+                return {
+                    backgroundColor: "#FFF1D6",
+                    color: "#A65F00",
+                };
 
             default:
-                return "default";
+                return {
+                    backgroundColor: "#F1ECE7",
+                    color: "#6D6258",
+                };
         }
     };
 
@@ -268,8 +265,7 @@ const EmployerApplicantProfile = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor:
-                        "#f6f8fb",
+                    backgroundColor: "#FFF8EF",
                 }}
             >
                 <Box
@@ -277,12 +273,19 @@ const EmployerApplicantProfile = () => {
                         textAlign: "center",
                     }}
                 >
-                    <CircularProgress />
+                    <CircularProgress
+                        size={38}
+                        sx={{
+                            color: "#E76F51",
+                        }}
+                    />
 
                     <Typography
                         sx={{
                             mt: 2,
-                            color: "#667085",
+                            color: "#7A7068",
+                            fontSize: 14,
+                            fontWeight: 600,
                         }}
                     >
                         Loading applicant profile...
@@ -292,6 +295,10 @@ const EmployerApplicantProfile = () => {
         );
     }
 
+    // =====================================================
+    // ERROR PAGE
+    // =====================================================
+
     if (error && !applicant) {
         return (
             <Box
@@ -300,8 +307,7 @@ const EmployerApplicantProfile = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor:
-                        "#f6f8fb",
+                    backgroundColor: "#FFF8EF",
                     p: 3,
                 }}
             >
@@ -313,13 +319,17 @@ const EmployerApplicantProfile = () => {
                         p: 4,
                         borderRadius: 3,
                         border:
-                            "1px solid #e5e7eb",
+                            "1px solid #E9DED0",
+                        backgroundColor: "#FFFDF9",
                         textAlign: "center",
                     }}
                 >
                     <Alert
                         severity="error"
-                        sx={{ mb: 3 }}
+                        sx={{
+                            mb: 3,
+                            borderRadius: 2,
+                        }}
                     >
                         {error}
                     </Alert>
@@ -331,18 +341,16 @@ const EmployerApplicantProfile = () => {
                                 `/employer/jobs/${jobId}/applicants`
                             )
                         }
+                        startIcon={<ArrowBack />}
                         sx={{
-                            textTransform:
-                                "none",
+                            textTransform: "none",
                             fontWeight: 700,
-                            backgroundColor:
-                                "#2563eb",
+                            backgroundColor: "#E76F51",
                             boxShadow: "none",
                             "&:hover": {
                                 backgroundColor:
-                                    "#1d4ed8",
-                                boxShadow:
-                                    "none",
+                                    "#D95D40",
+                                boxShadow: "none",
                             },
                         }}
                     >
@@ -363,11 +371,15 @@ const EmployerApplicantProfile = () => {
             applicant?.lastName?.charAt(0) || ""
         }`.toUpperCase();
 
+    const statusStyle = getStatusStyle(
+        applicant?.status
+    );
+
     return (
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f6f8fb",
+                backgroundColor: "#FFF8EF",
                 display: "flex",
             }}
         >
@@ -378,7 +390,7 @@ const EmployerApplicantProfile = () => {
             <Box
                 sx={{
                     width: 250,
-                    backgroundColor: "#111827",
+                    backgroundColor: "#293241",
                     color: "#fff",
                     display: "flex",
                     flexDirection: "column",
@@ -386,13 +398,23 @@ const EmployerApplicantProfile = () => {
                     left: 0,
                     top: 0,
                     bottom: 0,
+                    zIndex: 1200,
+                    "@media (max-width: 900px)": {
+                        width: 78,
+                    },
+                    "@media (max-width: 650px)": {
+                        display: "none",
+                    },
                 }}
             >
                 {/* LOGO */}
 
                 <Box
                     sx={{
-                        px: 3,
+                        px: {
+                            xs: 2,
+                            md: 3,
+                        },
                         py: 3,
                         display: "flex",
                         alignItems: "center",
@@ -403,14 +425,13 @@ const EmployerApplicantProfile = () => {
                         sx={{
                             width: 40,
                             height: 40,
+                            minWidth: 40,
                             borderRadius: 2,
                             backgroundColor:
-                                "#2563eb",
+                                "#E76F51",
                             display: "flex",
-                            alignItems:
-                                "center",
-                            justifyContent:
-                                "center",
+                            alignItems: "center",
+                            justifyContent: "center",
                             fontWeight: 800,
                             fontSize: 20,
                         }}
@@ -418,11 +439,18 @@ const EmployerApplicantProfile = () => {
                         C
                     </Box>
 
-                    <Box>
+                    <Box
+                        sx={{
+                            "@media (max-width: 900px)": {
+                                display: "none",
+                            },
+                        }}
+                    >
                         <Typography
                             sx={{
                                 fontWeight: 800,
                                 fontSize: 18,
+                                color: "#fff",
                             }}
                         >
                             CareerBridge
@@ -431,7 +459,7 @@ const EmployerApplicantProfile = () => {
                         <Typography
                             sx={{
                                 fontSize: 11,
-                                color: "#9ca3af",
+                                color: "#B8C0CC",
                             }}
                         >
                             Employer Portal
@@ -441,7 +469,7 @@ const EmployerApplicantProfile = () => {
 
                 <Divider
                     sx={{
-                        borderColor: "#273142",
+                        borderColor: "#3A4658",
                         mx: 2,
                     }}
                 />
@@ -463,9 +491,7 @@ const EmployerApplicantProfile = () => {
                             <Button
                                 key={item.label}
                                 fullWidth
-                                startIcon={
-                                    item.icon
-                                }
+                                startIcon={item.icon}
                                 onClick={() =>
                                     navigate(
                                         item.path
@@ -480,10 +506,10 @@ const EmployerApplicantProfile = () => {
                                     borderRadius: 2,
                                     color: active
                                         ? "#fff"
-                                        : "#9ca3af",
+                                        : "#B8C0CC",
                                     backgroundColor:
                                         active
-                                            ? "#2563eb"
+                                            ? "#E76F51"
                                             : "transparent",
                                     textTransform:
                                         "none",
@@ -491,17 +517,43 @@ const EmployerApplicantProfile = () => {
                                         active
                                             ? 700
                                             : 500,
-
+                                    minWidth: 0,
                                     "&:hover": {
                                         backgroundColor:
                                             active
-                                                ? "#2563eb"
-                                                : "#1f2937",
+                                                ? "#E76F51"
+                                                : "#3A4658",
                                         color: "#fff",
                                     },
+                                    "& .MuiButton-startIcon":
+                                        {
+                                            minWidth: 24,
+                                            marginRight:
+                                                {
+                                                    xs: 0,
+                                                    md: 8,
+                                                },
+                                        },
+                                    "@media (max-width: 900px)":
+                                        {
+                                            justifyContent:
+                                                "center",
+                                            px: 1,
+                                        },
                                 }}
                             >
-                                {item.label}
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        "@media (max-width: 900px)":
+                                            {
+                                                display:
+                                                    "none",
+                                            },
+                                    }}
+                                >
+                                    {item.label}
+                                </Box>
                             </Button>
                         );
                     })}
@@ -513,33 +565,47 @@ const EmployerApplicantProfile = () => {
                     sx={{
                         p: 2,
                         borderTop:
-                            "1px solid #273142",
+                            "1px solid #3A4658",
                     }}
                 >
                     <Button
                         fullWidth
-                        startIcon={
-                            <Logout />
-                        }
+                        startIcon={<Logout />}
                         onClick={handleLogout}
                         sx={{
                             justifyContent:
                                 "flex-start",
                             px: 1.5,
                             py: 1.25,
-                            color: "#9ca3af",
+                            color: "#B8C0CC",
                             textTransform:
                                 "none",
                             borderRadius: 2,
-
                             "&:hover": {
                                 backgroundColor:
-                                    "#1f2937",
+                                    "#3A4658",
                                 color: "#fff",
                             },
+                            "@media (max-width: 900px)":
+                                {
+                                    justifyContent:
+                                        "center",
+                                    px: 1,
+                                },
                         }}
                     >
-                        Logout
+                        <Box
+                            component="span"
+                            sx={{
+                                "@media (max-width: 900px)":
+                                    {
+                                        display:
+                                            "none",
+                                    },
+                            }}
+                        >
+                            Logout
+                        </Box>
                     </Button>
                 </Box>
             </Box>
@@ -552,35 +618,78 @@ const EmployerApplicantProfile = () => {
                 sx={{
                     marginLeft: "250px",
                     width: "calc(100% - 250px)",
+                    "@media (max-width: 900px)": {
+                        marginLeft: "78px",
+                        width: "calc(100% - 78px)",
+                    },
+                    "@media (max-width: 650px)": {
+                        marginLeft: 0,
+                        width: "100%",
+                    },
                 }}
             >
                 {/* HEADER */}
 
                 <Box
                     sx={{
-                        height: 72,
-                        backgroundColor:
-                            "#fff",
+                        minHeight: 72,
+                        backgroundColor: "#FFFDF9",
                         borderBottom:
-                            "1px solid #e5e7eb",
+                            "1px solid #E9DED0",
                         display: "flex",
-                        alignItems:
-                            "center",
+                        alignItems: "center",
+                        justifyContent:
+                            "space-between",
                         px: {
                             xs: 3,
                             md: 5,
                         },
+                        py: 1.5,
                     }}
                 >
-                    <Typography
+                    <Box>
+                        <Typography
+                            sx={{
+                                fontSize: {
+                                    xs: 18,
+                                    md: 20,
+                                },
+                                fontWeight: 800,
+                                color: "#293241",
+                            }}
+                        >
+                            Applicant Profile
+                        </Typography>
+
+                        <Typography
+                            sx={{
+                                fontSize: 12,
+                                color: "#7A7068",
+                                mt: 0.2,
+                            }}
+                        >
+                            Review applicant information
+                        </Typography>
+                    </Box>
+
+                    <Box
                         sx={{
-                            fontSize: 20,
+                            width: 40,
+                            height: 40,
+                            borderRadius: "50%",
+                            backgroundColor:
+                                "#F4A261",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#fff",
                             fontWeight: 800,
-                            color: "#101828",
                         }}
                     >
-                        Applicant Profile
-                    </Typography>
+                        {initials || (
+                            <Person />
+                        )}
+                    </Box>
                 </Box>
 
                 {/* PAGE */}
@@ -588,19 +697,18 @@ const EmployerApplicantProfile = () => {
                 <Box
                     sx={{
                         p: {
-                            xs: 3,
+                            xs: 2.5,
+                            sm: 3,
                             md: 5,
                         },
-                        maxWidth: 1100,
+                        maxWidth: 1150,
                         margin: "0 auto",
                     }}
                 >
                     {/* BACK */}
 
                     <Button
-                        startIcon={
-                            <ArrowBack />
-                        }
+                        startIcon={<ArrowBack />}
                         onClick={() =>
                             navigate(
                                 `/employer/jobs/${jobId}/applicants`
@@ -608,10 +716,14 @@ const EmployerApplicantProfile = () => {
                         }
                         sx={{
                             mb: 3,
-                            textTransform:
-                                "none",
-                            color: "#667085",
-                            fontWeight: 600,
+                            textTransform: "none",
+                            color: "#7A7068",
+                            fontWeight: 700,
+                            "&:hover": {
+                                backgroundColor:
+                                    "#FFF1D6",
+                                color: "#293241",
+                            },
                         }}
                     >
                         Back to Applicants
@@ -642,9 +754,9 @@ const EmployerApplicantProfile = () => {
                             },
                             borderRadius: 3,
                             border:
-                                "1px solid #e5e7eb",
-                            background:
-                                "linear-gradient(135deg, #ffffff 0%, #f8fbff 100%)",
+                                "1px solid #E9DED0",
+                            backgroundColor:
+                                "#FFFDF9",
                             mb: 3,
                         }}
                     >
@@ -662,40 +774,54 @@ const EmployerApplicantProfile = () => {
                         >
                             <Box
                                 sx={{
-                                    display:
-                                        "flex",
+                                    display: "flex",
                                     alignItems:
                                         "center",
                                     gap: 2.5,
+                                    minWidth: 0,
                                 }}
                             >
                                 <Avatar
                                     sx={{
-                                        width: 84,
-                                        height: 84,
+                                        width: {
+                                            xs: 68,
+                                            sm: 84,
+                                        },
+                                        height: {
+                                            xs: 68,
+                                            sm: 84,
+                                        },
                                         backgroundColor:
-                                            "#2563eb",
-                                        fontSize: 28,
+                                            "#E76F51",
+                                        fontSize: {
+                                            xs: 23,
+                                            sm: 28,
+                                        },
                                         fontWeight:
                                             800,
+                                        flexShrink: 0,
                                     }}
                                 >
                                     {initials ||
                                         <Person />}
                                 </Avatar>
 
-                                <Box>
+                                <Box
+                                    sx={{
+                                        minWidth: 0,
+                                    }}
+                                >
                                     <Typography
                                         sx={{
-                                            fontSize:
-                                                {
-                                                    xs: 25,
-                                                    md: 30,
-                                                },
-                                            fontWeight:
-                                                800,
-                                            color:
-                                                "#101828",
+                                            fontSize: {
+                                                xs: 23,
+                                                md: 30,
+                                            },
+                                            fontWeight: 800,
+                                            color: "#293241",
+                                            lineHeight: 1.2,
+                                            wordBreak:
+                                                "break-word",
                                         }}
                                     >
                                         {fullName}
@@ -703,18 +829,22 @@ const EmployerApplicantProfile = () => {
 
                                     <Typography
                                         sx={{
-                                            mt: 0.5,
-                                            color:
-                                                "#667085",
-                                            fontSize:
-                                                14,
+                                            mt: 0.7,
+                                            color: "#7A7068",
+                                            fontSize: 14,
                                         }}
                                     >
                                         Applicant for{" "}
-                                        <strong>
+                                        <Box
+                                            component="strong"
+                                            sx={{
+                                                color:
+                                                    "#293241",
+                                            }}
+                                        >
                                             {job?.JobTitle ||
                                                 "this position"}
-                                        </strong>
+                                        </Box>
                                     </Typography>
 
                                     <Box
@@ -733,28 +863,35 @@ const EmployerApplicantProfile = () => {
                                                 applicant.status ||
                                                 "Submitted"
                                             }
-                                            color={getStatusColor(
-                                                applicant.status
-                                            )}
                                             sx={{
-                                                fontWeight:
-                                                    700,
+                                                ...statusStyle,
+                                                fontWeight: 700,
+                                                borderRadius:
+                                                    1.5,
                                             }}
                                         />
 
                                         <Chip
                                             size="small"
                                             icon={
-                                                <CalendarToday />
+                                                <CalendarToday
+                                                    sx={{
+                                                        fontSize:
+                                                            15,
+                                                    }}
+                                                />
                                             }
                                             label={`Applied ${formatDate(
                                                 applicant.appliedOn
                                             )}`}
                                             sx={{
                                                 backgroundColor:
-                                                    "#f1f5f9",
-                                                fontWeight:
-                                                    600,
+                                                    "#FFF1D6",
+                                                color:
+                                                    "#6D6258",
+                                                fontWeight: 600,
+                                                borderRadius:
+                                                    1.5,
                                             }}
                                         />
                                     </Box>
@@ -776,7 +913,9 @@ const EmployerApplicantProfile = () => {
                             },
                             borderRadius: 3,
                             border:
-                                "1px solid #e5e7eb",
+                                "1px solid #E9DED0",
+                            backgroundColor:
+                                "#FFFDF9",
                             mb: 3,
                         }}
                     >
@@ -789,19 +928,16 @@ const EmployerApplicantProfile = () => {
                         <Box
                             sx={{
                                 display: "grid",
-                                gridTemplateColumns:
-                                    {
-                                        xs: "1fr",
-                                        md: "repeat(2, 1fr)",
-                                    },
+                                gridTemplateColumns: {
+                                    xs: "1fr",
+                                    md: "repeat(2, 1fr)",
+                                },
                                 gap: 2,
                                 mt: 3,
                             }}
                         >
                             <InfoCard
-                                icon={
-                                    <Email />
-                                }
+                                icon={<Email />}
                                 label="Email"
                                 value={
                                     applicant.email ||
@@ -810,9 +946,7 @@ const EmployerApplicantProfile = () => {
                             />
 
                             <InfoCard
-                                icon={
-                                    <Phone />
-                                }
+                                icon={<Phone />}
                                 label="Phone"
                                 value={
                                     applicant.phone ||
@@ -856,7 +990,9 @@ const EmployerApplicantProfile = () => {
                             },
                             borderRadius: 3,
                             border:
-                                "1px solid #e5e7eb",
+                                "1px solid #E9DED0",
+                            backgroundColor:
+                                "#FFFDF9",
                             mb: 3,
                         }}
                     >
@@ -868,21 +1004,17 @@ const EmployerApplicantProfile = () => {
 
                         <Box
                             sx={{
-                                display:
-                                    "grid",
-                                gridTemplateColumns:
-                                    {
-                                        xs: "1fr",
-                                        md: "repeat(2, 1fr)",
-                                    },
+                                display: "grid",
+                                gridTemplateColumns: {
+                                    xs: "1fr",
+                                    md: "repeat(2, 1fr)",
+                                },
                                 gap: 3,
                                 mt: 3,
                             }}
                         >
                             <ProfileSection
-                                icon={
-                                    <Code />
-                                }
+                                icon={<Code />}
                                 title="Skills"
                                 value={
                                     applicant.skills ||
@@ -891,9 +1023,7 @@ const EmployerApplicantProfile = () => {
                             />
 
                             <ProfileSection
-                                icon={
-                                    <School />
-                                }
+                                icon={<School />}
                                 title="Education"
                                 value={
                                     applicant.education ||
@@ -916,14 +1046,14 @@ const EmployerApplicantProfile = () => {
                             },
                             borderRadius: 3,
                             border:
-                                "1px solid #e5e7eb",
+                                "1px solid #E9DED0",
+                            backgroundColor:
+                                "#FFFDF9",
                             mb: 3,
                         }}
                     >
                         <SectionTitle
-                            icon={
-                                <Description />
-                            }
+                            icon={<Description />}
                             title="Curriculum Vitae"
                             subtitle="CV submitted with this application."
                         />
@@ -931,12 +1061,16 @@ const EmployerApplicantProfile = () => {
                         <Box
                             sx={{
                                 mt: 3,
-                                p: 3,
+                                p: {
+                                    xs: 2,
+                                    sm: 3,
+                                },
                                 borderRadius: 2,
                                 backgroundColor:
-                                    "#f8fafc",
-                                display:
-                                    "flex",
+                                    "#FFF8EF",
+                                border:
+                                    "1px solid #E9DED0",
+                                display: "flex",
                                 alignItems:
                                     "center",
                                 justifyContent:
@@ -948,11 +1082,11 @@ const EmployerApplicantProfile = () => {
                         >
                             <Box
                                 sx={{
-                                    display:
-                                        "flex",
+                                    display: "flex",
                                     alignItems:
                                         "center",
                                     gap: 2,
+                                    minWidth: 0,
                                 }}
                             >
                                 <Avatar
@@ -960,21 +1094,26 @@ const EmployerApplicantProfile = () => {
                                         width: 48,
                                         height: 48,
                                         backgroundColor:
-                                            "#eff6ff",
+                                            "#FFF1D6",
                                         color:
-                                            "#2563eb",
+                                            "#E76F51",
+                                        flexShrink: 0,
                                     }}
                                 >
                                     <Description />
                                 </Avatar>
 
-                                <Box>
+                                <Box
+                                    sx={{
+                                        minWidth: 0,
+                                    }}
+                                >
                                     <Typography
                                         sx={{
-                                            fontWeight:
-                                                800,
-                                            color:
-                                                "#101828",
+                                            fontWeight: 800,
+                                            color: "#293241",
+                                            wordBreak:
+                                                "break-word",
                                         }}
                                     >
                                         {applicant.cvTitle ||
@@ -983,10 +1122,8 @@ const EmployerApplicantProfile = () => {
 
                                     <Typography
                                         sx={{
-                                            fontSize:
-                                                13,
-                                            color:
-                                                "#667085",
+                                            fontSize: 13,
+                                            color: "#7A7068",
                                             mt: 0.3,
                                         }}
                                     >
@@ -1008,25 +1145,28 @@ const EmployerApplicantProfile = () => {
                                     !applicant.cvId
                                 }
                                 sx={{
-                                    minHeight:
-                                        44,
+                                    minHeight: 44,
                                     px: 2.5,
-                                    borderRadius:
-                                        2,
+                                    borderRadius: 2,
                                     textTransform:
                                         "none",
-                                    fontWeight:
-                                        700,
+                                    fontWeight: 700,
                                     backgroundColor:
-                                        "#2563eb",
-                                    boxShadow:
-                                        "none",
+                                        "#E76F51",
+                                    boxShadow: "none",
                                     "&:hover": {
                                         backgroundColor:
-                                            "#1d4ed8",
+                                            "#D95D40",
                                         boxShadow:
                                             "none",
                                     },
+                                    "&.Mui-disabled":
+                                        {
+                                            backgroundColor:
+                                                "#E9DED0",
+                                            color:
+                                                "#A39A91",
+                                        },
                                 }}
                             >
                                 Open CV
@@ -1047,14 +1187,14 @@ const EmployerApplicantProfile = () => {
                             },
                             borderRadius: 3,
                             border:
-                                "1px solid #e5e7eb",
+                                "1px solid #E9DED0",
+                            backgroundColor:
+                                "#FFFDF9",
                             mb: 3,
                         }}
                     >
                         <SectionTitle
-                            icon={
-                                <Description />
-                            }
+                            icon={<Description />}
                             title="Cover Letter"
                             subtitle="Message submitted by the applicant."
                         />
@@ -1064,22 +1204,19 @@ const EmployerApplicantProfile = () => {
                                 mt: 3,
                                 p: 3,
                                 backgroundColor:
-                                    "#f8fafc",
+                                    "#FFF8EF",
                                 borderRadius: 2,
                                 borderLeft:
-                                    "4px solid #2563eb",
+                                    "4px solid #E76F51",
                             }}
                         >
                             <Typography
                                 sx={{
                                     whiteSpace:
                                         "pre-wrap",
-                                    lineHeight:
-                                        1.8,
-                                    color:
-                                        "#475467",
-                                    fontSize:
-                                        14,
+                                    lineHeight: 1.8,
+                                    color: "#5F574F",
+                                    fontSize: 14,
                                 }}
                             >
                                 {applicant.coverLetter ||
@@ -1101,7 +1238,9 @@ const EmployerApplicantProfile = () => {
                             },
                             borderRadius: 3,
                             border:
-                                "1px solid #e5e7eb",
+                                "1px solid #E9DED0",
+                            backgroundColor:
+                                "#FFFDF9",
                         }}
                     >
                         <SectionTitle
@@ -1112,21 +1251,17 @@ const EmployerApplicantProfile = () => {
 
                         <Box
                             sx={{
-                                display:
-                                    "grid",
-                                gridTemplateColumns:
-                                    {
-                                        xs: "1fr",
-                                        md: "repeat(2, 1fr)",
-                                    },
+                                display: "grid",
+                                gridTemplateColumns: {
+                                    xs: "1fr",
+                                    md: "repeat(2, 1fr)",
+                                },
                                 gap: 2,
                                 mt: 3,
                             }}
                         >
                             <InfoCard
-                                icon={
-                                    <Work />
-                                }
+                                icon={<Work />}
                                 label="Position"
                                 value={
                                     job?.JobTitle ||
@@ -1135,9 +1270,7 @@ const EmployerApplicantProfile = () => {
                             />
 
                             <InfoCard
-                                icon={
-                                    <Business />
-                                }
+                                icon={<Business />}
                                 label="Company"
                                 value={
                                     job?.CompanyName ||
@@ -1196,11 +1329,11 @@ const EmployerApplicantProfile = () => {
                                     "none",
                                 fontWeight: 700,
                                 backgroundColor:
-                                    "#2563eb",
+                                    "#293241",
                                 boxShadow: "none",
                                 "&:hover": {
                                     backgroundColor:
-                                        "#1d4ed8",
+                                        "#3A4658",
                                     boxShadow:
                                         "none",
                                 },
@@ -1237,10 +1370,11 @@ const SectionTitle = ({
                     sx={{
                         width: 40,
                         height: 40,
+                        minWidth: 40,
                         borderRadius: 2,
                         backgroundColor:
-                            "#eff6ff",
-                        color: "#2563eb",
+                            "#FFF1D6",
+                        color: "#E76F51",
                         display: "flex",
                         alignItems:
                             "center",
@@ -1256,7 +1390,7 @@ const SectionTitle = ({
                         sx={{
                             fontSize: 18,
                             fontWeight: 800,
-                            color: "#101828",
+                            color: "#293241",
                         }}
                     >
                         {title}
@@ -1265,7 +1399,7 @@ const SectionTitle = ({
                     <Typography
                         sx={{
                             fontSize: 13,
-                            color: "#667085",
+                            color: "#7A7068",
                             mt: 0.2,
                         }}
                     >
@@ -1290,11 +1424,13 @@ const InfoCard = ({
         <Box
             sx={{
                 p: 2.5,
-                backgroundColor:
-                    "#f8fafc",
+                backgroundColor: "#FFF8EF",
+                border:
+                    "1px solid #E9DED0",
                 borderRadius: 2,
                 display: "flex",
                 gap: 1.5,
+                minWidth: 0,
             }}
         >
             <Box
@@ -1304,8 +1440,8 @@ const InfoCard = ({
                     minWidth: 38,
                     borderRadius: 2,
                     backgroundColor:
-                        "#eff6ff",
-                    color: "#2563eb",
+                        "#FFF1D6",
+                    color: "#E76F51",
                     display: "flex",
                     alignItems:
                         "center",
@@ -1316,11 +1452,16 @@ const InfoCard = ({
                 {icon}
             </Box>
 
-            <Box sx={{ minWidth: 0 }}>
+            <Box
+                sx={{
+                    minWidth: 0,
+                }}
+            >
                 <Typography
                     sx={{
                         fontSize: 11,
-                        color: "#98a2b3",
+                        color: "#9A9087",
+                        fontWeight: 600,
                     }}
                 >
                     {label}
@@ -1330,7 +1471,7 @@ const InfoCard = ({
                     sx={{
                         fontSize: 14,
                         fontWeight: 700,
-                        color: "#344054",
+                        color: "#3F4854",
                         mt: 0.4,
                         wordBreak:
                             "break-word",
@@ -1356,8 +1497,9 @@ const ProfileSection = ({
         <Box
             sx={{
                 p: 3,
-                backgroundColor:
-                    "#f8fafc",
+                backgroundColor: "#FFF8EF",
+                border:
+                    "1px solid #E9DED0",
                 borderRadius: 2,
                 minHeight: 150,
             }}
@@ -1372,7 +1514,17 @@ const ProfileSection = ({
             >
                 <Box
                     sx={{
-                        color: "#2563eb",
+                        width: 32,
+                        height: 32,
+                        borderRadius: 1.5,
+                        backgroundColor:
+                            "#FFF1D6",
+                        color: "#E76F51",
+                        display: "flex",
+                        alignItems:
+                            "center",
+                        justifyContent:
+                            "center",
                     }}
                 >
                     {icon}
@@ -1381,7 +1533,7 @@ const ProfileSection = ({
                 <Typography
                     sx={{
                         fontWeight: 800,
-                        color: "#101828",
+                        color: "#293241",
                     }}
                 >
                     {title}
@@ -1390,7 +1542,7 @@ const ProfileSection = ({
 
             <Typography
                 sx={{
-                    color: "#475467",
+                    color: "#5F574F",
                     lineHeight: 1.8,
                     whiteSpace:
                         "pre-wrap",

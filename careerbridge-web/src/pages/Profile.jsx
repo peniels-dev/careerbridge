@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -12,6 +13,7 @@ import {
     Container,
     Divider,
     Grid,
+    InputAdornment,
     Stack,
     TextField,
     Typography,
@@ -22,6 +24,10 @@ import {
     LocationOn,
     Phone,
     Save,
+    ArrowBack,
+    Person,
+    School,
+    Build,
 } from "@mui/icons-material";
 
 import axiosAPI from "../api/axiosAPI";
@@ -74,7 +80,7 @@ const Profile = () => {
 
                 setError(
                     err.response?.data?.message ||
-                    "Unable to load your profile."
+                        "Unable to load your profile."
                 );
             } finally {
                 setLoading(false);
@@ -99,18 +105,15 @@ const Profile = () => {
             setError("");
             setSuccess("");
 
-            await axiosAPI.put(
-                "/jobseeker/profile",
-                {
-                    firstName: profile.firstName,
-                    middleName: profile.middleName,
-                    lastName: profile.lastName,
-                    phone: profile.phone,
-                    location: profile.location,
-                    skills: profile.skills,
-                    education: profile.education,
-                }
-            );
+            await axiosAPI.put("/jobseeker/profile", {
+                firstName: profile.firstName,
+                middleName: profile.middleName,
+                lastName: profile.lastName,
+                phone: profile.phone,
+                location: profile.location,
+                skills: profile.skills,
+                education: profile.education,
+            });
 
             setSuccess(
                 "Your profile has been updated successfully."
@@ -120,7 +123,7 @@ const Profile = () => {
 
             setError(
                 err.response?.data?.message ||
-                "Failed to update profile."
+                    "Failed to update profile."
             );
         } finally {
             setSaving(false);
@@ -128,10 +131,14 @@ const Profile = () => {
     };
 
     const getInitials = () => {
-        const first = profile.firstName?.charAt(0) || "";
-        const last = profile.lastName?.charAt(0) || "";
+        const first =
+            profile.firstName?.charAt(0) || "";
 
-        const initials = `${first}${last}`.toUpperCase();
+        const last =
+            profile.lastName?.charAt(0) || "";
+
+        const initials =
+            `${first}${last}`.toUpperCase();
 
         return initials || "U";
     };
@@ -144,10 +151,14 @@ const Profile = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    backgroundColor: "#f5f7fb",
+                    backgroundColor: "#FFF8EF",
                 }}
             >
-                <CircularProgress />
+                <CircularProgress
+                    sx={{
+                        color: "#E76F51",
+                    }}
+                />
             </Box>
         );
     }
@@ -156,15 +167,20 @@ const Profile = () => {
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f5f7fb",
-                py: 5,
+                backgroundColor: "#FFF8EF",
+                py: {
+                    xs: 3,
+                    sm: 5,
+                },
             }}
         >
             <Container maxWidth="md">
-
                 {/* Header */}
                 <Stack
-                    direction={{ xs: "column", sm: "row" }}
+                    direction={{
+                        xs: "column",
+                        sm: "row",
+                    }}
                     justifyContent="space-between"
                     alignItems={{
                         xs: "flex-start",
@@ -175,40 +191,72 @@ const Profile = () => {
                 >
                     <Box>
                         <Typography
-                            variant="h4"
-                            fontWeight={800}
-                            color="#172033"
+                            sx={{
+                                fontSize: {
+                                    xs: 12,
+                                    sm: 13,
+                                },
+                                fontWeight: 800,
+                                letterSpacing: "1.5px",
+                                color: "#E76F51",
+                                mb: 0.8,
+                            }}
+                        >
+                            CAREERBRIDGE
+                        </Typography>
+
+                        <Typography
+                            component="h1"
+                            sx={{
+                                fontSize: {
+                                    xs: 30,
+                                    sm: 38,
+                                },
+                                lineHeight: 1.15,
+                                fontWeight: 900,
+                                color: "#293241",
+                                letterSpacing: "-0.8px",
+                            }}
                         >
                             My Profile
                         </Typography>
 
                         <Typography
-                            color="text.secondary"
-                            sx={{ mt: 0.5 }}
+                            sx={{
+                                color: "#746B63",
+                                mt: 0.8,
+                                fontSize: {
+                                    xs: 14,
+                                    sm: 15,
+                                },
+                            }}
                         >
-                            Manage your personal information.
+                            Keep your information up to date.
                         </Typography>
                     </Box>
 
                     <Button
-                        variant="contained"
-                        onClick={() => navigate("/dashboard")}
+                        variant="outlined"
+                        startIcon={<ArrowBack />}
+                        onClick={() =>
+                            navigate("/dashboard")
+                        }
                         sx={{
                             minHeight: 44,
-                            px: 3,
+                            px: 2.5,
                             borderRadius: 2,
                             textTransform: "none",
                             fontWeight: 700,
-                            fontSize: "0.95rem",
-                            backgroundColor: "#2563eb",
-                            boxShadow: "none",
+                            color: "#293241",
+                            borderColor: "#DCCFC2",
+                            backgroundColor: "#FFFDF9",
                             "&:hover": {
-                                backgroundColor: "#1d4ed8",
-                                boxShadow: "none",
+                                borderColor: "#E76F51",
+                                backgroundColor: "#FFF1D6",
                             },
                         }}
                     >
-                        Return to Dashboard
+                        Back to Dashboard
                     </Button>
                 </Stack>
 
@@ -216,7 +264,10 @@ const Profile = () => {
                 {error && (
                     <Alert
                         severity="error"
-                        sx={{ mb: 3 }}
+                        sx={{
+                            mb: 3,
+                            borderRadius: 2,
+                        }}
                     >
                         {error}
                     </Alert>
@@ -225,46 +276,102 @@ const Profile = () => {
                 {success && (
                     <Alert
                         severity="success"
-                        sx={{ mb: 3 }}
+                        sx={{
+                            mb: 3,
+                            borderRadius: 2,
+                            border: "1px solid #C9DFC0",
+                        }}
                     >
                         {success}
                     </Alert>
                 )}
 
+                {/* Profile Card */}
                 <Card
                     elevation={0}
                     sx={{
-                        borderRadius: 4,
-                        border: "1px solid #e4e8f0",
+                        backgroundColor: "#FFFDF9",
+                        border: "1px solid #E9DED0",
+                        borderRadius: {
+                            xs: 3,
+                            sm: 4,
+                        },
                         overflow: "hidden",
+                        boxShadow:
+                            "0 12px 35px rgba(95, 75, 55, 0.08)",
                     }}
                 >
-
                     {/* Profile Header */}
                     <Box
                         sx={{
-                            background:
-                                "linear-gradient(135deg, #172033 0%, #263b63 100%)",
+                            position: "relative",
+                            backgroundColor: "#293241",
                             px: {
                                 xs: 3,
                                 sm: 5,
                             },
-                            py: 4,
+                            py: {
+                                xs: 3.5,
+                                sm: 4.5,
+                            },
+                            overflow: "hidden",
                         }}
                     >
+                        {/* Decorative shapes */}
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                width: 150,
+                                height: 150,
+                                borderRadius: "50%",
+                                backgroundColor:
+                                    "rgba(244, 162, 97, 0.12)",
+                                right: -50,
+                                top: -70,
+                            }}
+                        />
+
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                width: 90,
+                                height: 90,
+                                borderRadius: "50%",
+                                backgroundColor:
+                                    "rgba(231, 111, 81, 0.16)",
+                                right: 55,
+                                bottom: -50,
+                            }}
+                        />
+
                         <Stack
                             direction="row"
                             spacing={2.5}
                             alignItems="center"
+                            sx={{
+                                position: "relative",
+                                zIndex: 1,
+                            }}
                         >
                             <Avatar
                                 sx={{
-                                    width: 72,
-                                    height: 72,
-                                    fontSize: 26,
-                                    fontWeight: 800,
-                                    backgroundColor: "#ffffff",
-                                    color: "#172033",
+                                    width: {
+                                        xs: 64,
+                                        sm: 76,
+                                    },
+                                    height: {
+                                        xs: 64,
+                                        sm: 76,
+                                    },
+                                    fontSize: {
+                                        xs: 22,
+                                        sm: 27,
+                                    },
+                                    fontWeight: 900,
+                                    backgroundColor: "#FFF1D6",
+                                    color: "#E76F51",
+                                    border:
+                                        "3px solid rgba(255,255,255,0.15)",
                                 }}
                             >
                                 {getInitials()}
@@ -272,9 +379,15 @@ const Profile = () => {
 
                             <Box>
                                 <Typography
-                                    variant="h5"
-                                    fontWeight={800}
-                                    color="white"
+                                    sx={{
+                                        color: "#FFFDF9",
+                                        fontSize: {
+                                            xs: 20,
+                                            sm: 25,
+                                        },
+                                        fontWeight: 900,
+                                        lineHeight: 1.2,
+                                    }}
                                 >
                                     {profile.firstName}{" "}
                                     {profile.middleName
@@ -283,15 +396,29 @@ const Profile = () => {
                                     {profile.lastName}
                                 </Typography>
 
-                                <Typography
-                                    sx={{
-                                        color:
-                                            "rgba(255,255,255,0.75)",
-                                        mt: 0.5,
-                                    }}
+                                <Stack
+                                    direction="row"
+                                    spacing={1}
+                                    alignItems="center"
+                                    sx={{ mt: 0.8 }}
                                 >
-                                    Job Seeker
-                                </Typography>
+                                    <Person
+                                        sx={{
+                                            fontSize: 17,
+                                            color: "#F4A261",
+                                        }}
+                                    />
+
+                                    <Typography
+                                        sx={{
+                                            color: "#E8DED5",
+                                            fontSize: 14,
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        Job Seeker
+                                    </Typography>
+                                </Stack>
                             </Box>
                         </Stack>
                     </Box>
@@ -299,31 +426,68 @@ const Profile = () => {
                     <CardContent
                         sx={{
                             p: {
-                                xs: 3,
+                                xs: 2.5,
                                 sm: 5,
                             },
                         }}
                     >
-                        <Typography
-                            variant="h6"
-                            fontWeight={800}
+                        {/* Section heading */}
+                        <Stack
+                            direction="row"
+                            spacing={1.5}
+                            alignItems="center"
                             sx={{ mb: 1 }}
                         >
-                            Personal Information
-                        </Typography>
+                            <Box
+                                sx={{
+                                    width: 38,
+                                    height: 38,
+                                    borderRadius: 2,
+                                    backgroundColor: "#FFF1D6",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <Person
+                                    sx={{
+                                        color: "#E76F51",
+                                        fontSize: 21,
+                                    }}
+                                />
+                            </Box>
+
+                            <Typography
+                                sx={{
+                                    fontSize: 21,
+                                    fontWeight: 900,
+                                    color: "#293241",
+                                }}
+                            >
+                                Personal Information
+                            </Typography>
+                        </Stack>
 
                         <Typography
-                            color="text.secondary"
-                            sx={{ mb: 3 }}
+                            sx={{
+                                color: "#746B63",
+                                fontSize: 14,
+                                mb: 3,
+                            }}
                         >
-                            Keep your information up to date so
-                            employers can get the correct details.
+                            Add details that help employers
+                            understand who you are.
                         </Typography>
 
-                        <Divider sx={{ mb: 4 }} />
+                        <Divider
+                            sx={{
+                                borderColor: "#E9DED0",
+                                mb: 4,
+                            }}
+                        />
 
                         <Grid container spacing={3}>
-
                             {/* First Name */}
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
@@ -332,6 +496,7 @@ const Profile = () => {
                                     name="firstName"
                                     value={profile.firstName}
                                     onChange={handleChange}
+                                    sx={textFieldStyle}
                                 />
                             </Grid>
 
@@ -343,6 +508,7 @@ const Profile = () => {
                                     name="middleName"
                                     value={profile.middleName}
                                     onChange={handleChange}
+                                    sx={textFieldStyle}
                                 />
                             </Grid>
 
@@ -354,6 +520,7 @@ const Profile = () => {
                                     name="lastName"
                                     value={profile.lastName}
                                     onChange={handleChange}
+                                    sx={textFieldStyle}
                                 />
                             </Grid>
 
@@ -365,15 +532,17 @@ const Profile = () => {
                                     value={profile.email}
                                     disabled
                                     helperText="Email is used for login and cannot be changed."
+                                    sx={textFieldStyle}
                                     InputProps={{
                                         startAdornment: (
-                                            <Email
-                                                sx={{
-                                                    mr: 1,
-                                                    color:
-                                                        "action.active",
-                                                }}
-                                            />
+                                            <InputAdornment position="start">
+                                                <Email
+                                                    sx={{
+                                                        color: "#E76F51",
+                                                        fontSize: 20,
+                                                    }}
+                                                />
+                                            </InputAdornment>
                                         ),
                                     }}
                                 />
@@ -387,15 +556,17 @@ const Profile = () => {
                                     name="phone"
                                     value={profile.phone}
                                     onChange={handleChange}
+                                    sx={textFieldStyle}
                                     InputProps={{
                                         startAdornment: (
-                                            <Phone
-                                                sx={{
-                                                    mr: 1,
-                                                    color:
-                                                        "action.active",
-                                                }}
-                                            />
+                                            <InputAdornment position="start">
+                                                <Phone
+                                                    sx={{
+                                                        color: "#6A994E",
+                                                        fontSize: 20,
+                                                    }}
+                                                />
+                                            </InputAdornment>
                                         ),
                                     }}
                                 />
@@ -410,15 +581,17 @@ const Profile = () => {
                                     value={profile.location}
                                     onChange={handleChange}
                                     placeholder="e.g. Accra, Ghana"
+                                    sx={textFieldStyle}
                                     InputProps={{
                                         startAdornment: (
-                                            <LocationOn
-                                                sx={{
-                                                    mr: 1,
-                                                    color:
-                                                        "action.active",
-                                                }}
-                                            />
+                                            <InputAdornment position="start">
+                                                <LocationOn
+                                                    sx={{
+                                                        color: "#F4A261",
+                                                        fontSize: 20,
+                                                    }}
+                                                />
+                                            </InputAdornment>
                                         ),
                                     }}
                                 />
@@ -436,6 +609,7 @@ const Profile = () => {
                                     rows={3}
                                     placeholder="e.g. Java, React, SQL, Networking"
                                     helperText="Separate multiple skills with commas."
+                                    sx={textFieldStyle}
                                 />
                             </Grid>
 
@@ -450,17 +624,95 @@ const Profile = () => {
                                     multiline
                                     rows={3}
                                     placeholder="e.g. BSc Computer Science"
+                                    sx={textFieldStyle}
                                 />
                             </Grid>
-
                         </Grid>
+
+                        {/* Extra section hint */}
+                        <Box
+                            sx={{
+                                mt: 4,
+                                p: 2.5,
+                                backgroundColor: "#FFF8EF",
+                                border: "1px solid #E9DED0",
+                                borderRadius: 2.5,
+                            }}
+                        >
+                            <Stack
+                                direction="row"
+                                spacing={1.5}
+                                alignItems="flex-start"
+                            >
+                                <Build
+                                    sx={{
+                                        color: "#6A994E",
+                                        fontSize: 21,
+                                        mt: 0.2,
+                                    }}
+                                />
+
+                                <Box>
+                                    <Typography
+                                        sx={{
+                                            fontWeight: 800,
+                                            color: "#293241",
+                                            fontSize: 14,
+                                            mb: 0.3,
+                                        }}
+                                    >
+                                        Keep your profile useful
+                                    </Typography>
+
+                                    <Typography
+                                        sx={{
+                                            color: "#746B63",
+                                            fontSize: 13,
+                                            lineHeight: 1.6,
+                                        }}
+                                    >
+                                        Adding your skills and
+                                        education makes it easier
+                                        for employers to understand
+                                        your background.
+                                    </Typography>
+                                </Box>
+                            </Stack>
+                        </Box>
 
                         {/* Save Button */}
                         <Stack
-                            direction="row"
+                            direction={{
+                                xs: "column-reverse",
+                                sm: "row",
+                            }}
                             justifyContent="flex-end"
+                            spacing={2}
                             sx={{ mt: 4 }}
                         >
+                            <Button
+                                variant="outlined"
+                                onClick={() =>
+                                    navigate("/dashboard")
+                                }
+                                sx={{
+                                    minHeight: 46,
+                                    px: 3,
+                                    borderRadius: 2,
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                    color: "#5F554D",
+                                    borderColor: "#DCCFC2",
+                                    "&:hover": {
+                                        borderColor: "#E76F51",
+                                        backgroundColor:
+                                            "#FFF8EF",
+                                    },
+                                }}
+                            >
+                                Cancel
+                            </Button>
+
                             <Button
                                 variant="contained"
                                 startIcon={
@@ -476,11 +728,18 @@ const Profile = () => {
                                 onClick={handleSave}
                                 disabled={saving}
                                 sx={{
+                                    minHeight: 46,
+                                    px: 3.5,
                                     borderRadius: 2,
-                                    px: 4,
-                                    py: 1.3,
                                     textTransform: "none",
-                                    fontWeight: 700,
+                                    fontWeight: 800,
+                                    backgroundColor: "#E76F51",
+                                    boxShadow: "none",
+                                    "&:hover": {
+                                        backgroundColor:
+                                            "#D85F43",
+                                        boxShadow: "none",
+                                    },
                                 }}
                             >
                                 {saving
@@ -488,12 +747,62 @@ const Profile = () => {
                                     : "Save Changes"}
                             </Button>
                         </Stack>
-
                     </CardContent>
                 </Card>
+
+                {/* Bottom note */}
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{ mt: 3 }}
+                >
+                    <School
+                        sx={{
+                            fontSize: 17,
+                            color: "#6A994E",
+                        }}
+                    />
+
+                    <Typography
+                        sx={{
+                            fontSize: 13,
+                            color: "#81776E",
+                        }}
+                    >
+                        Your profile information is only
+                        editable by you.
+                    </Typography>
+                </Stack>
             </Container>
         </Box>
     );
+};
+
+const textFieldStyle = {
+    "& .MuiOutlinedInput-root": {
+        backgroundColor: "#FFFDF9",
+        borderRadius: 2,
+        "& fieldset": {
+            borderColor: "#DCCFC2",
+        },
+        "&:hover fieldset": {
+            borderColor: "#C8B8A8",
+        },
+        "&.Mui-focused fieldset": {
+            borderColor: "#E76F51",
+            borderWidth: 2,
+        },
+    },
+
+    "& .MuiInputLabel-root.Mui-focused": {
+        color: "#E76F51",
+    },
+
+    "& .MuiFormHelperText-root": {
+        color: "#81776E",
+    },
 };
 
 export default Profile;

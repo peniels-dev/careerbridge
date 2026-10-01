@@ -27,20 +27,27 @@ function JobCard({ job, onViewDetails }) {
                 minWidth: 0,
                 display: "flex",
                 flexDirection: "column",
-                borderRadius: 3,
-                border: "1px solid #e5e7eb",
-                boxShadow: "0 2px 8px rgba(16, 24, 40, 0.06)",
-                backgroundColor: "#ffffff",
+                backgroundColor: "#FFFDF9",
+                border: "1px solid #E9DED0",
+                borderRadius: 2.5,
+                boxShadow: "0 3px 12px rgba(94, 65, 45, 0.07)",
                 overflow: "hidden",
                 transition: "transform 0.2s ease, box-shadow 0.2s ease",
-
                 "&:hover": {
-                    boxShadow:
-                        "0 8px 24px rgba(16, 24, 40, 0.10)",
-                    transform: "translateY(-3px)",
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 9px 22px rgba(94, 65, 45, 0.12)",
                 },
             }}
         >
+            {/* Small top accent */}
+            <Box
+                sx={{
+                    height: 5,
+                    backgroundColor: "#E76F51",
+                    width: "100%",
+                }}
+            />
+
             <CardContent
                 sx={{
                     flexGrow: 1,
@@ -63,14 +70,10 @@ function JobCard({ job, onViewDetails }) {
                         },
                         lineHeight: 1.35,
                         fontWeight: 800,
-                        color: "#101828",
-                        mb: 1.5,
-
-                        // Prevent long titles from breaking the card
+                        color: "#293241",
+                        mb: 1.2,
                         overflowWrap: "anywhere",
                         wordBreak: "break-word",
-
-                        // Keep card heights consistent
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: "vertical",
@@ -83,25 +86,25 @@ function JobCard({ job, onViewDetails }) {
                 {/* COMPANY */}
                 <Typography
                     sx={{
-                        color: "#475467",
+                        color: "#5F554D",
                         fontSize: {
                             xs: 13,
                             sm: 14,
                         },
                         lineHeight: 1.5,
-                        mb: 0.75,
+                        mb: 0.7,
+                        fontWeight: 600,
                         overflowWrap: "anywhere",
                         wordBreak: "break-word",
                     }}
                 >
-                    🏢{" "}
-                    {job.CompanyName || "Company not specified"}
+                    🏢 {job.CompanyName || "Company not specified"}
                 </Typography>
 
                 {/* LOCATION */}
                 <Typography
                     sx={{
-                        color: "#667085",
+                        color: "#7A7068",
                         fontSize: {
                             xs: 13,
                             sm: 14,
@@ -111,8 +114,7 @@ function JobCard({ job, onViewDetails }) {
                         wordBreak: "break-word",
                     }}
                 >
-                    📍{" "}
-                    {job.Location || "Location not specified"}
+                    📍 {job.Location || "Location not specified"}
                 </Typography>
 
                 {/* CHIPS */}
@@ -130,8 +132,11 @@ function JobCard({ job, onViewDetails }) {
                     <Chip
                         label={job.JobType || "Not specified"}
                         size="small"
-                        variant="outlined"
                         sx={{
+                            backgroundColor: "#FFF1D6",
+                            color: "#8A5A00",
+                            border: "1px solid #F4D7A1",
+                            fontWeight: 600,
                             maxWidth: "100%",
                             "& .MuiChip-label": {
                                 overflow: "hidden",
@@ -142,12 +147,13 @@ function JobCard({ job, onViewDetails }) {
                     />
 
                     <Chip
-                        label={
-                            job.CategoryName || "No category"
-                        }
+                        label={job.CategoryName || "No category"}
                         size="small"
-                        variant="outlined"
                         sx={{
+                            backgroundColor: "#EDF4E8",
+                            color: "#52743D",
+                            border: "1px solid #CFE0C5",
+                            fontWeight: 600,
                             maxWidth: "100%",
                             "& .MuiChip-label": {
                                 overflow: "hidden",
@@ -160,16 +166,32 @@ function JobCard({ job, onViewDetails }) {
                     <Chip
                         label={job.Status ? "Active" : "Closed"}
                         size="small"
-                        color={job.Status ? "success" : "default"}
+                        sx={{
+                            backgroundColor: job.Status
+                                ? "#FDE9E3"
+                                : "#F0ECE8",
+                            color: job.Status
+                                ? "#B84F38"
+                                : "#6F665F",
+                            border: job.Status
+                                ? "1px solid #F3C5B8"
+                                : "1px solid #DDD5CE",
+                            fontWeight: 600,
+                        }}
                     />
                 </Box>
 
-                <Divider sx={{ mb: 2 }} />
+                <Divider
+                    sx={{
+                        mb: 2,
+                        borderColor: "#E9DED0",
+                    }}
+                />
 
                 {/* DESCRIPTION */}
                 <Typography
                     sx={{
-                        color: "#667085",
+                        color: "#6F665F",
                         fontSize: {
                             xs: 13,
                             sm: 14,
@@ -177,7 +199,6 @@ function JobCard({ job, onViewDetails }) {
                         lineHeight: 1.65,
                         overflowWrap: "anywhere",
                         wordBreak: "break-word",
-
                         display: "-webkit-box",
                         WebkitLineClamp: 4,
                         WebkitBoxOrient: "vertical",
@@ -196,14 +217,13 @@ function JobCard({ job, onViewDetails }) {
                 >
                     <Typography
                         sx={{
-                            color: "#344054",
+                            color: "#4E463F",
                             fontSize: {
                                 xs: 12.5,
                                 sm: 13,
                             },
                             lineHeight: 1.5,
                             fontWeight: 700,
-                            overflowWrap: "anywhere",
                         }}
                     >
                         Application Deadline
@@ -211,7 +231,7 @@ function JobCard({ job, onViewDetails }) {
 
                     <Typography
                         sx={{
-                            color: "#667085",
+                            color: "#7A7068",
                             fontSize: {
                                 xs: 12.5,
                                 sm: 13,
@@ -242,17 +262,22 @@ function JobCard({ job, onViewDetails }) {
                 <Button
                     variant="contained"
                     fullWidth
-                    onClick={() =>
-                        onViewDetails(job.JobID)
-                    }
+                    onClick={() => onViewDetails(job.JobID)}
                     sx={{
                         minHeight: 42,
-                        borderRadius: 2,
+                        borderRadius: 1.5,
+                        backgroundColor: "#E76F51",
+                        color: "#FFFFFF",
                         textTransform: "none",
                         fontWeight: 700,
                         fontSize: {
                             xs: 13,
                             sm: 14,
+                        },
+                        boxShadow: "none",
+                        "&:hover": {
+                            backgroundColor: "#D85F43",
+                            boxShadow: "none",
                         },
                     }}
                 >
@@ -264,4 +289,3 @@ function JobCard({ job, onViewDetails }) {
 }
 
 export default JobCard;
-

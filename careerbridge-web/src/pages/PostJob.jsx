@@ -38,7 +38,6 @@ const PostJob = () => {
     const [categories, setCategories] = useState([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
@@ -60,25 +59,15 @@ const PostJob = () => {
                 setLoadingCategories(true);
                 setError("");
 
-                console.log("Loading job categories...");
-
                 const response = await axiosAPI.get("/categories");
-
-                console.log(
-                    "Categories response:",
-                    response.data
-                );
 
                 setCategories(response.data?.data || []);
             } catch (err) {
-                console.error(
-                    "Category loading error:",
-                    err
-                );
+                console.error("Category loading error:", err);
 
                 setError(
                     err.response?.data?.message ||
-                    "Unable to load job categories."
+                        "Unable to load job categories."
                 );
             } finally {
                 setLoadingCategories(false);
@@ -122,18 +111,12 @@ const PostJob = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        console.log("================================");
-        console.log("POST JOB STARTED");
-        console.log("FORM DATA:", formData);
-        console.log("================================");
-
         setError("");
         setSuccess("");
 
         // -------------------------------
         // VALIDATION
         // -------------------------------
-
         if (!formData.jobTitle.trim()) {
             setError("Please enter a job title.");
             return;
@@ -160,20 +143,15 @@ const PostJob = () => {
         }
 
         if (!formData.applicationDeadline) {
-            setError(
-                "Please select an application deadline."
-            );
+            setError("Please select an application deadline.");
             return;
         }
 
         // -------------------------------
         // SEND TO BACKEND
         // -------------------------------
-
         try {
             setSubmitting(true);
-
-            console.log("Sending job to backend...");
 
             const jobData = {
                 JobTitle: formData.jobTitle.trim(),
@@ -181,25 +159,14 @@ const PostJob = () => {
                 Description: formData.description.trim(),
                 Location: formData.location.trim(),
                 JobType: formData.jobType,
-                ApplicationDeadline:
-                    formData.applicationDeadline,
+                ApplicationDeadline: formData.applicationDeadline,
             };
 
-            console.log("DATA BEING SENT:", jobData);
-
-            const response = await axiosAPI.post(
-                "/jobs",
-                jobData
-            );
-
-            console.log("================================");
-            console.log("JOB POST RESPONSE:");
-            console.log(response.data);
-            console.log("================================");
+            const response = await axiosAPI.post("/jobs", jobData);
 
             setSuccess(
                 response.data?.message ||
-                "Job posted successfully!"
+                    "Job posted successfully!"
             );
 
             setFormData({
@@ -211,45 +178,47 @@ const PostJob = () => {
                 applicationDeadline: "",
             });
         } catch (err) {
-            console.error("================================");
-            console.error("POST JOB ERROR");
-            console.error(
-                "STATUS:",
-                err.response?.status
-            );
-            console.error(
-                "DATA:",
-                err.response?.data
-            );
-            console.error("ERROR:", err);
-            console.error("================================");
+            console.error("POST JOB ERROR:", err);
 
             setError(
                 err.response?.data?.message ||
-                "Unable to post the job. Please try again."
+                    "Unable to post the job. Please try again."
             );
         } finally {
             setSubmitting(false);
-
-            console.log("================================");
-            console.log("POST JOB FINISHED");
-            console.log("================================");
         }
     };
+
+    const firstName =
+        user?.firstName ||
+        user?.FirstName ||
+        "Employer";
+
+    const lastName =
+        user?.lastName ||
+        user?.LastName ||
+        "";
+
+    const initials =
+        `${firstName.charAt(0)}${lastName.charAt(0)}`
+            .trim()
+            .toUpperCase() || "E";
 
     return (
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f5f7fb",
+                backgroundColor: "#FFF8EF",
                 display: "flex",
             }}
         >
-            {/* SIDEBAR */}
+            {/* ==========================================
+                SIDEBAR
+            ========================================== */}
             <Box
                 sx={{
                     width: 250,
-                    backgroundColor: "#0f172a",
+                    backgroundColor: "#293241",
                     color: "white",
                     display: {
                         xs: "none",
@@ -272,28 +241,50 @@ const PostJob = () => {
                             "1px solid rgba(255,255,255,0.08)",
                     }}
                 >
-                    <Typography
-                        variant="h5"
+                    <Box
                         sx={{
-                            fontWeight: 800,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1.2,
                         }}
                     >
-                        Career
-                        <span style={{ color: "#60a5fa" }}>
-                            Bridge
-                        </span>
-                    </Typography>
+                        <Box
+                            sx={{
+                                width: 38,
+                                height: 38,
+                                borderRadius: 2,
+                                backgroundColor: "#E76F51",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontWeight: 800,
+                                fontSize: 20,
+                            }}
+                        >
+                            C
+                        </Box>
 
-                    <Typography
-                        variant="caption"
-                        sx={{
-                            color: "#94a3b8",
-                            display: "block",
-                            mt: 0.5,
-                        }}
-                    >
-                        Employer Portal
-                    </Typography>
+                        <Box>
+                            <Typography
+                                sx={{
+                                    fontSize: 20,
+                                    fontWeight: 800,
+                                    lineHeight: 1,
+                                }}
+                            >
+                                CareerBridge
+                            </Typography>
+
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    color: "#AEB7C4",
+                                }}
+                            >
+                                Employer Portal
+                            </Typography>
+                        </Box>
+                    </Box>
                 </Box>
 
                 {/* NAVIGATION */}
@@ -307,118 +298,58 @@ const PostJob = () => {
                     <Typography
                         variant="caption"
                         sx={{
-                            color: "#64748b",
+                            color: "#8D98A8",
                             px: 2,
                             mb: 1,
                             display: "block",
                             textTransform: "uppercase",
                             letterSpacing: "1px",
+                            fontWeight: 700,
                         }}
                     >
                         Workspace
                     </Typography>
 
-                    <Button
-                        fullWidth
-                        startIcon={<Dashboard />}
+                    <SidebarItem
+                        icon={<Dashboard />}
+                        label="Dashboard"
                         onClick={() =>
-                            navigate(
-                                "/employer-dashboard"
-                            )
+                            navigate("/employer-dashboard")
                         }
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "#cbd5e1",
-                            px: 2,
-                            py: 1.3,
-                            mb: 0.5,
-                            borderRadius: 2,
-                            textTransform: "none",
-                        }}
-                    >
-                        Dashboard
-                    </Button>
+                    />
 
-                    <Button
-                        fullWidth
-                        startIcon={<Work />}
+                    <SidebarItem
+                        icon={<Work />}
+                        label="My Job Postings"
                         onClick={() =>
                             navigate("/employer/jobs")
                         }
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "#cbd5e1",
-                            px: 2,
-                            py: 1.3,
-                            mb: 0.5,
-                            borderRadius: 2,
-                            textTransform: "none",
-                        }}
-                    >
-                        My Job Postings
-                    </Button>
+                    />
 
-                    <Button
-                        fullWidth
-                        startIcon={<Add />}
+                    <SidebarItem
+                        icon={<Add />}
+                        label="Post a Job"
+                        active
                         onClick={() =>
-                            navigate(
-                                "/employer/post-job"
-                            )
+                            navigate("/employer/post-job")
                         }
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "white",
-                            backgroundColor:
-                                "rgba(96,165,250,0.15)",
-                            px: 2,
-                            py: 1.3,
-                            mb: 0.5,
-                            borderRadius: 2,
-                            textTransform: "none",
-                        }}
-                    >
-                        Post a Job
-                    </Button>
+                    />
 
-                    <Button
-                        fullWidth
-                        startIcon={<People />}
+                    <SidebarItem
+                        icon={<People />}
+                        label="Applicants"
                         onClick={() =>
-                            navigate(
-                                "/employer/applicants"
-                            )
+                            navigate("/employer/applicants")
                         }
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "#cbd5e1",
-                            px: 2,
-                            py: 1.3,
-                            mb: 0.5,
-                            borderRadius: 2,
-                            textTransform: "none",
-                        }}
-                    >
-                        Applicants
-                    </Button>
+                    />
 
-                    <Button
-                        fullWidth
-                        startIcon={<Business />}
+                    <SidebarItem
+                        icon={<Business />}
+                        label="Company Profile"
                         onClick={() =>
                             navigate("/company-profile")
                         }
-                        sx={{
-                            justifyContent: "flex-start",
-                            color: "#cbd5e1",
-                            px: 2,
-                            py: 1.3,
-                            borderRadius: 2,
-                            textTransform: "none",
-                        }}
-                    >
-                        Company Profile
-                    </Button>
+                    />
                 </Box>
 
                 {/* LOGOUT */}
@@ -436,11 +367,16 @@ const PostJob = () => {
                         onClick={handleLogout}
                         sx={{
                             justifyContent: "flex-start",
-                            color: "#94a3b8",
+                            color: "#B8C0CB",
                             px: 2,
                             py: 1.3,
                             borderRadius: 2,
                             textTransform: "none",
+                            "&:hover": {
+                                backgroundColor:
+                                    "rgba(255,255,255,0.06)",
+                                color: "white",
+                            },
                         }}
                     >
                         Logout
@@ -448,7 +384,9 @@ const PostJob = () => {
                 </Box>
             </Box>
 
-            {/* MAIN CONTENT */}
+            {/* ==========================================
+                MAIN CONTENT
+            ========================================== */}
             <Box
                 sx={{
                     flex: 1,
@@ -462,13 +400,12 @@ const PostJob = () => {
                 <Box
                     sx={{
                         height: 72,
-                        backgroundColor: "white",
+                        backgroundColor: "#FFFDF9",
                         borderBottom:
-                            "1px solid #e2e8f0",
+                            "1px solid #E9DED0",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent:
-                            "space-between",
+                        justifyContent: "space-between",
                         px: {
                             xs: 2,
                             md: 4,
@@ -478,8 +415,9 @@ const PostJob = () => {
                     <Box>
                         <Typography
                             sx={{
-                                fontWeight: 700,
-                                color: "#0f172a",
+                                fontWeight: 800,
+                                color: "#293241",
+                                fontSize: 16,
                             }}
                         >
                             Post a Job
@@ -488,7 +426,7 @@ const PostJob = () => {
                         <Typography
                             variant="caption"
                             sx={{
-                                color: "#64748b",
+                                color: "#7A7068",
                             }}
                         >
                             Create a new opportunity
@@ -504,17 +442,15 @@ const PostJob = () => {
                     >
                         <Avatar
                             sx={{
-                                width: 38,
-                                height: 38,
-                                backgroundColor:
-                                    "#dbeafe",
-                                color: "#2563eb",
-                                fontWeight: 700,
+                                width: 40,
+                                height: 40,
+                                backgroundColor: "#F4A261",
+                                color: "#293241",
+                                fontWeight: 800,
+                                fontSize: 14,
                             }}
                         >
-                            {user?.firstName
-                                ?.charAt(0)
-                                ?.toUpperCase() || "E"}
+                            {initials}
                         </Avatar>
 
                         <Box
@@ -529,16 +465,16 @@ const PostJob = () => {
                                 sx={{
                                     fontSize: 14,
                                     fontWeight: 700,
+                                    color: "#293241",
                                 }}
                             >
-                                {user?.firstName || "Employer"}{" "}
-                                {user?.lastName || ""}
+                                {firstName} {lastName}
                             </Typography>
 
                             <Typography
                                 variant="caption"
                                 sx={{
-                                    color: "#64748b",
+                                    color: "#7A7068",
                                 }}
                             >
                                 Employer
@@ -565,9 +501,14 @@ const PostJob = () => {
                         }
                         sx={{
                             mb: 3,
-                            color: "#475569",
+                            color: "#6F665F",
                             textTransform: "none",
-                            fontWeight: 600,
+                            fontWeight: 700,
+                            px: 0,
+                            "&:hover": {
+                                backgroundColor: "transparent",
+                                color: "#E76F51",
+                            },
                         }}
                     >
                         Back to My Job Postings
@@ -579,7 +520,11 @@ const PostJob = () => {
                             variant="h4"
                             sx={{
                                 fontWeight: 800,
-                                color: "#0f172a",
+                                color: "#293241",
+                                fontSize: {
+                                    xs: 30,
+                                    md: 36,
+                                },
                             }}
                         >
                             Create a new job
@@ -587,13 +532,14 @@ const PostJob = () => {
 
                         <Typography
                             sx={{
-                                color: "#64748b",
+                                color: "#7A7068",
                                 mt: 1,
+                                maxWidth: 650,
+                                lineHeight: 1.7,
                             }}
                         >
-                            Share an opportunity and
-                            connect with qualified
-                            candidates.
+                            Share an opportunity and connect
+                            with qualified candidates.
                         </Typography>
                     </Box>
 
@@ -601,12 +547,11 @@ const PostJob = () => {
                     {error && (
                         <Alert
                             severity="error"
-                            onClose={() =>
-                                setError("")
-                            }
+                            onClose={() => setError("")}
                             sx={{
                                 mb: 3,
                                 borderRadius: 2,
+                                border: "1px solid #E8C7C0",
                             }}
                         >
                             {error}
@@ -617,12 +562,11 @@ const PostJob = () => {
                     {success && (
                         <Alert
                             severity="success"
-                            onClose={() =>
-                                setSuccess("")
-                            }
+                            onClose={() => setSuccess("")}
                             sx={{
                                 mb: 3,
                                 borderRadius: 2,
+                                border: "1px solid #C9DDBE",
                             }}
                         >
                             {success}
@@ -633,8 +577,9 @@ const PostJob = () => {
                     <Paper
                         elevation={0}
                         sx={{
+                            backgroundColor: "#FFFDF9",
                             border:
-                                "1px solid #e2e8f0",
+                                "1px solid #E9DED0",
                             borderRadius: 3,
                             overflow: "hidden",
                         }}
@@ -652,34 +597,30 @@ const PostJob = () => {
                                         md: 4,
                                     },
                                     py: 3,
-                                    backgroundColor:
-                                        "#f8fafc",
+                                    backgroundColor: "#FFF1D6",
                                     borderBottom:
-                                        "1px solid #e2e8f0",
+                                        "1px solid #E9DED0",
                                 }}
                             >
                                 <Box
                                     sx={{
                                         display: "flex",
-                                        alignItems:
-                                            "center",
+                                        alignItems: "center",
                                         gap: 1.5,
                                     }}
                                 >
                                     <Box
                                         sx={{
-                                            width: 42,
-                                            height: 42,
+                                            width: 44,
+                                            height: 44,
                                             borderRadius: 2,
                                             backgroundColor:
-                                                "#dbeafe",
-                                            display:
-                                                "flex",
-                                            alignItems:
-                                                "center",
+                                                "#E76F51",
+                                            display: "flex",
+                                            alignItems: "center",
                                             justifyContent:
                                                 "center",
-                                            color: "#2563eb",
+                                            color: "white",
                                         }}
                                     >
                                         <Work />
@@ -688,7 +629,8 @@ const PostJob = () => {
                                     <Box>
                                         <Typography
                                             sx={{
-                                                fontWeight: 700,
+                                                fontWeight: 800,
+                                                color: "#293241",
                                             }}
                                         >
                                             Job Information
@@ -697,14 +639,12 @@ const PostJob = () => {
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color:
-                                                    "#64748b",
+                                                color: "#7A7068",
+                                                mt: 0.3,
                                             }}
                                         >
-                                            Provide the
-                                            details
-                                            candidates
-                                            need.
+                                            Provide the details
+                                            candidates need.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -720,59 +660,36 @@ const PostJob = () => {
                                 }}
                             >
                                 {/* JOB TITLE */}
-                                <Box sx={{ mb: 3 }}>
-                                    <Typography
-                                        sx={{
-                                            fontWeight: 700,
-                                            mb: 1,
-                                            color:
-                                                "#334155",
-                                        }}
-                                    >
-                                        Job Title
-                                    </Typography>
+                                <FormLabel>
+                                    Job Title
+                                </FormLabel>
 
-                                    <TextField
-                                        fullWidth
-                                        name="jobTitle"
-                                        value={
-                                            formData.jobTitle
-                                        }
-                                        onChange={
-                                            handleChange
-                                        }
-                                        placeholder="e.g. Software Engineering Intern"
-                                        disabled={
-                                            submitting
-                                        }
-                                    />
-                                </Box>
+                                <TextField
+                                    fullWidth
+                                    name="jobTitle"
+                                    value={formData.jobTitle}
+                                    onChange={handleChange}
+                                    placeholder="e.g. Software Engineering Intern"
+                                    disabled={submitting}
+                                    sx={fieldStyles}
+                                />
 
                                 {/* CATEGORY + TYPE */}
                                 <Box
                                     sx={{
                                         display: "grid",
-                                        gridTemplateColumns:
-                                            {
-                                                xs: "1fr",
-                                                md: "1fr 1fr",
-                                            },
+                                        gridTemplateColumns: {
+                                            xs: "1fr",
+                                            md: "1fr 1fr",
+                                        },
                                         gap: 3,
-                                        mb: 3,
+                                        mt: 3,
                                     }}
                                 >
-                                    {/* CATEGORY */}
                                     <Box>
-                                        <Typography
-                                            sx={{
-                                                fontWeight: 700,
-                                                mb: 1,
-                                                color:
-                                                    "#334155",
-                                            }}
-                                        >
+                                        <FormLabel>
                                             Job Category
-                                        </Typography>
+                                        </FormLabel>
 
                                         <TextField
                                             select
@@ -793,16 +710,14 @@ const PostJob = () => {
                                                     ? "Loading categories..."
                                                     : "Select a category"
                                             }
+                                            sx={fieldStyles}
                                         >
                                             <MenuItem value="">
-                                                Select a
-                                                category
+                                                Select a category
                                             </MenuItem>
 
                                             {categories.map(
-                                                (
-                                                    category
-                                                ) => (
+                                                (category) => (
                                                     <MenuItem
                                                         key={
                                                             category.CategoryID
@@ -820,18 +735,10 @@ const PostJob = () => {
                                         </TextField>
                                     </Box>
 
-                                    {/* JOB TYPE */}
                                     <Box>
-                                        <Typography
-                                            sx={{
-                                                fontWeight: 700,
-                                                mb: 1,
-                                                color:
-                                                    "#334155",
-                                            }}
-                                        >
+                                        <FormLabel>
                                             Job Type
-                                        </Typography>
+                                        </FormLabel>
 
                                         <TextField
                                             select
@@ -843,13 +750,11 @@ const PostJob = () => {
                                             onChange={
                                                 handleChange
                                             }
-                                            disabled={
-                                                submitting
-                                            }
+                                            disabled={submitting}
+                                            sx={fieldStyles}
                                         >
                                             <MenuItem value="">
-                                                Select job
-                                                type
+                                                Select job type
                                             </MenuItem>
 
                                             <MenuItem value="Full-time">
@@ -875,102 +780,92 @@ const PostJob = () => {
                                     </Box>
                                 </Box>
 
-                               {/* LOCATION + DEADLINE */}
-<Box
-    sx={{
-        display: "grid",
-        gridTemplateColumns: {
-            xs: "1fr",
-            md: "1fr 1fr",
-        },
-        gap: 3,
-        mb: 3,
-    }}
->
-    {/* LOCATION */}
-    <Box>
-        <Typography
-            sx={{
-                fontWeight: 700,
-                mb: 1,
-                color: "#334155",
-            }}
-        >
-            Location
-        </Typography>
+                                {/* LOCATION + DEADLINE */}
+                                <Box
+                                    sx={{
+                                        display: "grid",
+                                        gridTemplateColumns: {
+                                            xs: "1fr",
+                                            md: "1fr 1fr",
+                                        },
+                                        gap: 3,
+                                        mt: 3,
+                                    }}
+                                >
+                                    <Box>
+                                        <FormLabel>
+                                            Location
+                                        </FormLabel>
 
-        <TextField
-            fullWidth
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            placeholder="e.g. Accra, Ghana"
-            disabled={submitting}
-            slotProps={{
-                input: {
-                    startAdornment: (
-                        <LocationOn
-                            sx={{
-                                mr: 1,
-                                color: "#94a3b8",
-                            }}
-                        />
-                    ),
-                },
-            }}
-        />
-    </Box>
+                                        <TextField
+                                            fullWidth
+                                            name="location"
+                                            value={
+                                                formData.location
+                                            }
+                                            onChange={
+                                                handleChange
+                                            }
+                                            placeholder="e.g. Accra, Ghana"
+                                            disabled={submitting}
+                                            slotProps={{
+                                                input: {
+                                                    startAdornment: (
+                                                        <LocationOn
+                                                            sx={{
+                                                                mr: 1,
+                                                                color: "#E76F51",
+                                                            }}
+                                                        />
+                                                    ),
+                                                },
+                                            }}
+                                            sx={fieldStyles}
+                                        />
+                                    </Box>
 
-    {/* DEADLINE */}
-    <Box>
-        <Typography
-            sx={{
-                fontWeight: 700,
-                mb: 1,
-                color: "#334155",
-            }}
-        >
-            Application Deadline
-        </Typography>
+                                    <Box>
+                                        <FormLabel>
+                                            Application Deadline
+                                        </FormLabel>
 
-        <TextField
-            fullWidth
-            type="date"
-            name="applicationDeadline"
-            value={formData.applicationDeadline}
-            onChange={handleChange}
-            disabled={submitting}
-            slotProps={{
-                inputLabel: {
-                    shrink: true,
-                },
-                input: {
-                    startAdornment: (
-                        <CalendarToday
-                            sx={{
-                                mr: 1,
-                                color: "#94a3b8",
-                            }}
-                        />
-                    ),
-                },
-            }}
-        />
-    </Box>
-</Box>
+                                        <TextField
+                                            fullWidth
+                                            type="date"
+                                            name="applicationDeadline"
+                                            value={
+                                                formData.applicationDeadline
+                                            }
+                                            onChange={
+                                                handleChange
+                                            }
+                                            disabled={submitting}
+                                            slotProps={{
+                                                inputLabel: {
+                                                    shrink: true,
+                                                },
+                                                input: {
+                                                    startAdornment: (
+                                                        <CalendarToday
+                                                            sx={{
+                                                                mr: 1,
+                                                                color: "#E76F51",
+                                                                fontSize: 19,
+                                                            }}
+                                                        />
+                                                    ),
+                                                },
+                                            }}
+                                            sx={fieldStyles}
+                                        />
+                                    </Box>
+                                </Box>
 
                                 {/* DESCRIPTION */}
-                                <Box sx={{ mb: 4 }}>
-                                    <Typography
-                                        sx={{
-                                            fontWeight: 700,
-                                            mb: 1,
-                                            color:
-                                                "#334155",
-                                        }}
-                                    >
+                                <Box sx={{ mt: 3, mb: 4 }}>
+                                    <FormLabel>
                                         Job Description
-                                    </Typography>
+                                    </FormLabel>
 
                                     <TextField
                                         fullWidth
@@ -984,41 +879,43 @@ const PostJob = () => {
                                             handleChange
                                         }
                                         placeholder="Describe the role, responsibilities, requirements, skills, and what candidates can expect..."
-                                        disabled={
-                                            submitting
-                                        }
+                                        disabled={submitting}
+                                        sx={fieldStyles}
                                     />
 
                                     <Box
                                         sx={{
                                             display: "flex",
-                                            alignItems:
-                                                "center",
+                                            alignItems: "center",
                                             gap: 1,
                                             mt: 1,
-                                            color:
-                                                "#64748b",
+                                            color: "#8A817A",
                                         }}
                                     >
                                         <Description
                                             sx={{
-                                                fontSize: 16,
+                                                fontSize: 17,
+                                                color: "#E76F51",
                                             }}
                                         />
 
                                         <Typography
                                             variant="caption"
                                         >
-                                            Give candidates
-                                            enough
-                                            information to
-                                            understand the
-                                            opportunity.
+                                            Give candidates enough
+                                            information to understand
+                                            the opportunity.
                                         </Typography>
                                     </Box>
                                 </Box>
 
-                                <Divider sx={{ mb: 3 }} />
+                                <Divider
+                                    sx={{
+                                        mb: 3,
+                                        borderColor:
+                                            "#E9DED0",
+                                    }}
+                                />
 
                                 {/* BUTTONS */}
                                 <Box
@@ -1040,9 +937,7 @@ const PostJob = () => {
                                                 "/employer/jobs"
                                             )
                                         }
-                                        disabled={
-                                            submitting
-                                        }
+                                        disabled={submitting}
                                         sx={{
                                             px: 3,
                                             py: 1.3,
@@ -1050,6 +945,15 @@ const PostJob = () => {
                                             textTransform:
                                                 "none",
                                             fontWeight: 700,
+                                            color: "#6F665F",
+                                            borderColor:
+                                                "#D8CBBE",
+                                            "&:hover": {
+                                                borderColor:
+                                                    "#B9A99A",
+                                                backgroundColor:
+                                                    "#FFF8EF",
+                                            },
                                         }}
                                     >
                                         Cancel
@@ -1058,9 +962,7 @@ const PostJob = () => {
                                     <Button
                                         type="submit"
                                         variant="contained"
-                                        disabled={
-                                            submitting
-                                        }
+                                        disabled={submitting}
                                         startIcon={
                                             submitting ? (
                                                 <CircularProgress
@@ -1077,9 +979,16 @@ const PostJob = () => {
                                             borderRadius: 2,
                                             textTransform:
                                                 "none",
-                                            fontWeight: 700,
+                                            fontWeight: 800,
                                             backgroundColor:
-                                                "#2563eb",
+                                                "#E76F51",
+                                            boxShadow: "none",
+                                            "&:hover": {
+                                                backgroundColor:
+                                                    "#D85F43",
+                                                boxShadow:
+                                                    "none",
+                                            },
                                         }}
                                     >
                                         {submitting
@@ -1096,5 +1005,86 @@ const PostJob = () => {
     );
 };
 
-export default PostJob;
+// ==========================================
+// SIDEBAR ITEM
+// ==========================================
+const SidebarItem = ({
+    icon,
+    label,
+    active = false,
+    onClick,
+}) => {
+    return (
+        <Button
+            fullWidth
+            startIcon={icon}
+            onClick={onClick}
+            sx={{
+                justifyContent: "flex-start",
+                color: active ? "white" : "#C1C9D3",
+                backgroundColor: active
+                    ? "#E76F51"
+                    : "transparent",
+                px: 2,
+                py: 1.3,
+                mb: 0.6,
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: active ? 700 : 500,
+                "&:hover": {
+                    backgroundColor: active
+                        ? "#E76F51"
+                        : "#374354",
+                    color: "white",
+                },
+            }}
+        >
+            {label}
+        </Button>
+    );
+};
 
+// ==========================================
+// FORM LABEL
+// ==========================================
+const FormLabel = ({ children }) => {
+    return (
+        <Typography
+            sx={{
+                fontWeight: 700,
+                mb: 1,
+                color: "#3B454F",
+                display: "block",
+            }}
+        >
+            {children}
+        </Typography>
+    );
+};
+
+// ==========================================
+// TEXT FIELD STYLES
+// ==========================================
+const fieldStyles = {
+    "& .MuiOutlinedInput-root": {
+        backgroundColor: "#FFFDF9",
+        borderRadius: 2,
+        "& fieldset": {
+            borderColor: "#DCCFC1",
+        },
+        "&:hover fieldset": {
+            borderColor: "#C6B5A5",
+        },
+        "&.Mui-focused fieldset": {
+            borderColor: "#E76F51",
+            borderWidth: 1.5,
+        },
+    },
+
+    "& .MuiFormHelperText-root": {
+        color: "#8A817A",
+        marginLeft: 0,
+    },
+};
+
+export default PostJob;

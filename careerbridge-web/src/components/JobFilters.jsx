@@ -1,12 +1,14 @@
 import {
     Box,
-    TextField,
+    Button,
     FormControl,
     InputLabel,
-    Select,
     MenuItem,
-    Button,
+    Select,
+    TextField,
 } from "@mui/material";
+
+import { Search, LocationOn } from "@mui/icons-material";
 
 function JobFilters({
     search,
@@ -26,24 +28,30 @@ function JobFilters({
     return (
         <Box
             sx={{
-                backgroundColor: "background.paper",
-                p: 3,
+                backgroundColor: "#FFFDF9",
+                p: {
+                    xs: 2,
+                    sm: 2.5,
+                    md: 3,
+                },
                 borderRadius: 3,
-                boxShadow: 2,
-                mb: 4,
+                border: "1px solid #E9DED0",
             }}
         >
-
-            {/* SEARCH */}
+            {/* SEARCH AREA */}
             <Box
                 sx={{
-                    display: "flex",
-                    gap: 2,
-                    mb: 2,
-                    flexWrap: "wrap",
+                    display: "grid",
+                    gridTemplateColumns: {
+                        xs: "1fr",
+                        md: "1fr auto",
+                    },
+                    gap: 1.5,
+                    mb: 2.5,
                 }}
             >
                 <TextField
+                    fullWidth
                     label="Search jobs"
                     placeholder="e.g. developer"
                     value={search}
@@ -55,61 +63,151 @@ function JobFilters({
                             onSearch();
                         }
                     }}
-                    fullWidth
+                    InputProps={{
+                        startAdornment: (
+                            <Search
+                                sx={{
+                                    color: "#E76F51",
+                                    mr: 1,
+                                }}
+                            />
+                        ),
+                    }}
                     sx={{
-                        flex: 1,
-                        minWidth: "250px",
+                        "& .MuiOutlinedInput-root": {
+                            backgroundColor: "#FFFDF9",
+                            borderRadius: 2,
+                            "& fieldset": {
+                                borderColor: "#DCCFC2",
+                            },
+                            "&:hover fieldset": {
+                                borderColor: "#E76F51",
+                            },
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#E76F51",
+                            },
+                        },
+                        "& .MuiInputLabel-root.Mui-focused": {
+                            color: "#E76F51",
+                        },
                     }}
                 />
 
                 <Button
                     variant="contained"
                     onClick={onSearch}
+                    startIcon={<Search />}
                     sx={{
-                        minWidth: "120px",
+                        minWidth: {
+                            xs: "100%",
+                            md: 130,
+                        },
+                        minHeight: 56,
+                        borderRadius: 2,
+                        backgroundColor: "#E76F51",
+                        color: "#fff",
+                        textTransform: "none",
+                        fontWeight: 800,
+                        "&:hover": {
+                            backgroundColor: "#D85F43",
+                        },
                     }}
                 >
                     Search
                 </Button>
             </Box>
 
+            {/* FILTER LABEL */}
+            <Box
+                sx={{
+                    mb: 1.5,
+                    fontSize: 13,
+                    fontWeight: 800,
+                    color: "#5F554D",
+                }}
+            >
+                Filter results
+            </Box>
+
             {/* FILTERS */}
             <Box
                 sx={{
-                    display: "flex",
-                    gap: 2,
-                    flexWrap: "wrap",
+                    display: "grid",
+                    gridTemplateColumns: {
+                        xs: "1fr",
+                        sm: "repeat(2, minmax(0, 1fr))",
+                        lg: "repeat(4, minmax(0, 1fr))",
+                    },
+                    gap: 1.5,
                 }}
             >
-
                 {/* LOCATION */}
                 <TextField
+                    fullWidth
                     label="Location"
                     placeholder="e.g. Accra"
                     value={location}
                     onChange={(e) =>
                         onLocationChange(e.target.value)
                     }
+                    InputProps={{
+                        startAdornment: (
+                            <LocationOn
+                                sx={{
+                                    color: "#6A994E",
+                                    mr: 1,
+                                }}
+                            />
+                        ),
+                    }}
                     sx={{
-                        flex: 1,
-                        minWidth: "180px",
+                        "& .MuiOutlinedInput-root": {
+                            borderRadius: 2,
+                            "& fieldset": {
+                                borderColor: "#DCCFC2",
+                            },
+                            "&:hover fieldset": {
+                                borderColor: "#6A994E",
+                            },
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#6A994E",
+                            },
+                        },
+                        "& .MuiInputLabel-root.Mui-focused": {
+                            color: "#6A994E",
+                        },
                     }}
                 />
 
                 {/* JOB TYPE */}
-                <FormControl
-                    sx={{
-                        flex: 1,
-                        minWidth: "180px",
-                    }}
-                >
-                    <InputLabel>Job Type</InputLabel>
+                <FormControl fullWidth>
+                    <InputLabel
+                        sx={{
+                            "&.Mui-focused": {
+                                color: "#E76F51",
+                            },
+                        }}
+                    >
+                        Job Type
+                    </InputLabel>
 
                     <Select
                         value={jobType}
                         label="Job Type"
                         onChange={(e) => {
                             onJobTypeChange(e.target.value);
+                        }}
+                        sx={{
+                            borderRadius: 2,
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#DCCFC2",
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#E76F51",
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#E76F51",
+                            },
                         }}
                     >
                         <MenuItem value="">
@@ -135,19 +233,34 @@ function JobFilters({
                 </FormControl>
 
                 {/* CATEGORY */}
-                <FormControl
-                    sx={{
-                        flex: 1,
-                        minWidth: "180px",
-                    }}
-                >
-                    <InputLabel>Category</InputLabel>
+                <FormControl fullWidth>
+                    <InputLabel
+                        sx={{
+                            "&.Mui-focused": {
+                                color: "#E76F51",
+                            },
+                        }}
+                    >
+                        Category
+                    </InputLabel>
 
                     <Select
                         value={categoryId}
                         label="Category"
                         onChange={(e) => {
                             onCategoryChange(e.target.value);
+                        }}
+                        sx={{
+                            borderRadius: 2,
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#DCCFC2",
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#E76F51",
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#E76F51",
+                            },
                         }}
                     >
                         <MenuItem value="">
@@ -166,27 +279,34 @@ function JobFilters({
                 </FormControl>
 
                 {/* SORT */}
-                <FormControl
-                    sx={{
-                        flex: 1,
-                        minWidth: "180px",
-                    }}
-                >
-                    <InputLabel>Sort</InputLabel>
+                <FormControl fullWidth>
+                    <InputLabel
+                        sx={{
+                            "&.Mui-focused": {
+                                color: "#E76F51",
+                            },
+                        }}
+                    >
+                        Sort
+                    </InputLabel>
 
                     <Select
                         value={sort}
                         label="Sort"
                         onChange={(e) => {
                             onSortChange(e.target.value);
-
-                            // Apply the new sort immediately
-                            const newSort = e.target.value;
-
-                            setTimeout(() => {
-                                // This is handled by the parent
-                                // when the user searches/filters.
-                            }, 0);
+                        }}
+                        sx={{
+                            borderRadius: 2,
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#DCCFC2",
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#E76F51",
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#E76F51",
+                            },
                         }}
                     >
                         <MenuItem value="newest">
@@ -200,14 +320,29 @@ function JobFilters({
                 </FormControl>
             </Box>
 
-            {/* CLEAR */}
-            <Box sx={{ mt: 3 }}>
+            {/* CLEAR FILTERS */}
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    mt: 2,
+                }}
+            >
                 <Button
-                    variant="outlined"
-                    color="secondary"
+                    variant="text"
                     onClick={onClear}
+                    sx={{
+                        color: "#7A7068",
+                        textTransform: "none",
+                        fontWeight: 700,
+                        borderRadius: 2,
+                        "&:hover": {
+                            backgroundColor: "#FFF1D6",
+                            color: "#E76F51",
+                        },
+                    }}
                 >
-                    Clear Filters
+                    Clear filters
                 </Button>
             </Box>
         </Box>

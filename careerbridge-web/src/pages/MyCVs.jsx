@@ -38,7 +38,6 @@ const MyCVs = () => {
     const [loading, setLoading] = useState(true);
 
     const [uploadOpen, setUploadOpen] = useState(false);
-
     const [cvFile, setCvFile] = useState(null);
     const [cvTitle, setCvTitle] = useState("");
     const [uploading, setUploading] = useState(false);
@@ -46,7 +45,6 @@ const MyCVs = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    // DELETE CONFIRMATION DIALOG
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [cvToDelete, setCvToDelete] = useState(null);
     const [deleting, setDeleting] = useState(false);
@@ -107,7 +105,6 @@ const MyCVs = () => {
 
         if (file.size > 5 * 1024 * 1024) {
             setError("CV file must be smaller than 5MB.");
-
             setCvFile(null);
             return;
         }
@@ -208,7 +205,6 @@ const MyCVs = () => {
                 );
 
                 URL.revokeObjectURL(fileURL);
-
                 return;
             }
 
@@ -232,7 +228,6 @@ const MyCVs = () => {
     const openDeleteDialog = (cv) => {
         setError("");
         setSuccess("");
-
         setCvToDelete(cv);
         setDeleteOpen(true);
     };
@@ -326,21 +321,44 @@ const MyCVs = () => {
             <Box
                 sx={{
                     minHeight: "100vh",
-                    backgroundColor: "#f8fafc",
+                    backgroundColor: "#FFF8EF",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     px: 2,
                 }}
             >
-                <Box sx={{ textAlign: "center" }}>
-                    <CircularProgress size={42} />
+                <Box
+                    sx={{
+                        textAlign: "center",
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: 64,
+                            height: 64,
+                            borderRadius: "50%",
+                            backgroundColor: "#FFF1D6",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mx: "auto",
+                            mb: 2,
+                        }}
+                    >
+                        <CircularProgress
+                            size={30}
+                            sx={{
+                                color: "#E76F51",
+                            }}
+                        />
+                    </Box>
 
                     <Typography
                         sx={{
-                            mt: 2,
-                            color: "#667085",
+                            color: "#6F665F",
                             fontSize: 14,
+                            fontWeight: 600,
                         }}
                     >
                         Loading your CVs...
@@ -354,7 +372,7 @@ const MyCVs = () => {
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f8fafc",
+                backgroundColor: "#FFF8EF",
                 py: {
                     xs: 2.5,
                     sm: 4,
@@ -373,7 +391,9 @@ const MyCVs = () => {
                     },
                 }}
             >
-                {/* PAGE HEADER */}
+                {/* ==========================
+                    PAGE HEADER
+                ========================== */}
 
                 <Box
                     sx={{
@@ -405,10 +425,11 @@ const MyCVs = () => {
                                 px: 0,
                                 textTransform: "none",
                                 fontWeight: 700,
-                                color: "#2563eb",
+                                color: "#E76F51",
                                 "&:hover": {
                                     backgroundColor:
                                         "transparent",
+                                    color: "#D85F43",
                                 },
                             }}
                         >
@@ -419,14 +440,14 @@ const MyCVs = () => {
                             component="h1"
                             sx={{
                                 fontSize: {
-                                    xs: 28,
-                                    sm: 34,
-                                    md: 40,
+                                    xs: 30,
+                                    sm: 36,
+                                    md: 42,
                                 },
-                                lineHeight: 1.15,
-                                fontWeight: 800,
-                                color: "#111827",
-                                letterSpacing: "-0.7px",
+                                lineHeight: 1.12,
+                                fontWeight: 900,
+                                color: "#293241",
+                                letterSpacing: "-1px",
                                 mb: 1,
                             }}
                         >
@@ -435,16 +456,16 @@ const MyCVs = () => {
 
                         <Typography
                             sx={{
-                                color: "#667085",
+                                color: "#746B63",
                                 fontSize: {
                                     xs: 13,
                                     sm: 15,
                                 },
-                                lineHeight: 1.6,
+                                lineHeight: 1.7,
                                 maxWidth: 620,
                             }}
                         >
-                            Manage your CVs and keep them
+                            Keep your CVs organized and
                             ready for your next opportunity.
                         </Typography>
                     </Box>
@@ -454,28 +475,37 @@ const MyCVs = () => {
                         startIcon={<Add />}
                         onClick={openUploadDialog}
                         sx={{
-                            minHeight: 46,
+                            minHeight: 48,
                             px: {
                                 xs: 2,
-                                sm: 2.5,
+                                sm: 2.7,
                             },
                             borderRadius: 2,
                             textTransform: "none",
-                            fontWeight: 700,
+                            fontWeight: 800,
                             fontSize: 14,
                             alignSelf: {
                                 xs: "stretch",
                                 sm: "auto",
                             },
+                            backgroundColor: "#E76F51",
                             boxShadow:
-                                "0 4px 12px rgba(37, 99, 235, 0.18)",
+                                "0 6px 16px rgba(231, 111, 81, 0.18)",
+                            "&:hover": {
+                                backgroundColor:
+                                    "#D85F43",
+                                boxShadow:
+                                    "0 8px 20px rgba(231, 111, 81, 0.22)",
+                            },
                         }}
                     >
                         Upload New CV
                     </Button>
                 </Box>
 
-                {/* ALERTS */}
+                {/* ==========================
+                    ALERTS
+                ========================== */}
 
                 {error && (
                     <Alert
@@ -484,6 +514,8 @@ const MyCVs = () => {
                         sx={{
                             mb: 3,
                             borderRadius: 2,
+                            border: "1px solid #F1C4BB",
+                            backgroundColor: "#FFF3F0",
                         }}
                     >
                         {error}
@@ -497,13 +529,17 @@ const MyCVs = () => {
                         sx={{
                             mb: 3,
                             borderRadius: 2,
+                            border: "1px solid #CFE0C5",
+                            backgroundColor: "#F3F8EF",
                         }}
                     >
                         {success}
                     </Alert>
                 )}
 
-                {/* INFORMATION CARD */}
+                {/* ==========================
+                    INFORMATION CARD
+                ========================== */}
 
                 <Paper
                     elevation={0}
@@ -517,10 +553,23 @@ const MyCVs = () => {
                             sm: 4,
                         },
                         borderRadius: 3,
-                        border: "1px solid #e5e7eb",
-                        backgroundColor: "#ffffff",
+                        border: "1px solid #E9DED0",
+                        backgroundColor: "#FFFDF9",
+                        position: "relative",
+                        overflow: "hidden",
                     }}
                 >
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                            width: 4,
+                            backgroundColor: "#F4A261",
+                        }}
+                    />
+
                     <Box
                         sx={{
                             display: "flex",
@@ -534,20 +583,20 @@ const MyCVs = () => {
                         <Box
                             sx={{
                                 width: {
-                                    xs: 44,
-                                    sm: 48,
+                                    xs: 46,
+                                    sm: 50,
                                 },
                                 height: {
-                                    xs: 44,
-                                    sm: 48,
+                                    xs: 46,
+                                    sm: 50,
                                 },
                                 minWidth: {
-                                    xs: 44,
-                                    sm: 48,
+                                    xs: 46,
+                                    sm: 50,
                                 },
                                 borderRadius: 2,
-                                backgroundColor: "#eff6ff",
-                                color: "#2563eb",
+                                backgroundColor: "#FFF1D6",
+                                color: "#E76F51",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
@@ -559,8 +608,8 @@ const MyCVs = () => {
                         <Box sx={{ minWidth: 0 }}>
                             <Typography
                                 sx={{
-                                    fontWeight: 700,
-                                    color: "#111827",
+                                    fontWeight: 800,
+                                    color: "#293241",
                                     fontSize: {
                                         xs: 14,
                                         sm: 15,
@@ -572,8 +621,8 @@ const MyCVs = () => {
 
                             <Typography
                                 sx={{
-                                    color: "#667085",
-                                    mt: 0.3,
+                                    color: "#746B63",
+                                    mt: 0.4,
                                     fontSize: {
                                         xs: 12,
                                         sm: 13,
@@ -589,7 +638,9 @@ const MyCVs = () => {
                     </Box>
                 </Paper>
 
-                {/* NO CVS */}
+                {/* ==========================
+                    NO CVS
+                ========================== */}
 
                 {cvs.length === 0 ? (
                     <Paper
@@ -602,23 +653,23 @@ const MyCVs = () => {
                             },
                             textAlign: "center",
                             borderRadius: 3,
-                            border: "1px solid #e5e7eb",
-                            backgroundColor: "#ffffff",
+                            border: "1px solid #E9DED0",
+                            backgroundColor: "#FFFDF9",
                         }}
                     >
                         <Box
                             sx={{
                                 width: {
-                                    xs: 68,
-                                    sm: 80,
+                                    xs: 72,
+                                    sm: 84,
                                 },
                                 height: {
-                                    xs: 68,
-                                    sm: 80,
+                                    xs: 72,
+                                    sm: 84,
                                 },
                                 borderRadius: "50%",
-                                backgroundColor: "#eff6ff",
-                                color: "#2563eb",
+                                backgroundColor: "#FFF1D6",
+                                color: "#E76F51",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
@@ -629,8 +680,8 @@ const MyCVs = () => {
                             <Description
                                 sx={{
                                     fontSize: {
-                                        xs: 36,
-                                        sm: 42,
+                                        xs: 38,
+                                        sm: 44,
                                     },
                                 }}
                             />
@@ -640,11 +691,11 @@ const MyCVs = () => {
                             component="h2"
                             sx={{
                                 fontSize: {
-                                    xs: 20,
-                                    sm: 24,
+                                    xs: 21,
+                                    sm: 25,
                                 },
-                                fontWeight: 800,
-                                color: "#111827",
+                                fontWeight: 900,
+                                color: "#293241",
                                 mb: 1,
                             }}
                         >
@@ -653,7 +704,7 @@ const MyCVs = () => {
 
                         <Typography
                             sx={{
-                                color: "#667085",
+                                color: "#746B63",
                                 maxWidth: 520,
                                 mx: "auto",
                                 lineHeight: 1.7,
@@ -678,7 +729,12 @@ const MyCVs = () => {
                                 px: 3,
                                 borderRadius: 2,
                                 textTransform: "none",
-                                fontWeight: 700,
+                                fontWeight: 800,
+                                backgroundColor: "#E76F51",
+                                "&:hover": {
+                                    backgroundColor:
+                                        "#D85F43",
+                                },
                             }}
                         >
                             Upload Your First CV
@@ -686,7 +742,9 @@ const MyCVs = () => {
                     </Paper>
                 ) : (
                     <>
-                        {/* CV COUNT */}
+                        {/* ==========================
+                            CV COUNT
+                        ========================== */}
 
                         <Box
                             sx={{
@@ -700,8 +758,8 @@ const MyCVs = () => {
                         >
                             <Typography
                                 sx={{
-                                    color: "#475467",
-                                    fontWeight: 700,
+                                    color: "#5F554D",
+                                    fontWeight: 800,
                                     fontSize: {
                                         xs: 14,
                                         sm: 15,
@@ -716,7 +774,9 @@ const MyCVs = () => {
                             </Typography>
                         </Box>
 
-                        {/* CV CARDS */}
+                        {/* ==========================
+                            CV CARDS
+                        ========================== */}
 
                         <Box
                             sx={{
@@ -744,35 +804,52 @@ const MyCVs = () => {
                                         },
                                         borderRadius: 3,
                                         border:
-                                            "1px solid #e5e7eb",
+                                            "1px solid #E9DED0",
                                         backgroundColor:
-                                            "#ffffff",
+                                            "#FFFDF9",
                                         display: "flex",
                                         flexDirection:
                                             "column",
                                         minWidth: 0,
                                         minHeight: {
-                                            xs: 235,
-                                            sm: 260,
+                                            xs: 245,
+                                            sm: 265,
                                         },
+                                        position: "relative",
+                                        overflow: "hidden",
                                         transition:
-                                            "transform 0.2s ease, box-shadow 0.2s ease",
+                                            "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
                                         "&:hover": {
                                             transform:
                                                 "translateY(-3px)",
                                             boxShadow:
-                                                "0 10px 25px rgba(16, 24, 40, 0.08)",
+                                                "0 12px 28px rgba(91, 71, 55, 0.10)",
                                             borderColor:
-                                                "#bfdbfe",
+                                                "#E7B6A8",
                                         },
                                     }}
                                 >
+                                    {/* TOP ACCENT */}
+
+                                    <Box
+                                        sx={{
+                                            position:
+                                                "absolute",
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            height: 4,
+                                            backgroundColor:
+                                                "#E76F51",
+                                        }}
+                                    />
+
                                     {/* CV ICON */}
 
                                     <Box
                                         sx={{
-                                            width: 52,
-                                            height: 52,
+                                            width: 54,
+                                            height: 54,
                                             borderRadius: 2,
                                             display: "flex",
                                             alignItems:
@@ -780,8 +857,8 @@ const MyCVs = () => {
                                             justifyContent:
                                                 "center",
                                             backgroundColor:
-                                                "#eff6ff",
-                                            color: "#2563eb",
+                                                "#FFF1D6",
+                                            color: "#E76F51",
                                             mb: 2,
                                         }}
                                     >
@@ -800,8 +877,8 @@ const MyCVs = () => {
                                                 xs: 17,
                                                 sm: 18,
                                             },
-                                            fontWeight: 800,
-                                            color: "#111827",
+                                            fontWeight: 900,
+                                            color: "#293241",
                                             mb: 1,
                                             overflow:
                                                 "hidden",
@@ -825,15 +902,18 @@ const MyCVs = () => {
                                         sx={{
                                             width: "fit-content",
                                             mb: 2,
-                                            fontWeight: 600,
+                                            fontWeight: 700,
                                             backgroundColor:
-                                                "#f2f4f7",
+                                                "#EDF4E8",
+                                            color: "#557E3E",
+                                            border:
+                                                "1px solid #D5E5CB",
                                         }}
                                     />
 
                                     <Typography
                                         sx={{
-                                            color: "#667085",
+                                            color: "#7A7068",
                                             fontSize: 13,
                                             mb: 2.5,
                                         }}
@@ -842,7 +922,14 @@ const MyCVs = () => {
                                         {cv.UploadDate
                                             ? new Date(
                                                   cv.UploadDate
-                                              ).toLocaleDateString()
+                                              ).toLocaleDateString(
+                                                  "en-GH",
+                                                  {
+                                                      day: "numeric",
+                                                      month: "short",
+                                                      year: "numeric",
+                                                  }
+                                              )
                                             : "Unknown"}
                                     </Typography>
 
@@ -855,6 +942,8 @@ const MyCVs = () => {
                                     <Divider
                                         sx={{
                                             mb: 2,
+                                            borderColor:
+                                                "#E9DED0",
                                         }}
                                     />
 
@@ -881,11 +970,21 @@ const MyCVs = () => {
                                                 minHeight: 42,
                                                 textTransform:
                                                     "none",
-                                                fontWeight: 700,
+                                                fontWeight: 800,
                                                 borderRadius: 2,
                                                 fontSize: {
                                                     xs: 13,
                                                     sm: 14,
+                                                },
+                                                backgroundColor:
+                                                    "#E76F51",
+                                                boxShadow:
+                                                    "none",
+                                                "&:hover": {
+                                                    backgroundColor:
+                                                        "#D85F43",
+                                                    boxShadow:
+                                                        "none",
                                                 },
                                             }}
                                         >
@@ -905,13 +1004,13 @@ const MyCVs = () => {
                                                 flexShrink: 0,
                                                 borderRadius: 2,
                                                 border:
-                                                    "1px solid #fecaca",
-                                                color: "#dc2626",
+                                                    "1px solid #E8B9B0",
+                                                color: "#C95543",
                                                 "&:hover": {
                                                     backgroundColor:
-                                                        "#fef2f2",
+                                                        "#FFF0ED",
                                                     borderColor:
-                                                        "#fca5a5",
+                                                        "#D99184",
                                                 },
                                             }}
                                         >
@@ -948,6 +1047,7 @@ const MyCVs = () => {
                             xs: "calc(100% - 24px)",
                             sm: "100%",
                         },
+                        backgroundColor: "#FFFDF9",
                     },
                 }}
             >
@@ -957,8 +1057,8 @@ const MyCVs = () => {
                         justifyContent: "space-between",
                         alignItems: "center",
                         gap: 2,
-                        fontWeight: 800,
-                        color: "#111827",
+                        fontWeight: 900,
+                        color: "#293241",
                         fontSize: {
                             xs: 19,
                             sm: 21,
@@ -974,7 +1074,24 @@ const MyCVs = () => {
                             minWidth: 0,
                         }}
                     >
-                        <UploadFile color="primary" />
+                        <Box
+                            sx={{
+                                width: 38,
+                                height: 38,
+                                borderRadius: 2,
+                                backgroundColor:
+                                    "#FFF1D6",
+                                color: "#E76F51",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexShrink: 0,
+                            }}
+                        >
+                            <UploadFile
+                                fontSize="small"
+                            />
+                        </Box>
 
                         <span>Upload New CV</span>
                     </Box>
@@ -983,6 +1100,9 @@ const MyCVs = () => {
                         onClick={closeUploadDialog}
                         disabled={uploading}
                         size="small"
+                        sx={{
+                            color: "#746B63",
+                        }}
                     >
                         <Close />
                     </IconButton>
@@ -995,7 +1115,7 @@ const MyCVs = () => {
                 >
                     <Typography
                         sx={{
-                            color: "#667085",
+                            color: "#746B63",
                             fontSize: {
                                 xs: 13,
                                 sm: 14,
@@ -1023,7 +1143,17 @@ const MyCVs = () => {
                             mb: 2.5,
                             "& .MuiOutlinedInput-root": {
                                 borderRadius: 2,
+                                backgroundColor:
+                                    "#FFFFFF",
+                                "&.Mui-focused fieldset": {
+                                    borderColor:
+                                        "#E76F51",
+                                },
                             },
+                            "& .MuiInputLabel-root.Mui-focused":
+                                {
+                                    color: "#E76F51",
+                                },
                         }}
                     />
 
@@ -1035,20 +1165,25 @@ const MyCVs = () => {
                         disabled={uploading}
                         sx={{
                             minHeight: {
-                                xs: 72,
-                                sm: 80,
+                                xs: 78,
+                                sm: 86,
                             },
                             px: 2,
                             borderRadius: 2,
                             textTransform: "none",
-                            fontWeight: 600,
+                            fontWeight: 700,
+                            color: "#5F554D",
+                            borderColor: "#DCCFC2",
                             borderStyle: "dashed",
                             borderWidth: 2,
                             overflow: "hidden",
+                            backgroundColor: "#FFFBF5",
                             "&:hover": {
                                 borderWidth: 2,
+                                borderColor:
+                                    "#E76F51",
                                 backgroundColor:
-                                    "#eff6ff",
+                                    "#FFF5EA",
                             },
                         }}
                     >
@@ -1071,7 +1206,9 @@ const MyCVs = () => {
                             type="file"
                             hidden
                             accept=".pdf,.doc,.docx"
-                            onChange={handleFileChange}
+                            onChange={
+                                handleFileChange
+                            }
                         />
                     </Button>
 
@@ -1079,7 +1216,7 @@ const MyCVs = () => {
                         sx={{
                             display: "block",
                             mt: 1.5,
-                            color: "#667085",
+                            color: "#7A7068",
                             fontSize: 12,
                         }}
                     >
@@ -1094,6 +1231,10 @@ const MyCVs = () => {
                                 borderRadius: 2,
                                 overflowWrap:
                                     "anywhere",
+                                backgroundColor:
+                                    "#F3F8EF",
+                                border:
+                                    "1px solid #CFE0C5",
                             }}
                         >
                             {cvFile.name} selected
@@ -1128,7 +1269,7 @@ const MyCVs = () => {
                             textTransform: "none",
                             fontWeight: 700,
                             borderRadius: 2,
-                            color: "#667085",
+                            color: "#746B63",
                         }}
                     >
                         Cancel
@@ -1152,8 +1293,13 @@ const MyCVs = () => {
                             minHeight: 44,
                             px: 3,
                             textTransform: "none",
-                            fontWeight: 700,
+                            fontWeight: 800,
                             borderRadius: 2,
+                            backgroundColor: "#E76F51",
+                            "&:hover": {
+                                backgroundColor:
+                                    "#D85F43",
+                            },
                         }}
                     >
                         {uploading
@@ -1176,6 +1322,7 @@ const MyCVs = () => {
                     sx: {
                         borderRadius: 3,
                         p: 1,
+                        backgroundColor: "#FFFDF9",
                     },
                 }}
             >
@@ -1184,8 +1331,8 @@ const MyCVs = () => {
                         display: "flex",
                         alignItems: "center",
                         gap: 1.5,
-                        fontWeight: 800,
-                        color: "#111827",
+                        fontWeight: 900,
+                        color: "#293241",
                     }}
                 >
                     <Box
@@ -1196,8 +1343,8 @@ const MyCVs = () => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            backgroundColor: "#fef2f2",
-                            color: "#dc2626",
+                            backgroundColor: "#FFF0ED",
+                            color: "#C95543",
                             flexShrink: 0,
                         }}
                     >
@@ -1210,7 +1357,7 @@ const MyCVs = () => {
                 <DialogContent>
                     <Typography
                         sx={{
-                            color: "#667085",
+                            color: "#746B63",
                             fontSize: 14,
                             lineHeight: 1.7,
                         }}
@@ -1219,8 +1366,8 @@ const MyCVs = () => {
                         <Box
                             component="span"
                             sx={{
-                                fontWeight: 700,
-                                color: "#344054",
+                                fontWeight: 800,
+                                color: "#293241",
                             }}
                         >
                             {cvToDelete?.CVTitle ||
@@ -1246,7 +1393,7 @@ const MyCVs = () => {
                             borderRadius: 2,
                             textTransform: "none",
                             fontWeight: 700,
-                            color: "#475467",
+                            color: "#5F554D",
                         }}
                     >
                         Cancel
@@ -1271,11 +1418,11 @@ const MyCVs = () => {
                             px: 2.5,
                             borderRadius: 2,
                             textTransform: "none",
-                            fontWeight: 700,
-                            backgroundColor: "#dc2626",
+                            fontWeight: 800,
+                            backgroundColor: "#C95543",
                             "&:hover": {
                                 backgroundColor:
-                                    "#b91c1c",
+                                    "#B54736",
                             },
                         }}
                     >

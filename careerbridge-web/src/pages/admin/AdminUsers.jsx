@@ -45,7 +45,6 @@ import {
 import axiosAPI from "../../api/axiosAPI";
 
 function AdminUsers() {
-    console.log("🔥 ADMIN USERS COMPONENT IS RENDERING");
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -68,13 +67,11 @@ function AdminUsers() {
     });
 
     const loadUsers = async () => {
-        console.log("LOAD USERS FUNCTION STARTED");
         try {
             setLoading(true);
             setError("");
 
             const response = await axiosAPI.get("/admin/users");
-            console.log("ADMIN USERS RESPONSE:", response.data);
 
             setUsers(response.data.data || []);
         } catch (err) {
@@ -89,13 +86,12 @@ function AdminUsers() {
         }
     };
 
-useEffect(() => {
-    console.log("ADMIN USERS COMPONENT MOUNTED");
-    loadUsers();
-}, []);   
+    useEffect(() => {
+        loadUsers();
+    }, []);
 
     /*
-     * Get employers waiting for admin approval.
+     * Employers waiting for admin approval.
      */
     const pendingEmployers = useMemo(() => {
         return users.filter(
@@ -106,7 +102,7 @@ useEffect(() => {
     }, [users]);
 
     /*
-     * Filter main users table.
+     * Filter users.
      */
     const filteredUsers = useMemo(() => {
         return users.filter((user) => {
@@ -165,9 +161,7 @@ useEffect(() => {
         try {
             setStatusUpdating(true);
 
-            const newStatus = !Boolean(
-                selectedUser.IsActive
-            );
+            const newStatus = !Boolean(selectedUser.IsActive);
 
             await axiosAPI.patch(
                 `/admin/users/${selectedUser.UserID}/status`,
@@ -231,9 +225,6 @@ useEffect(() => {
 
     /*
      * Approve or reject employer.
-     *
-     * Backend endpoint:
-     * PATCH /admin/employers/:id/approval
      */
     const handleEmployerApproval = async () => {
         if (!selectedEmployer || !approvalDecision) {
@@ -298,11 +289,8 @@ useEffect(() => {
     };
 
     const getInitials = (user) => {
-        const first =
-            user.FirstName?.charAt(0) || "";
-
-        const last =
-            user.LastName?.charAt(0) || "";
+        const first = user.FirstName?.charAt(0) || "";
+        const last = user.LastName?.charAt(0) || "";
 
         return `${first}${last}`.toUpperCase();
     };
@@ -312,14 +300,11 @@ useEffect(() => {
             return "—";
         }
 
-        return new Date(date).toLocaleDateString(
-            "en-GB",
-            {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-            }
-        );
+        return new Date(date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        });
     };
 
     const getRoleLabel = (role) => {
@@ -333,27 +318,54 @@ useEffect(() => {
         return role || "Unknown";
     };
 
-    const getRoleColor = (role) => {
+    const getRoleChipSx = (role) => {
         if (
             role === "JobSeeker" ||
             role === "Job seeker"
         ) {
-            return "primary";
+            return {
+                color: "#A65F00",
+                backgroundColor: "#FFF1D6",
+            };
         }
 
         if (role === "Employer") {
-            return "secondary";
+            return {
+                color: "#477A35",
+                backgroundColor: "#EDF4E8",
+            };
         }
 
         if (role === "Admin") {
-            return "warning";
+            return {
+                color: "#7E4BA3",
+                backgroundColor: "#F3E8FF",
+            };
         }
 
-        return "default";
+        return {
+            color: "#5F554D",
+            backgroundColor: "#F1ECE7",
+        };
     };
 
+    const totalUsers = users.length;
+
+    const activeUsers = users.filter(
+        (user) => user.IsActive
+    ).length;
+
+    const inactiveUsers = users.filter(
+        (user) => !user.IsActive
+    ).length;
+
     return (
-        <Box>
+        <Box
+            sx={{
+                minHeight: "100%",
+                backgroundColor: "#FFF8EF",
+            }}
+        >
             {/* PAGE HEADER */}
             <Box
                 sx={{
@@ -375,17 +387,17 @@ useEffect(() => {
                     <Typography
                         variant="h4"
                         sx={{
-                            fontWeight: 800,
-                            color: "#0f172a",
-                            letterSpacing: "-0.5px",
+                            fontWeight: 900,
+                            color: "#293241",
+                            letterSpacing: "-0.8px",
                         }}
                     >
-                        User Management
+                        Users
                     </Typography>
 
                     <Typography
                         sx={{
-                            color: "#64748b",
+                            color: "#7A7068",
                             mt: 0.75,
                         }}
                     >
@@ -400,12 +412,19 @@ useEffect(() => {
                     onClick={loadUsers}
                     disabled={loading}
                     sx={{
-                        borderRadius: 2.5,
+                        borderRadius: 2,
                         textTransform: "none",
                         fontWeight: 700,
-                        borderColor: "#dbe2ea",
-                        color: "#334155",
-                        px: 2,
+                        borderColor: "#DCCFC2",
+                        color: "#5F554D",
+                        px: 2.2,
+                        backgroundColor: "#FFFDF9",
+
+                        "&:hover": {
+                            borderColor: "#E76F51",
+                            color: "#E76F51",
+                            backgroundColor: "#FFF8EF",
+                        },
                     }}
                 >
                     Refresh
@@ -418,108 +437,182 @@ useEffect(() => {
                     display: "grid",
                     gridTemplateColumns: {
                         xs: "1fr",
-                        sm: "repeat(4, 1fr)",
+                        sm: "repeat(2, 1fr)",
+                        lg: "repeat(4, 1fr)",
                     },
                     gap: 2,
                     mb: 3,
                 }}
             >
+                {/* TOTAL */}
                 <Paper
                     elevation={0}
                     sx={{
                         p: 2.5,
                         borderRadius: 3,
-                        border: "1px solid #e5e7eb",
+                        border: "1px solid #E9DED0",
+                        backgroundColor: "#FFFDF9",
                     }}
                 >
-                    <Typography
-                        variant="body2"
+                    <Stack
+                        direction="row"
+                        spacing={2}
                         sx={{
-                            color: "#64748b",
-                            fontWeight: 600,
+                            alignItems: "center",
                         }}
                     >
-                        Total Users
-                    </Typography>
+                        <Box
+                            sx={{
+                                width: 46,
+                                height: 46,
+                                borderRadius: 2,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "#FFF1D6",
+                                color: "#A65F00",
+                            }}
+                        >
+                            <PersonAdd />
+                        </Box>
 
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            mt: 0.5,
-                            fontWeight: 800,
-                            color: "#0f172a",
-                        }}
-                    >
-                        {users.length}
-                    </Typography>
+                        <Box>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "#7A7068",
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Total Users
+                            </Typography>
+
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    mt: 0.3,
+                                    fontWeight: 900,
+                                    color: "#293241",
+                                }}
+                            >
+                                {totalUsers}
+                            </Typography>
+                        </Box>
+                    </Stack>
                 </Paper>
 
+                {/* ACTIVE */}
                 <Paper
                     elevation={0}
                     sx={{
                         p: 2.5,
                         borderRadius: 3,
-                        border: "1px solid #e5e7eb",
+                        border: "1px solid #E9DED0",
+                        backgroundColor: "#FFFDF9",
                     }}
                 >
-                    <Typography
-                        variant="body2"
+                    <Stack
+                        direction="row"
+                        spacing={2}
                         sx={{
-                            color: "#64748b",
-                            fontWeight: 600,
+                            alignItems: "center",
                         }}
                     >
-                        Active Users
-                    </Typography>
+                        <Box
+                            sx={{
+                                width: 46,
+                                height: 46,
+                                borderRadius: 2,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "#EDF4E8",
+                                color: "#6A994E",
+                            }}
+                        >
+                            <CheckCircle />
+                        </Box>
 
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            mt: 0.5,
-                            fontWeight: 800,
-                            color: "#16a34a",
-                        }}
-                    >
-                        {
-                            users.filter(
-                                (user) => user.IsActive
-                            ).length
-                        }
-                    </Typography>
+                        <Box>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "#7A7068",
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Active Users
+                            </Typography>
+
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    mt: 0.3,
+                                    fontWeight: 900,
+                                    color: "#6A994E",
+                                }}
+                            >
+                                {activeUsers}
+                            </Typography>
+                        </Box>
+                    </Stack>
                 </Paper>
 
+                {/* INACTIVE */}
                 <Paper
                     elevation={0}
                     sx={{
                         p: 2.5,
                         borderRadius: 3,
-                        border: "1px solid #e5e7eb",
+                        border: "1px solid #E9DED0",
+                        backgroundColor: "#FFFDF9",
                     }}
                 >
-                    <Typography
-                        variant="body2"
+                    <Stack
+                        direction="row"
+                        spacing={2}
                         sx={{
-                            color: "#64748b",
-                            fontWeight: 600,
+                            alignItems: "center",
                         }}
                     >
-                        Inactive Users
-                    </Typography>
+                        <Box
+                            sx={{
+                                width: 46,
+                                height: 46,
+                                borderRadius: 2,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "#FBE9E6",
+                                color: "#B96868",
+                            }}
+                        >
+                            <PersonOff />
+                        </Box>
 
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            mt: 0.5,
-                            fontWeight: 800,
-                            color: "#dc2626",
-                        }}
-                    >
-                        {
-                            users.filter(
-                                (user) => !user.IsActive
-                            ).length
-                        }
-                    </Typography>
+                        <Box>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "#7A7068",
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Inactive Users
+                            </Typography>
+
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    mt: 0.3,
+                                    fontWeight: 900,
+                                    color: "#B96868",
+                                }}
+                            >
+                                {inactiveUsers}
+                            </Typography>
+                        </Box>
+                    </Stack>
                 </Paper>
 
                 {/* PENDING EMPLOYERS */}
@@ -530,68 +623,88 @@ useEffect(() => {
                         borderRadius: 3,
                         border:
                             pendingEmployers.length > 0
-                                ? "1px solid #bfdbfe"
-                                : "1px solid #e5e7eb",
-                        background:
+                                ? "1px solid #F4D3B5"
+                                : "1px solid #E9DED0",
+                        backgroundColor:
                             pendingEmployers.length > 0
-                                ? "linear-gradient(135deg, #eff6ff, #f8fafc)"
-                                : "#ffffff",
+                                ? "#FFF8EF"
+                                : "#FFFDF9",
                     }}
                 >
-                    <Typography
-                        variant="body2"
+                    <Stack
+                        direction="row"
+                        spacing={2}
                         sx={{
-                            color: "#64748b",
-                            fontWeight: 600,
+                            alignItems: "center",
                         }}
                     >
-                        Pending Employers
-                    </Typography>
-
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            mt: 0.5,
-                            fontWeight: 800,
-                            color:
-                                pendingEmployers.length > 0
-                                    ? "#2563eb"
-                                    : "#0f172a",
-                        }}
-                    >
-                        {pendingEmployers.length}
-                    </Typography>
-
-                    {pendingEmployers.length > 0 && (
-                        <Typography
-                            variant="caption"
+                        <Box
                             sx={{
-                                display: "block",
-                                mt: 0.5,
-                                color: "#2563eb",
-                                fontWeight: 600,
+                                width: 46,
+                                height: 46,
+                                borderRadius: 2,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "#FFE5CC",
+                                color: "#E76F51",
                             }}
                         >
-                            Requires review
-                        </Typography>
-                    )}
+                            <Business />
+                        </Box>
+
+                        <Box>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "#7A7068",
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Pending Employers
+                            </Typography>
+
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    mt: 0.3,
+                                    fontWeight: 900,
+                                    color:
+                                        pendingEmployers.length >
+                                        0
+                                            ? "#E76F51"
+                                            : "#293241",
+                                }}
+                            >
+                                {pendingEmployers.length}
+                            </Typography>
+
+                            {pendingEmployers.length > 0 && (
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        color: "#A65F00",
+                                        fontWeight: 700,
+                                    }}
+                                >
+                                    Requires review
+                                </Typography>
+                            )}
+                        </Box>
+                    </Stack>
                 </Paper>
             </Box>
 
-            {/* =====================================================
-                EMPLOYER APPROVAL SECTION
-            ====================================================== */}
-
+            {/* EMPLOYER APPROVAL SECTION */}
             {pendingEmployers.length > 0 && (
                 <Paper
                     elevation={0}
                     sx={{
                         mb: 3,
                         borderRadius: 3,
-                        border: "2px solid #bfdbfe",
+                        border: "1px solid #E9DED0",
                         overflow: "hidden",
-                        boxShadow:
-                            "0 8px 30px rgba(37, 99, 235, 0.08)",
+                        backgroundColor: "#FFFDF9",
                     }}
                 >
                     {/* SECTION HEADER */}
@@ -602,10 +715,9 @@ useEffect(() => {
                                 sm: 3,
                             },
                             py: 2.5,
-                            background:
-                                "linear-gradient(135deg, #eff6ff, #f8fafc)",
+                            backgroundColor: "#FFF1D6",
                             borderBottom:
-                                "1px solid #dbeafe",
+                                "1px solid #F4D3B5",
                         }}
                     >
                         <Stack
@@ -619,13 +731,12 @@ useEffect(() => {
                                 sx={{
                                     width: 48,
                                     height: 48,
-                                    borderRadius: 2.5,
+                                    borderRadius: 2,
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    backgroundColor:
-                                        "#dbeafe",
-                                    color: "#2563eb",
+                                    backgroundColor: "#FFE5CC",
+                                    color: "#E76F51",
                                 }}
                             >
                                 <Business />
@@ -648,8 +759,8 @@ useEffect(() => {
                                     <Typography
                                         variant="h6"
                                         sx={{
-                                            fontWeight: 800,
-                                            color: "#0f172a",
+                                            fontWeight: 900,
+                                            color: "#293241",
                                         }}
                                     >
                                         Employer Registrations
@@ -660,9 +771,9 @@ useEffect(() => {
                                         size="small"
                                         sx={{
                                             fontWeight: 800,
-                                            color: "#1d4ed8",
+                                            color: "#A65F00",
                                             backgroundColor:
-                                                "#dbeafe",
+                                                "#FFE5CC",
                                         }}
                                     />
                                 </Stack>
@@ -671,13 +782,12 @@ useEffect(() => {
                                     variant="body2"
                                     sx={{
                                         mt: 0.5,
-                                        color: "#64748b",
+                                        color: "#7A7068",
                                     }}
                                 >
                                     These employers are waiting
-                                    for admin approval before
-                                    they can access employer
-                                    features.
+                                    for admin approval before they
+                                    can access employer features.
                                 </Typography>
                             </Box>
                         </Stack>
@@ -704,10 +814,9 @@ useEffect(() => {
                                 elevation={0}
                                 sx={{
                                     p: 2.5,
-                                    borderRadius: 3,
-                                    border: "1px solid #e2e8f0",
-                                    backgroundColor:
-                                        "#ffffff",
+                                    borderRadius: 2.5,
+                                    border: "1px solid #E9DED0",
+                                    backgroundColor: "#FFFDF9",
                                 }}
                             >
                                 <Stack
@@ -727,21 +836,20 @@ useEffect(() => {
                                         sx={{
                                             width: 52,
                                             height: 52,
-                                            background:
-                                                "linear-gradient(135deg, #2563eb, #4f46e5)",
+                                            backgroundColor:
+                                                "#E76F51",
+                                            color: "#fff",
                                             fontWeight: 800,
                                         }}
                                     >
-                                        {getInitials(
-                                            employer
-                                        )}
+                                        {getInitials(employer)}
                                     </Avatar>
 
                                     <Box sx={{ flex: 1 }}>
                                         <Typography
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#0f172a",
+                                                color: "#293241",
                                             }}
                                         >
                                             {[
@@ -756,7 +864,7 @@ useEffect(() => {
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color: "#64748b",
+                                                color: "#7A7068",
                                                 mt: 0.25,
                                             }}
                                         >
@@ -766,7 +874,7 @@ useEffect(() => {
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color: "#64748b",
+                                                color: "#7A7068",
                                                 mt: 0.25,
                                             }}
                                         >
@@ -780,9 +888,9 @@ useEffect(() => {
                                         size="small"
                                         sx={{
                                             fontWeight: 800,
-                                            color: "#92400e",
+                                            color: "#A65F00",
                                             backgroundColor:
-                                                "#fef3c7",
+                                                "#FFF1D6",
                                         }}
                                     />
                                 </Stack>
@@ -792,33 +900,32 @@ useEffect(() => {
                                         mt: 2,
                                         pt: 2,
                                         borderTop:
-                                            "1px solid #f1f5f9",
+                                            "1px solid #E9DED0",
                                     }}
                                 >
                                     <Typography
                                         variant="caption"
                                         sx={{
-                                            color: "#94a3b8",
+                                            color: "#9A8F86",
                                             display: "block",
                                             mb: 1.5,
                                         }}
                                     >
                                         Registered{" "}
-                                        {formatDate(
-                                            employer.CreatedOn
-                                        )}
+                                        formatDate(employer.RegistrationCreatedAt)
                                     </Typography>
 
                                     <Stack
-                                        direction="row"
+                                        direction={{
+                                            xs: "column",
+                                            sm: "row",
+                                        }}
                                         spacing={1.5}
                                     >
                                         <Button
                                             fullWidth
                                             variant="contained"
-                                            startIcon={
-                                                <Check />
-                                            }
+                                            startIcon={<Check />}
                                             onClick={() =>
                                                 openApprovalDialog(
                                                     employer,
@@ -831,10 +938,13 @@ useEffect(() => {
                                                 fontWeight: 800,
                                                 borderRadius: 2,
                                                 backgroundColor:
-                                                    "#16a34a",
+                                                    "#6A994E",
+                                                boxShadow: "none",
+
                                                 "&:hover": {
                                                     backgroundColor:
-                                                        "#15803d",
+                                                        "#58843F",
+                                                    boxShadow: "none",
                                                 },
                                             }}
                                         >
@@ -858,14 +968,15 @@ useEffect(() => {
                                                     "none",
                                                 fontWeight: 800,
                                                 borderRadius: 2,
-                                                color: "#dc2626",
+                                                color: "#B96868",
                                                 borderColor:
-                                                    "#fecaca",
+                                                    "#E8C7C7",
+
                                                 "&:hover": {
                                                     borderColor:
-                                                        "#dc2626",
+                                                        "#B96868",
                                                     backgroundColor:
-                                                        "#fef2f2",
+                                                        "#FBE9E6",
                                                 },
                                             }}
                                         >
@@ -886,7 +997,8 @@ useEffect(() => {
                     p: 2,
                     mb: 3,
                     borderRadius: 3,
-                    border: "1px solid #e5e7eb",
+                    border: "1px solid #E9DED0",
+                    backgroundColor: "#FFFDF9",
                 }}
             >
                 <Box
@@ -913,11 +1025,25 @@ useEffect(() => {
                                     <InputAdornment position="start">
                                         <Search
                                             sx={{
-                                                color: "#94a3b8",
+                                                color: "#9A8F86",
                                             }}
                                         />
                                     </InputAdornment>
                                 ),
+                            },
+                        }}
+                        sx={{
+                            "& .MuiOutlinedInput-root": {
+                                backgroundColor: "#FFFDF9",
+                                "& fieldset": {
+                                    borderColor: "#DCCFC2",
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: "#CBBBAE",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#E76F51",
+                                },
                             },
                         }}
                     />
@@ -927,10 +1053,22 @@ useEffect(() => {
                         size="small"
                         value={roleFilter}
                         onChange={(event) =>
-                            setRoleFilter(
-                                event.target.value
-                            )
+                            setRoleFilter(event.target.value)
                         }
+                        sx={{
+                            backgroundColor: "#FFFDF9",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#DCCFC2",
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline":
+                                {
+                                    borderColor: "#CBBBAE",
+                                },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                {
+                                    borderColor: "#E76F51",
+                                },
+                        }}
                     >
                         <MenuItem value="All">
                             All Roles
@@ -954,10 +1092,22 @@ useEffect(() => {
                         size="small"
                         value={statusFilter}
                         onChange={(event) =>
-                            setStatusFilter(
-                                event.target.value
-                            )
+                            setStatusFilter(event.target.value)
                         }
+                        sx={{
+                            backgroundColor: "#FFFDF9",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "#DCCFC2",
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline":
+                                {
+                                    borderColor: "#CBBBAE",
+                                },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                {
+                                    borderColor: "#E76F51",
+                                },
+                        }}
                     >
                         <MenuItem value="All">
                             All Statuses
@@ -987,13 +1137,14 @@ useEffect(() => {
                 </Alert>
             )}
 
-            {/* MAIN USERS TABLE */}
+            {/* USERS TABLE */}
             <Paper
                 elevation={0}
                 sx={{
                     borderRadius: 3,
-                    border: "1px solid #e5e7eb",
+                    border: "1px solid #E9DED0",
                     overflow: "hidden",
+                    backgroundColor: "#FFFDF9",
                 }}
             >
                 <TableContainer
@@ -1005,79 +1156,40 @@ useEffect(() => {
                     <Table stickyHeader>
                         <TableHead>
                             <TableRow>
-                                <TableCell
-                                    sx={{
-                                        fontWeight: 800,
-                                        color: "#475569",
-                                        backgroundColor:
-                                            "#f8fafc",
-                                    }}
-                                >
-                                    User
-                                </TableCell>
-
-                                <TableCell
-                                    sx={{
-                                        fontWeight: 800,
-                                        color: "#475569",
-                                        backgroundColor:
-                                            "#f8fafc",
-                                    }}
-                                >
-                                    Email
-                                </TableCell>
-
-                                <TableCell
-                                    sx={{
-                                        fontWeight: 800,
-                                        color: "#475569",
-                                        backgroundColor:
-                                            "#f8fafc",
-                                    }}
-                                >
-                                    Role
-                                </TableCell>
-
-                                <TableCell
-                                    sx={{
-                                        fontWeight: 800,
-                                        color: "#475569",
-                                        backgroundColor:
-                                            "#f8fafc",
-                                    }}
-                                >
-                                    Company
-                                </TableCell>
-
-                                <TableCell
-                                    sx={{
-                                        fontWeight: 800,
-                                        color: "#475569",
-                                        backgroundColor:
-                                            "#f8fafc",
-                                    }}
-                                >
-                                    Status
-                                </TableCell>
-
-                                <TableCell
-                                    sx={{
-                                        fontWeight: 800,
-                                        color: "#475569",
-                                        backgroundColor:
-                                            "#f8fafc",
-                                    }}
-                                >
-                                    Date Joined
-                                </TableCell>
+                                {[
+                                    "User",
+                                    "Email",
+                                    "Role",
+                                    "Company",
+                                    "Status",
+                                    "Date Joined",
+                                ].map((heading) => (
+                                    <TableCell
+                                        key={heading}
+                                        sx={{
+                                            fontWeight: 800,
+                                            color: "#5F554D",
+                                            backgroundColor:
+                                                "#FFF8EF",
+                                            borderBottom:
+                                                "1px solid #E9DED0",
+                                            whiteSpace:
+                                                "nowrap",
+                                        }}
+                                    >
+                                        {heading}
+                                    </TableCell>
+                                ))}
 
                                 <TableCell
                                     align="right"
                                     sx={{
                                         fontWeight: 800,
-                                        color: "#475569",
+                                        color: "#5F554D",
                                         backgroundColor:
-                                            "#f8fafc",
+                                            "#FFF8EF",
+                                        borderBottom:
+                                            "1px solid #E9DED0",
                                     }}
                                 >
                                     Action
@@ -1091,16 +1203,22 @@ useEffect(() => {
                                     <TableCell
                                         colSpan={7}
                                         align="center"
-                                        sx={{ py: 8 }}
+                                        sx={{
+                                            py: 8,
+                                            borderBottom: "none",
+                                        }}
                                     >
                                         <CircularProgress
                                             size={32}
+                                            sx={{
+                                                color: "#E76F51",
+                                            }}
                                         />
 
                                         <Typography
                                             sx={{
                                                 mt: 2,
-                                                color: "#64748b",
+                                                color: "#7A7068",
                                             }}
                                         >
                                             Loading users...
@@ -1113,12 +1231,34 @@ useEffect(() => {
                                     <TableCell
                                         colSpan={7}
                                         align="center"
-                                        sx={{ py: 8 }}
+                                        sx={{
+                                            py: 8,
+                                            borderBottom: "none",
+                                        }}
                                     >
+                                        <Box
+                                            sx={{
+                                                width: 58,
+                                                height: 58,
+                                                mx: "auto",
+                                                mb: 1.5,
+                                                borderRadius: "50%",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent:
+                                                    "center",
+                                                backgroundColor:
+                                                    "#FFF1D6",
+                                                color: "#E76F51",
+                                            }}
+                                        >
+                                            <Search />
+                                        </Box>
+
                                         <Typography
                                             sx={{
-                                                fontWeight: 700,
-                                                color: "#334155",
+                                                fontWeight: 800,
+                                                color: "#293241",
                                             }}
                                         >
                                             No users found
@@ -1128,7 +1268,7 @@ useEffect(() => {
                                             variant="body2"
                                             sx={{
                                                 mt: 0.5,
-                                                color: "#94a3b8",
+                                                color: "#9A8F86",
                                             }}
                                         >
                                             Try changing your
@@ -1141,6 +1281,15 @@ useEffect(() => {
                                     <TableRow
                                         key={user.UserID}
                                         hover
+                                        sx={{
+                                            "&:last-child td": {
+                                                borderBottom: "none",
+                                            },
+                                            "&:hover": {
+                                                backgroundColor:
+                                                    "#FFFBF6",
+                                            },
+                                        }}
                                     >
                                         <TableCell>
                                             <Stack
@@ -1155,8 +1304,9 @@ useEffect(() => {
                                                     sx={{
                                                         width: 40,
                                                         height: 40,
-                                                        background:
-                                                            "linear-gradient(135deg, #2563eb, #4f46e5)",
+                                                        backgroundColor:
+                                                            "#E76F51",
+                                                        color: "#fff",
                                                         fontSize:
                                                             "0.85rem",
                                                         fontWeight: 700,
@@ -1171,7 +1321,7 @@ useEffect(() => {
                                                     <Typography
                                                         sx={{
                                                             fontWeight: 700,
-                                                            color: "#0f172a",
+                                                            color: "#293241",
                                                         }}
                                                     >
                                                         {[
@@ -1190,7 +1340,7 @@ useEffect(() => {
                                                     <Typography
                                                         variant="caption"
                                                         sx={{
-                                                            color: "#94a3b8",
+                                                            color: "#9A8F86",
                                                         }}
                                                     >
                                                         ID #
@@ -1206,7 +1356,7 @@ useEffect(() => {
                                             <Typography
                                                 variant="body2"
                                                 sx={{
-                                                    color: "#475569",
+                                                    color: "#5F554D",
                                                 }}
                                             >
                                                 {user.Email}
@@ -1218,12 +1368,12 @@ useEffect(() => {
                                                 label={getRoleLabel(
                                                     user.Role
                                                 )}
-                                                color={getRoleColor(
-                                                    user.Role
-                                                )}
                                                 size="small"
                                                 sx={{
-                                                    fontWeight: 700,
+                                                    ...getRoleChipSx(
+                                                        user.Role
+                                                    ),
+                                                    fontWeight: 800,
                                                 }}
                                             />
                                         </TableCell>
@@ -1232,7 +1382,7 @@ useEffect(() => {
                                             <Typography
                                                 variant="body2"
                                                 sx={{
-                                                    color: "#475569",
+                                                    color: "#5F554D",
                                                 }}
                                             >
                                                 {user.CompanyName ||
@@ -1250,9 +1400,9 @@ useEffect(() => {
                                                     size="small"
                                                     sx={{
                                                         fontWeight: 700,
-                                                        color: "#92400e",
+                                                        color: "#A65F00",
                                                         backgroundColor:
-                                                            "#fef3c7",
+                                                            "#FFF1D6",
                                                     }}
                                                 />
                                             ) : user.Role ===
@@ -1264,9 +1414,9 @@ useEffect(() => {
                                                     size="small"
                                                     sx={{
                                                         fontWeight: 700,
-                                                        color: "#b91c1c",
+                                                        color: "#B96868",
                                                         backgroundColor:
-                                                            "#fee2e2",
+                                                            "#FBE9E6",
                                                     }}
                                                 />
                                             ) : (
@@ -1287,12 +1437,12 @@ useEffect(() => {
                                                     sx={{
                                                         fontWeight: 700,
                                                         color: user.IsActive
-                                                            ? "#15803d"
-                                                            : "#b91c1c",
+                                                            ? "#477A35"
+                                                            : "#B96868",
                                                         backgroundColor:
                                                             user.IsActive
-                                                                ? "#dcfce7"
-                                                                : "#fee2e2",
+                                                                ? "#EDF4E8"
+                                                                : "#FBE9E6",
                                                         "& .MuiChip-icon":
                                                             {
                                                                 color: "inherit",
@@ -1306,14 +1456,12 @@ useEffect(() => {
                                             <Typography
                                                 variant="body2"
                                                 sx={{
-                                                    color: "#64748b",
+                                                    color: "#7A7068",
                                                     whiteSpace:
                                                         "nowrap",
                                                 }}
                                             >
-                                                {formatDate(
-                                                    user.CreatedOn
-                                                )}
+                                            {formatDate(user.RegistrationCreatedAt)}   
                                             </Typography>
                                         </TableCell>
 
@@ -1336,13 +1484,13 @@ useEffect(() => {
                                                                 )
                                                             }
                                                             sx={{
-                                                                color: "#16a34a",
+                                                                color: "#6A994E",
                                                                 backgroundColor:
-                                                                    "#f0fdf4",
+                                                                    "#EDF4E8",
                                                                 "&:hover":
                                                                     {
                                                                         backgroundColor:
-                                                                            "#dcfce7",
+                                                                            "#DDEBD6",
                                                                     },
                                                             }}
                                                         >
@@ -1359,13 +1507,13 @@ useEffect(() => {
                                                                 )
                                                             }
                                                             sx={{
-                                                                color: "#dc2626",
+                                                                color: "#B96868",
                                                                 backgroundColor:
-                                                                    "#fef2f2",
+                                                                    "#FBE9E6",
                                                                 "&:hover":
                                                                     {
                                                                         backgroundColor:
-                                                                            "#fee2e2",
+                                                                            "#F5D9D6",
                                                                     },
                                                             }}
                                                         >
@@ -1389,8 +1537,19 @@ useEffect(() => {
                                                         }
                                                         sx={{
                                                             color: user.IsActive
-                                                                ? "#dc2626"
-                                                                : "#16a34a",
+                                                                ? "#B96868"
+                                                                : "#6A994E",
+                                                            backgroundColor:
+                                                                user.IsActive
+                                                                    ? "#FBE9E6"
+                                                                    : "#EDF4E8",
+                                                            "&:hover":
+                                                                {
+                                                                    backgroundColor:
+                                                                        user.IsActive
+                                                                            ? "#F5D9D6"
+                                                                            : "#DDEBD6",
+                                                                },
                                                         }}
                                                     >
                                                         {user.IsActive ? (
@@ -1416,11 +1575,17 @@ useEffect(() => {
                 onClose={closeStatusDialog}
                 maxWidth="xs"
                 fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: 3,
+                        backgroundColor: "#FFFDF9",
+                    },
+                }}
             >
                 <DialogTitle
                     sx={{
-                        fontWeight: 800,
-                        color: "#0f172a",
+                        fontWeight: 900,
+                        color: "#293241",
                     }}
                 >
                     {selectedUser?.IsActive
@@ -1431,7 +1596,7 @@ useEffect(() => {
                 <DialogContent>
                     <DialogContentText
                         sx={{
-                            color: "#64748b",
+                            color: "#7A7068",
                         }}
                     >
                         Are you sure you want to{" "}
@@ -1448,8 +1613,8 @@ useEffect(() => {
                                 sx={{
                                     display: "block",
                                     mt: 1.5,
-                                    fontWeight: 700,
-                                    color: "#0f172a",
+                                    fontWeight: 800,
+                                    color: "#293241",
                                 }}
                             >
                                 {[
@@ -1470,7 +1635,7 @@ useEffect(() => {
                         sx={{
                             textTransform: "none",
                             fontWeight: 700,
-                            color: "#64748b",
+                            color: "#7A7068",
                         }}
                     >
                         Cancel
@@ -1494,13 +1659,16 @@ useEffect(() => {
                             borderRadius: 2,
                             backgroundColor:
                                 selectedUser?.IsActive
-                                    ? "#dc2626"
-                                    : "#16a34a",
+                                    ? "#B96868"
+                                    : "#6A994E",
+                            boxShadow: "none",
+
                             "&:hover": {
                                 backgroundColor:
                                     selectedUser?.IsActive
-                                        ? "#b91c1c"
-                                        : "#15803d",
+                                        ? "#A75A5A"
+                                        : "#58843F",
+                                boxShadow: "none",
                             },
                         }}
                     >
@@ -1519,7 +1687,7 @@ useEffect(() => {
                         position: "absolute",
                         right: 8,
                         top: 8,
-                        color: "#94a3b8",
+                        color: "#9A8F86",
                     }}
                 >
                     <Close />
@@ -1532,11 +1700,17 @@ useEffect(() => {
                 onClose={closeApprovalDialog}
                 maxWidth="xs"
                 fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: 3,
+                        backgroundColor: "#FFFDF9",
+                    },
+                }}
             >
                 <DialogTitle
                     sx={{
-                        fontWeight: 800,
-                        color: "#0f172a",
+                        fontWeight: 900,
+                        color: "#293241",
                     }}
                 >
                     {approvalDecision === "Approved"
@@ -1547,7 +1721,7 @@ useEffect(() => {
                 <DialogContent>
                     <DialogContentText
                         sx={{
-                            color: "#64748b",
+                            color: "#7A7068",
                         }}
                     >
                         Are you sure you want to{" "}
@@ -1565,13 +1739,15 @@ useEffect(() => {
                                     p: 2,
                                     borderRadius: 2,
                                     backgroundColor:
-                                        "#f8fafc",
+                                        "#FFF8EF",
+                                    border:
+                                        "1px solid #E9DED0",
                                 }}
                             >
                                 <Typography
                                     sx={{
                                         fontWeight: 800,
-                                        color: "#0f172a",
+                                        color: "#293241",
                                     }}
                                 >
                                     {[
@@ -1587,7 +1763,7 @@ useEffect(() => {
                                     variant="body2"
                                     sx={{
                                         mt: 0.5,
-                                        color: "#64748b",
+                                        color: "#7A7068",
                                     }}
                                 >
                                     {selectedEmployer.Email}
@@ -1596,7 +1772,7 @@ useEffect(() => {
                                 <Typography
                                     variant="body2"
                                     sx={{
-                                        color: "#64748b",
+                                        color: "#7A7068",
                                     }}
                                 >
                                     {selectedEmployer.Phone ||
@@ -1614,7 +1790,7 @@ useEffect(() => {
                         sx={{
                             textTransform: "none",
                             fontWeight: 700,
-                            color: "#64748b",
+                            color: "#7A7068",
                         }}
                     >
                         Cancel
@@ -1644,14 +1820,17 @@ useEffect(() => {
                             backgroundColor:
                                 approvalDecision ===
                                 "Approved"
-                                    ? "#16a34a"
-                                    : "#dc2626",
+                                    ? "#6A994E"
+                                    : "#B96868",
+                            boxShadow: "none",
+
                             "&:hover": {
                                 backgroundColor:
                                     approvalDecision ===
                                     "Approved"
-                                        ? "#15803d"
-                                        : "#b91c1c",
+                                        ? "#58843F"
+                                        : "#A75A5A",
+                                boxShadow: "none",
                             },
                         }}
                     >
@@ -1671,7 +1850,7 @@ useEffect(() => {
                         position: "absolute",
                         right: 8,
                         top: 8,
-                        color: "#94a3b8",
+                        color: "#9A8F86",
                     }}
                 >
                     <Close />
@@ -1698,7 +1877,9 @@ useEffect(() => {
                             open: false,
                         }))
                     }
-                    sx={{ width: "100%" }}
+                    sx={{
+                        width: "100%",
+                    }}
                 >
                     {snackbar.message}
                 </Alert>
@@ -1708,3 +1889,4 @@ useEffect(() => {
 }
 
 export default AdminUsers;
+

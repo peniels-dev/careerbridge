@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import {
@@ -36,9 +37,9 @@ const drawerWidth = 260;
 function AdminLayout() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
     const navigate = useNavigate();
-    const { user } = useAuth();
+
+    const { user, logout } = useAuth();
 
     const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -47,8 +48,12 @@ function AdminLayout() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        if (logout) {
+            logout();
+        } else {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+        }
 
         navigate("/login");
     };
@@ -76,14 +81,25 @@ function AdminLayout() {
         },
     ];
 
+    const firstName =
+        user?.FirstName ||
+        user?.firstName ||
+        "Admin";
+
+    const lastName =
+        user?.LastName ||
+        user?.lastName ||
+        "";
+
+    const avatarLetter = firstName.charAt(0).toUpperCase();
+
     const drawerContent = (
         <Box
             sx={{
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                background:
-                    "linear-gradient(180deg, #0f172a 0%, #111827 100%)",
+                backgroundColor: "#293241",
                 color: "#fff",
             }}
         >
@@ -105,25 +121,27 @@ function AdminLayout() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        background:
-                            "linear-gradient(135deg, #2563eb, #4f46e5)",
+                        backgroundColor: "#E76F51",
+                        color: "#fff",
+                        flexShrink: 0,
                         boxShadow:
-                            "0 8px 20px rgba(37, 99, 235, 0.35)",
+                            "0 8px 18px rgba(231, 111, 81, 0.25)",
                     }}
                 >
                     <BusinessRounded />
                 </Box>
 
                 <Box>
-                 <Typography
-                    fontWeight={800}
-                    fontSize="1.15rem"
-                    sx={{
-                        lineHeight: 1.1,
-                    }}
-                >
-                    CareerBridge
-                </Typography>  
+                    <Typography
+                        fontWeight={800}
+                        fontSize="1.15rem"
+                        sx={{
+                            lineHeight: 1.1,
+                            color: "#fff",
+                        }}
+                    >
+                        CareerBridge
+                    </Typography>
 
                     <Typography
                         variant="caption"
@@ -139,17 +157,22 @@ function AdminLayout() {
 
             <Divider
                 sx={{
-                    borderColor: "rgba(255,255,255,0.08)",
+                    borderColor: "rgba(255,255,255,0.09)",
                 }}
             />
 
             {/* NAVIGATION */}
-            <Box sx={{ px: 2, py: 3 }}>
+            <Box
+                sx={{
+                    px: 2,
+                    py: 3,
+                }}
+            >
                 <Typography
                     variant="caption"
                     sx={{
                         px: 2,
-                        color: "rgba(255,255,255,0.4)",
+                        color: "rgba(255,255,255,0.42)",
                         fontWeight: 700,
                         letterSpacing: 1.2,
                     }}
@@ -163,18 +186,19 @@ function AdminLayout() {
                             key={item.path}
                             component={NavLink}
                             to={item.path}
+                            end={item.path === "/admin"}
                             onClick={() => {
                                 if (isMobile) {
                                     setMobileOpen(false);
                                 }
                             }}
-                            end={item.path === "/admin"}
                             sx={{
                                 minHeight: 50,
                                 mb: 0.7,
                                 px: 2,
                                 borderRadius: 2.5,
                                 color: "rgba(255,255,255,0.68)",
+                                transition: "all 0.2s ease",
 
                                 "& .MuiListItemIcon-root": {
                                     color: "inherit",
@@ -188,11 +212,14 @@ function AdminLayout() {
                                 },
 
                                 "&.active": {
-                                    background:
-                                        "linear-gradient(90deg, #2563eb, #4f46e5)",
+                                    backgroundColor: "#E76F51",
                                     color: "#fff",
                                     boxShadow:
-                                        "0 8px 20px rgba(37, 99, 235, 0.25)",
+                                        "0 8px 20px rgba(231, 111, 81, 0.22)",
+                                },
+
+                                "&.active:hover": {
+                                    backgroundColor: "#D85F43",
                                 },
                             }}
                         >
@@ -200,29 +227,34 @@ function AdminLayout() {
                                 {item.icon}
                             </ListItemIcon>
 
-                        <ListItemText
-    primary={
-        <Typography
-            sx={{
-                fontWeight: 600,
-                fontSize: "0.92rem",
-            }}
-        >
-            {item.label}
-        </Typography>
-    }
-/>    
+                            <ListItemText
+                                primary={
+                                    <Typography
+                                        sx={{
+                                            fontWeight: 600,
+                                            fontSize: "0.92rem",
+                                        }}
+                                    >
+                                        {item.label}
+                                    </Typography>
+                                }
+                            />
                         </ListItemButton>
                     ))}
                 </List>
             </Box>
 
             {/* BOTTOM ADMIN PROFILE */}
-            <Box sx={{ mt: "auto", p: 2 }}>
+            <Box
+                sx={{
+                    mt: "auto",
+                    p: 2,
+                }}
+            >
                 <Divider
                     sx={{
                         mb: 2,
-                        borderColor: "rgba(255,255,255,0.08)",
+                        borderColor: "rgba(255,255,255,0.09)",
                     }}
                 />
 
@@ -240,21 +272,28 @@ function AdminLayout() {
                             width: 40,
                             height: 40,
                             fontWeight: 700,
-                            background:
-                                "linear-gradient(135deg, #2563eb, #4f46e5)",
+                            backgroundColor: "#F4A261",
+                            color: "#293241",
                         }}
                     >
-                        {user?.firstName?.charAt(0)?.toUpperCase() || "A"}
+                        {avatarLetter}
                     </Avatar>
 
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Box
+                        sx={{
+                            minWidth: 0,
+                            flex: 1,
+                        }}
+                    >
                         <Typography
                             fontWeight={700}
                             fontSize="0.9rem"
                             noWrap
+                            sx={{
+                                color: "#fff",
+                            }}
                         >
-                            {user?.firstName || "Admin"}{" "}
-                            {user?.lastName || ""}
+                            {firstName} {lastName}
                         </Typography>
 
                         <Typography
@@ -272,10 +311,11 @@ function AdminLayout() {
                             onClick={handleLogout}
                             sx={{
                                 color: "rgba(255,255,255,0.55)",
+
                                 "&:hover": {
                                     color: "#fff",
                                     backgroundColor:
-                                        "rgba(255,255,255,0.08)",
+                                        "rgba(231,111,81,0.16)",
                                 },
                             }}
                         >
@@ -292,7 +332,7 @@ function AdminLayout() {
             sx={{
                 display: "flex",
                 minHeight: "100vh",
-                backgroundColor: "#f8fafc",
+                backgroundColor: "#FFF8EF",
             }}
         >
             {/* DESKTOP SIDEBAR */}
@@ -302,10 +342,12 @@ function AdminLayout() {
                     sx={{
                         width: drawerWidth,
                         flexShrink: 0,
+
                         "& .MuiDrawer-paper": {
                             width: drawerWidth,
                             boxSizing: "border-box",
                             border: "none",
+                            backgroundColor: "#293241",
                         },
                     }}
                 >
@@ -327,6 +369,7 @@ function AdminLayout() {
                             width: drawerWidth,
                             boxSizing: "border-box",
                             border: "none",
+                            backgroundColor: "#293241",
                         },
                     }}
                 >
@@ -340,6 +383,7 @@ function AdminLayout() {
                 sx={{
                     flexGrow: 1,
                     minWidth: 0,
+                    backgroundColor: "#FFF8EF",
                 }}
             >
                 {/* TOP BAR */}
@@ -347,10 +391,9 @@ function AdminLayout() {
                     position="sticky"
                     elevation={0}
                     sx={{
-                        backgroundColor: "rgba(255,255,255,0.92)",
-                        backdropFilter: "blur(12px)",
-                        borderBottom: "1px solid #e5e7eb",
-                        color: "#111827",
+                        backgroundColor: "#FFFDF9",
+                        borderBottom: "1px solid #E9DED0",
+                        color: "#293241",
                     }}
                 >
                     <Toolbar
@@ -369,7 +412,7 @@ function AdminLayout() {
                                 onClick={handleDrawerToggle}
                                 sx={{
                                     mr: 2,
-                                    color: "#334155",
+                                    color: "#293241",
                                 }}
                             >
                                 <MenuRounded />
@@ -381,7 +424,7 @@ function AdminLayout() {
                                 variant="h6"
                                 fontWeight={800}
                                 sx={{
-                                    color: "#0f172a",
+                                    color: "#293241",
                                 }}
                             >
                                 Admin Portal
@@ -390,7 +433,7 @@ function AdminLayout() {
                             <Typography
                                 variant="caption"
                                 sx={{
-                                    color: "#64748b",
+                                    color: "#7A7068",
                                 }}
                             >
                                 Manage and monitor CareerBridge
@@ -402,11 +445,11 @@ function AdminLayout() {
                                 width: 40,
                                 height: 40,
                                 fontWeight: 700,
-                                background:
-                                    "linear-gradient(135deg, #2563eb, #4f46e5)",
+                                backgroundColor: "#F4A261",
+                                color: "#293241",
                             }}
                         >
-                            {user?.firstName?.charAt(0)?.toUpperCase() || "A"}
+                            {avatarLetter}
                         </Avatar>
                     </Toolbar>
                 </AppBar>

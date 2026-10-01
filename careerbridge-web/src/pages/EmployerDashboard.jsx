@@ -40,6 +40,7 @@ function EmployerDashboard() {
     const { user, logout } = useAuth();
 
     const [company, setCompany] = useState(null);
+
     const [statistics, setStatistics] = useState({
         totalJobs: 0,
         openJobs: 0,
@@ -61,16 +62,16 @@ function EmployerDashboard() {
             setError("");
 
             const response = await axiosAPI.get("/jobs/employer");
-
             const data = response.data?.data;
 
             setCompany(data?.company || null);
 
             setStatistics({
-    totalJobs: data?.statistics?.totalJobs || 0,
-    openJobs: data?.statistics?.openJobs || 0,
-    totalApplications: data?.statistics?.totalApplications || 0,
-});
+                totalJobs: data?.statistics?.totalJobs || 0,
+                openJobs: data?.statistics?.openJobs || 0,
+                totalApplications:
+                    data?.statistics?.totalApplications || 0,
+            });
 
             setRecentJobs((data?.jobs || []).slice(0, 5));
         } catch (err) {
@@ -124,7 +125,7 @@ function EmployerDashboard() {
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                backgroundColor: "#111827",
+                backgroundColor: "#293241",
                 color: "#fff",
             }}
         >
@@ -136,7 +137,8 @@ function EmployerDashboard() {
                     display: "flex",
                     alignItems: "center",
                     gap: 1.5,
-                    borderBottom: "1px solid rgba(255,255,255,0.08)",
+                    borderBottom:
+                        "1px solid rgba(255,255,255,0.08)",
                 }}
             >
                 <Box
@@ -147,8 +149,7 @@ function EmployerDashboard() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        background:
-                            "linear-gradient(135deg, #2563eb, #7c3aed)",
+                        backgroundColor: "#E76F51",
                         fontWeight: 800,
                         fontSize: "1.25rem",
                     }}
@@ -170,7 +171,7 @@ function EmployerDashboard() {
                     <Typography
                         sx={{
                             fontSize: "0.72rem",
-                            color: "#9ca3af",
+                            color: "#C8C5C0",
                             mt: 0.3,
                         }}
                     >
@@ -188,19 +189,22 @@ function EmployerDashboard() {
                     return (
                         <ListItemButton
                             key={item.label}
-                            onClick={() => handleNavigation(item.path)}
+                            onClick={() =>
+                                handleNavigation(item.path)
+                            }
                             sx={{
                                 borderRadius: 2,
                                 mb: 1,
                                 py: 1.3,
-                                color: isActive ? "#fff" : "#9ca3af",
+                                color: isActive
+                                    ? "#fff"
+                                    : "#C8C5C0",
                                 backgroundColor: isActive
-                                    ? "rgba(37, 99, 235, 0.18)"
+                                    ? "rgba(231,111,81,0.18)"
                                     : "transparent",
                                 borderLeft: isActive
-                                    ? "3px solid #3b82f6"
+                                    ? "3px solid #E76F51"
                                     : "3px solid transparent",
-
                                 "&:hover": {
                                     backgroundColor:
                                         "rgba(255,255,255,0.06)",
@@ -212,8 +216,8 @@ function EmployerDashboard() {
                                 sx={{
                                     minWidth: 42,
                                     color: isActive
-                                        ? "#60a5fa"
-                                        : "#9ca3af",
+                                        ? "#F4A261"
+                                        : "#C8C5C0",
                                 }}
                             >
                                 {item.icon}
@@ -223,7 +227,9 @@ function EmployerDashboard() {
                                 primary={item.label}
                                 primaryTypographyProps={{
                                     fontSize: "0.92rem",
-                                    fontWeight: isActive ? 700 : 500,
+                                    fontWeight: isActive
+                                        ? 700
+                                        : 500,
                                 }}
                             />
                         </ListItemButton>
@@ -231,12 +237,13 @@ function EmployerDashboard() {
                 })}
             </List>
 
-            {/* Bottom user section */}
+            {/* Bottom User Section */}
             <Box
                 sx={{
                     mt: "auto",
                     p: 2,
-                    borderTop: "1px solid rgba(255,255,255,0.08)",
+                    borderTop:
+                        "1px solid rgba(255,255,255,0.08)",
                 }}
             >
                 <Box
@@ -247,19 +254,22 @@ function EmployerDashboard() {
                         p: 1.5,
                         mb: 1,
                         borderRadius: 2,
-                        backgroundColor: "rgba(255,255,255,0.04)",
+                        backgroundColor:
+                            "rgba(255,255,255,0.05)",
                     }}
                 >
                     <Avatar
                         sx={{
                             width: 38,
                             height: 38,
-                            background:
-                                "linear-gradient(135deg, #2563eb, #7c3aed)",
+                            backgroundColor: "#F4A261",
+                            color: "#293241",
                             fontWeight: 700,
                         }}
                     >
-                        {user?.FirstName?.charAt(0)?.toUpperCase() || "E"}
+                        {user?.FirstName
+                            ?.charAt(0)
+                            ?.toUpperCase() || "E"}
                     </Avatar>
 
                     <Box sx={{ minWidth: 0 }}>
@@ -278,7 +288,7 @@ function EmployerDashboard() {
                             noWrap
                             sx={{
                                 fontSize: "0.72rem",
-                                color: "#9ca3af",
+                                color: "#C8C5C0",
                             }}
                         >
                             Employer
@@ -294,13 +304,13 @@ function EmployerDashboard() {
                         justifyContent: "flex-start",
                         px: 1.5,
                         py: 1,
-                        color: "#fca5a5",
+                        color: "#F4B4A8",
                         textTransform: "none",
                         borderRadius: 2,
-
                         "&:hover": {
-                            backgroundColor: "rgba(239,68,68,0.1)",
-                            color: "#f87171",
+                            backgroundColor:
+                                "rgba(231,111,81,0.12)",
+                            color: "#F4A261",
                         },
                     }}
                 >
@@ -314,7 +324,7 @@ function EmployerDashboard() {
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f5f7fb",
+                backgroundColor: "#FFF8EF",
             }}
         >
             {/* Desktop Sidebar */}
@@ -366,8 +376,9 @@ function EmployerDashboard() {
                 <Box
                     sx={{
                         height: 72,
-                        backgroundColor: "#fff",
-                        borderBottom: "1px solid #e5e7eb",
+                        backgroundColor: "#FFFDF9",
+                        borderBottom:
+                            "1px solid #E9DED0",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
@@ -389,12 +400,15 @@ function EmployerDashboard() {
                         }}
                     >
                         <IconButton
-                            onClick={() => setMobileOpen(true)}
+                            onClick={() =>
+                                setMobileOpen(true)
+                            }
                             sx={{
                                 display: {
                                     xs: "flex",
                                     md: "none",
                                 },
+                                color: "#293241",
                             }}
                         >
                             <Menu />
@@ -408,7 +422,7 @@ function EmployerDashboard() {
                                         xs: "1.05rem",
                                         sm: "1.2rem",
                                     },
-                                    color: "#111827",
+                                    color: "#293241",
                                 }}
                             >
                                 Employer Dashboard
@@ -420,7 +434,7 @@ function EmployerDashboard() {
                                         xs: "none",
                                         sm: "block",
                                     },
-                                    color: "#6b7280",
+                                    color: "#7A7068",
                                     fontSize: "0.8rem",
                                 }}
                             >
@@ -433,12 +447,14 @@ function EmployerDashboard() {
                         sx={{
                             width: 40,
                             height: 40,
-                            background:
-                                "linear-gradient(135deg, #2563eb, #7c3aed)",
+                            backgroundColor: "#F4A261",
+                            color: "#293241",
                             fontWeight: 700,
                         }}
                     >
-                        {user?.FirstName?.charAt(0)?.toUpperCase() || "E"}
+                        {user?.FirstName
+                            ?.charAt(0)
+                            ?.toUpperCase() || "E"}
                     </Avatar>
                 </Box>
 
@@ -492,7 +508,7 @@ function EmployerDashboard() {
                                         sm: "1.8rem",
                                     },
                                     fontWeight: 800,
-                                    color: "#111827",
+                                    color: "#293241",
                                     mb: 0.5,
                                 }}
                             >
@@ -502,7 +518,7 @@ function EmployerDashboard() {
 
                             <Typography
                                 sx={{
-                                    color: "#6b7280",
+                                    color: "#7A7068",
                                     fontSize: "0.95rem",
                                 }}
                             >
@@ -523,13 +539,11 @@ function EmployerDashboard() {
                                 py: 1.2,
                                 textTransform: "none",
                                 fontWeight: 700,
-                                background:
-                                    "linear-gradient(135deg, #2563eb, #4f46e5)",
+                                backgroundColor: "#E76F51",
                                 boxShadow:
-                                    "0 6px 18px rgba(37,99,235,0.22)",
+                                    "0 5px 14px rgba(231,111,81,0.18)",
                                 "&:hover": {
-                                    background:
-                                        "linear-gradient(135deg, #1d4ed8, #4338ca)",
+                                    backgroundColor: "#D85F43",
                                 },
                             }}
                         >
@@ -544,7 +558,7 @@ function EmployerDashboard() {
                             height={105}
                             sx={{
                                 mb: 4,
-                                borderRadius: 3,
+                                borderRadius: 2,
                             }}
                         />
                     ) : (
@@ -556,13 +570,14 @@ function EmployerDashboard() {
                                     sm: 2.5,
                                 },
                                 mb: 4,
-                                borderRadius: 3,
-                                border: "1px solid #e5e7eb",
-                                background:
-                                    "linear-gradient(135deg, #ffffff, #f8faff)",
+                                borderRadius: 2.5,
+                                border:
+                                    "1px solid #E9DED0",
+                                backgroundColor: "#FFFDF9",
                                 display: "flex",
                                 alignItems: "center",
-                                justifyContent: "space-between",
+                                justifyContent:
+                                    "space-between",
                                 gap: 2,
                                 flexWrap: "wrap",
                             }}
@@ -578,8 +593,9 @@ function EmployerDashboard() {
                                     sx={{
                                         width: 52,
                                         height: 52,
-                                        backgroundColor: "#eff6ff",
-                                        color: "#2563eb",
+                                        backgroundColor:
+                                            "#FFF1D6",
+                                        color: "#E76F51",
                                     }}
                                 >
                                     <Business />
@@ -589,7 +605,7 @@ function EmployerDashboard() {
                                     <Typography
                                         sx={{
                                             fontSize: "0.75rem",
-                                            color: "#6b7280",
+                                            color: "#7A7068",
                                             mb: 0.3,
                                         }}
                                     >
@@ -600,7 +616,7 @@ function EmployerDashboard() {
                                         sx={{
                                             fontSize: "1.1rem",
                                             fontWeight: 800,
-                                            color: "#111827",
+                                            color: "#293241",
                                         }}
                                     >
                                         {company?.CompanyName ||
@@ -612,12 +628,21 @@ function EmployerDashboard() {
                             <Button
                                 variant="outlined"
                                 onClick={() =>
-                                    navigate("/company-profile")
+                                    navigate(
+                                        "/company-profile"
+                                    )
                                 }
                                 sx={{
                                     textTransform: "none",
                                     borderRadius: 2,
                                     fontWeight: 600,
+                                    color: "#E76F51",
+                                    borderColor: "#E9B8AA",
+                                    "&:hover": {
+                                        borderColor: "#E76F51",
+                                        backgroundColor:
+                                            "#FFF8EF",
+                                    },
                                 }}
                             >
                                 View Company
@@ -644,6 +669,8 @@ function EmployerDashboard() {
                             icon={<Work />}
                             loading={loading}
                             description="Jobs posted"
+                            iconBackground="#FFF1D6"
+                            iconColor="#E76F51"
                         />
 
                         <SummaryCard
@@ -652,14 +679,20 @@ function EmployerDashboard() {
                             icon={<TrendingUp />}
                             loading={loading}
                             description="Currently active"
+                            iconBackground="#EDF4E8"
+                            iconColor="#6A994E"
                         />
 
                         <SummaryCard
                             title="Total Applications"
-                            value={statistics.totalApplications}
+                            value={
+                                statistics.totalApplications
+                            }
                             icon={<People />}
                             loading={loading}
                             description="Applications received"
+                            iconBackground="#FCEBDD"
+                            iconColor="#D9822B"
                         />
                     </Box>
 
@@ -667,9 +700,11 @@ function EmployerDashboard() {
                     <Paper
                         elevation={0}
                         sx={{
-                            borderRadius: 3,
-                            border: "1px solid #e5e7eb",
+                            borderRadius: 2.5,
+                            border:
+                                "1px solid #E9DED0",
                             overflow: "hidden",
+                            backgroundColor: "#FFFDF9",
                         }}
                     >
                         <Box
@@ -680,10 +715,12 @@ function EmployerDashboard() {
                                 },
                                 py: 2.5,
                                 display: "flex",
-                                justifyContent: "space-between",
+                                justifyContent:
+                                    "space-between",
                                 alignItems: "center",
                                 gap: 2,
-                                borderBottom: "1px solid #e5e7eb",
+                                borderBottom:
+                                    "1px solid #E9DED0",
                             }}
                         >
                             <Box>
@@ -691,7 +728,7 @@ function EmployerDashboard() {
                                     sx={{
                                         fontWeight: 800,
                                         fontSize: "1.1rem",
-                                        color: "#111827",
+                                        color: "#293241",
                                     }}
                                 >
                                     Recent Job Postings
@@ -700,7 +737,7 @@ function EmployerDashboard() {
                                 <Typography
                                     sx={{
                                         fontSize: "0.8rem",
-                                        color: "#6b7280",
+                                        color: "#7A7068",
                                         mt: 0.3,
                                     }}
                                 >
@@ -711,11 +748,18 @@ function EmployerDashboard() {
                             <Button
                                 endIcon={<ArrowForward />}
                                 onClick={() =>
-                                    navigate("/employer/jobs")
+                                    navigate(
+                                        "/employer/jobs"
+                                    )
                                 }
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,
+                                    color: "#E76F51",
+                                    "&:hover": {
+                                        backgroundColor:
+                                            "#FFF1D6",
+                                    },
                                 }}
                             >
                                 View All
@@ -750,8 +794,8 @@ function EmployerDashboard() {
                                             mx: "auto",
                                             mb: 2,
                                             backgroundColor:
-                                                "#eff6ff",
-                                            color: "#2563eb",
+                                                "#FFF1D6",
+                                            color: "#E76F51",
                                         }}
                                     >
                                         <Work />
@@ -762,6 +806,7 @@ function EmployerDashboard() {
                                             fontWeight: 700,
                                             fontSize: "1rem",
                                             mb: 0.5,
+                                            color: "#293241",
                                         }}
                                     >
                                         No jobs posted yet
@@ -769,13 +814,14 @@ function EmployerDashboard() {
 
                                     <Typography
                                         sx={{
-                                            color: "#6b7280",
+                                            color: "#7A7068",
                                             fontSize: "0.85rem",
                                             mb: 2,
                                         }}
                                     >
                                         Create your first job
-                                        posting to start receiving
+                                        posting to start
+                                        receiving
                                         applications.
                                     </Typography>
 
@@ -788,9 +834,16 @@ function EmployerDashboard() {
                                             )
                                         }
                                         sx={{
-                                            textTransform: "none",
+                                            textTransform:
+                                                "none",
                                             borderRadius: 2,
                                             fontWeight: 700,
+                                            backgroundColor:
+                                                "#E76F51",
+                                            "&:hover": {
+                                                backgroundColor:
+                                                    "#D85F43",
+                                            },
                                         }}
                                     >
                                         Post Your First Job
@@ -803,17 +856,19 @@ function EmployerDashboard() {
                                         elevation={0}
                                         sx={{
                                             mb: 1.5,
-                                            borderRadius: 2.5,
+                                            borderRadius: 2,
                                             border:
-                                                "1px solid #e5e7eb",
+                                                "1px solid #E9DED0",
+                                            backgroundColor:
+                                                "#FFFDF9",
                                             "&:last-child": {
                                                 mb: 0,
                                             },
                                             "&:hover": {
                                                 borderColor:
-                                                    "#bfdbfe",
+                                                    "#E6B7A8",
                                                 boxShadow:
-                                                    "0 4px 14px rgba(0,0,0,0.05)",
+                                                    "0 4px 14px rgba(82,64,52,0.07)",
                                             },
                                             transition:
                                                 "all 0.2s ease",
@@ -858,7 +913,7 @@ function EmployerDashboard() {
                                                     <Typography
                                                         sx={{
                                                             fontWeight: 800,
-                                                            color: "#111827",
+                                                            color: "#293241",
                                                             mb: 1,
                                                             fontSize:
                                                                 "0.98rem",
@@ -886,8 +941,9 @@ function EmployerDashboard() {
                                                             size="small"
                                                             sx={{
                                                                 backgroundColor:
-                                                                    "#eff6ff",
-                                                                color: "#2563eb",
+                                                                    "#FFF1D6",
+                                                                color:
+                                                                    "#A65F00",
                                                                 fontWeight:
                                                                     600,
                                                             }}
@@ -903,11 +959,12 @@ function EmployerDashboard() {
                                                             sx={{
                                                                 backgroundColor:
                                                                     job.Status
-                                                                        ? "#ecfdf5"
-                                                                        : "#f3f4f6",
-                                                                color: job.Status
-                                                                    ? "#059669"
-                                                                    : "#6b7280",
+                                                                        ? "#EDF4E8"
+                                                                        : "#F1ECE7",
+                                                                color:
+                                                                    job.Status
+                                                                        ? "#477A35"
+                                                                        : "#756B63",
                                                                 fontWeight:
                                                                     600,
                                                             }}
@@ -921,7 +978,14 @@ function EmployerDashboard() {
                                                                     : "applications"
                                                             }`}
                                                             size="small"
-                                                            variant="outlined"
+                                                            sx={{
+                                                                backgroundColor:
+                                                                    "#F7F1EA",
+                                                                color:
+                                                                    "#6F655D",
+                                                                fontWeight:
+                                                                    600,
+                                                            }}
                                                         />
                                                     </Box>
                                                 </Box>
@@ -941,6 +1005,12 @@ function EmployerDashboard() {
                                                         fontWeight: 700,
                                                         whiteSpace:
                                                             "nowrap",
+                                                        color:
+                                                            "#E76F51",
+                                                        "&:hover": {
+                                                            backgroundColor:
+                                                                "#FFF1D6",
+                                                        },
                                                     }}
                                                 >
                                                     View Job
@@ -964,14 +1034,16 @@ function SummaryCard({
     icon,
     loading,
     description,
+    iconBackground,
+    iconColor,
 }) {
     return (
         <Card
             elevation={0}
             sx={{
-                borderRadius: 3,
-                border: "1px solid #e5e7eb",
-                backgroundColor: "#fff",
+                borderRadius: 2.5,
+                border: "1px solid #E9DED0",
+                backgroundColor: "#FFFDF9",
                 height: "100%",
             }}
         >
@@ -1005,8 +1077,9 @@ function SummaryCard({
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                backgroundColor: "#eff6ff",
-                                color: "#2563eb",
+                                backgroundColor:
+                                    iconBackground,
+                                color: iconColor,
                                 mb: 2,
                             }}
                         >
@@ -1015,7 +1088,7 @@ function SummaryCard({
 
                         <Typography
                             sx={{
-                                color: "#6b7280",
+                                color: "#7A7068",
                                 fontSize: "0.82rem",
                                 mb: 0.5,
                             }}
@@ -1027,7 +1100,7 @@ function SummaryCard({
                             sx={{
                                 fontSize: "1.8rem",
                                 fontWeight: 800,
-                                color: "#111827",
+                                color: "#293241",
                                 lineHeight: 1.2,
                             }}
                         >
@@ -1037,7 +1110,7 @@ function SummaryCard({
                         <Typography
                             sx={{
                                 mt: 0.7,
-                                color: "#9ca3af",
+                                color: "#9A9088",
                                 fontSize: "0.75rem",
                             }}
                         >

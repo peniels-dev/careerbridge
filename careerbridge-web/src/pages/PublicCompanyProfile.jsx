@@ -85,19 +85,44 @@ const PublicCompanyProfile = () => {
             <Box
                 sx={{
                     minHeight: "100vh",
-                    backgroundColor: "#f5f7fb",
+                    backgroundColor: "#FFF8EF",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    px: 2,
                 }}
             >
-                <Box sx={{ textAlign: "center" }}>
-                    <CircularProgress />
+                <Box
+                    sx={{
+                        textAlign: "center",
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: 70,
+                            height: 70,
+                            borderRadius: "50%",
+                            backgroundColor: "#FFF1D6",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mx: "auto",
+                            mb: 2,
+                        }}
+                    >
+                        <CircularProgress
+                            size={30}
+                            thickness={4}
+                            sx={{
+                                color: "#E76F51",
+                            }}
+                        />
+                    </Box>
 
                     <Typography
                         sx={{
-                            mt: 2,
-                            color: "#6b7280",
+                            color: "#6F675F",
+                            fontWeight: 600,
                         }}
                     >
                         Loading company profile...
@@ -116,41 +141,55 @@ const PublicCompanyProfile = () => {
             <Box
                 sx={{
                     minHeight: "100vh",
-                    backgroundColor: "#f5f7fb",
-                    py: 5,
+                    backgroundColor: "#FFF8EF",
+                    py: {
+                        xs: 4,
+                        md: 6,
+                    },
                 }}
             >
                 <Container maxWidth="md">
-                    <Alert
-                        severity="error"
+                    <Paper
+                        elevation={0}
                         sx={{
-                            mb: 3,
-                            borderRadius: 2,
-                        }}
-                    >
-                        {error}
-                    </Alert>
-
-                    <Button
-                        variant="contained"
-                        startIcon={<ArrowBack />}
-                        onClick={() => navigate(-1)}
-                        sx={{
-                            minHeight: 44,
-                            px: 3,
-                            borderRadius: 2,
-                            textTransform: "none",
-                            fontWeight: 700,
-                            backgroundColor: "#2563eb",
-                            boxShadow: "none",
-                            "&:hover": {
-                                backgroundColor: "#1d4ed8",
-                                boxShadow: "none",
+                            p: {
+                                xs: 3,
+                                md: 4,
                             },
+                            backgroundColor: "#FFFDF9",
+                            border: "1px solid #E9DED0",
+                            borderRadius: 3,
                         }}
                     >
-                        Go Back
-                    </Button>
+                        <Alert
+                            severity="error"
+                            sx={{
+                                mb: 3,
+                                borderRadius: 2,
+                            }}
+                        >
+                            {error}
+                        </Alert>
+
+                        <Button
+                            startIcon={<ArrowBack />}
+                            onClick={() => navigate(-1)}
+                            sx={{
+                                color: "#E76F51",
+                                fontWeight: 700,
+                                textTransform: "none",
+                                px: 0,
+
+                                "&:hover": {
+                                    backgroundColor:
+                                        "transparent",
+                                    color: "#D85F43",
+                                },
+                            }}
+                        >
+                            Go Back
+                        </Button>
+                    </Paper>
                 </Container>
             </Box>
         );
@@ -166,8 +205,11 @@ const PublicCompanyProfile = () => {
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f5f7fb",
-                py: 5,
+                backgroundColor: "#FFF8EF",
+                py: {
+                    xs: 3,
+                    md: 5,
+                },
             }}
         >
             <Container maxWidth="lg">
@@ -184,9 +226,11 @@ const PublicCompanyProfile = () => {
                         px: 0,
                         textTransform: "none",
                         fontWeight: 700,
-                        color: "#2563eb",
+                        color: "#E76F51",
+
                         "&:hover": {
                             backgroundColor: "transparent",
+                            color: "#D85F43",
                         },
                     }}
                 >
@@ -200,34 +244,94 @@ const PublicCompanyProfile = () => {
                 <Paper
                     elevation={0}
                     sx={{
-                        borderRadius: 4,
-                        border: "1px solid #e5e7eb",
+                        backgroundColor: "#FFFDF9",
+                        border: "1px solid #E9DED0",
+                        borderRadius: {
+                            xs: 3,
+                            md: 4,
+                        },
                         overflow: "hidden",
                         mb: 3,
                     }}
                 >
-                    {/* Blue banner */}
+                    {/* Warm header banner */}
 
                     <Box
                         sx={{
                             height: {
-                                xs: 120,
-                                md: 150,
+                                xs: 110,
+                                sm: 130,
+                                md: 155,
                             },
-                            background:
-                                "linear-gradient(135deg, #1e3a8a, #2563eb)",
+                            backgroundColor: "#293241",
+                            position: "relative",
+                            overflow: "hidden",
                         }}
-                    />
+                    >
+                        {/* Decorative circles */}
+
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                width: 190,
+                                height: 190,
+                                borderRadius: "50%",
+                                backgroundColor:
+                                    "rgba(231,111,81,0.18)",
+                                right: {
+                                    xs: -80,
+                                    md: 60,
+                                },
+                                top: -100,
+                            }}
+                        />
+
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                width: 120,
+                                height: 120,
+                                borderRadius: "50%",
+                                backgroundColor:
+                                    "rgba(244,162,97,0.18)",
+                                right: {
+                                    xs: 70,
+                                    md: 220,
+                                },
+                                bottom: -80,
+                            }}
+                        />
+
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                width: 90,
+                                height: 90,
+                                borderRadius: "50%",
+                                backgroundColor:
+                                    "rgba(106,153,78,0.15)",
+                                left: {
+                                    xs: -35,
+                                    md: 80,
+                                },
+                                top: -35,
+                            }}
+                        />
+                    </Box>
 
                     {/* Header content */}
 
                     <Box
                         sx={{
                             px: {
-                                xs: 3,
+                                xs: 2.5,
+                                sm: 3.5,
                                 md: 5,
                             },
-                            pb: 4,
+                            pb: {
+                                xs: 3,
+                                md: 4,
+                            },
                         }}
                     >
                         <Box
@@ -242,27 +346,38 @@ const PublicCompanyProfile = () => {
                                     md: "flex-end",
                                 },
                                 gap: 3,
-                                mt: -6,
+                                mt: {
+                                    xs: -5,
+                                    md: -6,
+                                },
                             }}
                         >
-
                             {/* COMPANY LOGO */}
 
                             <Box
                                 sx={{
-                                    width: 120,
-                                    height: 120,
-                                    minWidth: 120,
+                                    width: {
+                                        xs: 100,
+                                        md: 120,
+                                    },
+                                    height: {
+                                        xs: 100,
+                                        md: 120,
+                                    },
+                                    minWidth: {
+                                        xs: 100,
+                                        md: 120,
+                                    },
                                     borderRadius: 3,
-                                    backgroundColor: "white",
+                                    backgroundColor: "#FFFDF9",
                                     border:
-                                        "1px solid #e5e7eb",
+                                        "1px solid #E9DED0",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
                                     overflow: "hidden",
                                     boxShadow:
-                                        "0 5px 18px rgba(0,0,0,0.1)",
+                                        "0 8px 22px rgba(41,50,65,0.13)",
                                 }}
                             >
                                 {logoURL ? (
@@ -281,8 +396,11 @@ const PublicCompanyProfile = () => {
                                 ) : (
                                     <Business
                                         sx={{
-                                            fontSize: 55,
-                                            color: "#2563eb",
+                                            fontSize: {
+                                                xs: 45,
+                                                md: 55,
+                                            },
+                                            color: "#E76F51",
                                         }}
                                     />
                                 )}
@@ -302,9 +420,15 @@ const PublicCompanyProfile = () => {
                                 <Typography
                                     variant="h4"
                                     sx={{
-                                        fontWeight: 800,
-                                        color: "#111827",
-                                        mb: 1,
+                                        fontWeight: 900,
+                                        color: "#293241",
+                                        fontSize: {
+                                            xs: 27,
+                                            sm: 32,
+                                            md: 38,
+                                        },
+                                        lineHeight: 1.15,
+                                        mb: 1.2,
                                     }}
                                 >
                                     {company.CompanyName}
@@ -319,19 +443,17 @@ const PublicCompanyProfile = () => {
                                         <LocationOn
                                             sx={{
                                                 fontSize: 19,
-                                                color: "#6b7280",
+                                                color: "#6A994E",
                                             }}
                                         />
 
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color: "#6b7280",
+                                                color: "#6F675F",
                                             }}
                                         >
-                                            {
-                                                company.Address
-                                            }
+                                            {company.Address}
                                         </Typography>
                                     </Stack>
                                 )}
@@ -342,9 +464,15 @@ const PublicCompanyProfile = () => {
                                 icon={<Business />}
                                 sx={{
                                     fontWeight: 700,
-                                    color: "#1d4ed8",
+                                    color: "#5A713E",
                                     backgroundColor:
-                                        "#eff6ff",
+                                        "#EDF4E8",
+                                    border:
+                                        "1px solid #D8E7CF",
+
+                                    "& .MuiChip-icon": {
+                                        color: "#6A994E",
+                                    },
                                 }}
                             />
                         </Box>
@@ -365,7 +493,6 @@ const PublicCompanyProfile = () => {
                         gap: 3,
                     }}
                 >
-
                     {/* =================================================
                         ABOUT COMPANY
                     ================================================= */}
@@ -373,30 +500,61 @@ const PublicCompanyProfile = () => {
                     <Paper
                         elevation={0}
                         sx={{
+                            backgroundColor: "#FFFDF9",
+                            border:
+                                "1px solid #E9DED0",
                             borderRadius: 3,
-                            border: "1px solid #e5e7eb",
                             p: {
                                 xs: 3,
                                 md: 4,
                             },
                         }}
                     >
-                        <Typography
-                            variant="h5"
+                        <Box
                             sx={{
-                                fontWeight: 800,
-                                color: "#111827",
-                                mb: 2,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1.5,
+                                mb: 2.5,
                             }}
                         >
-                            About the Company
-                        </Typography>
+                            <Box
+                                sx={{
+                                    width: 42,
+                                    height: 42,
+                                    borderRadius: 2,
+                                    backgroundColor:
+                                        "#FFF1D6",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Business
+                                    sx={{
+                                        color: "#E76F51",
+                                        fontSize: 22,
+                                    }}
+                                />
+                            </Box>
+
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    fontWeight: 900,
+                                    color: "#293241",
+                                }}
+                            >
+                                About the Company
+                            </Typography>
+                        </Box>
 
                         <Typography
                             sx={{
-                                color: "#6b7280",
-                                lineHeight: 1.8,
+                                color: "#6F675F",
+                                lineHeight: 1.85,
                                 whiteSpace: "pre-line",
+                                fontSize: "0.98rem",
                             }}
                         >
                             {company.Description ||
@@ -411,17 +569,22 @@ const PublicCompanyProfile = () => {
                     <Paper
                         elevation={0}
                         sx={{
+                            backgroundColor: "#FFFDF9",
+                            border:
+                                "1px solid #E9DED0",
                             borderRadius: 3,
-                            border: "1px solid #e5e7eb",
-                            p: 4,
+                            p: {
+                                xs: 3,
+                                md: 3.5,
+                            },
                             height: "fit-content",
                         }}
                     >
                         <Typography
                             variant="h6"
                             sx={{
-                                fontWeight: 800,
-                                color: "#111827",
+                                fontWeight: 900,
+                                color: "#293241",
                                 mb: 3,
                             }}
                         >
@@ -438,21 +601,38 @@ const PublicCompanyProfile = () => {
                                     spacing={1.5}
                                     alignItems="flex-start"
                                 >
-                                    <Email
+                                    <Box
                                         sx={{
-                                            color: "#2563eb",
-                                            mt: 0.3,
+                                            width: 38,
+                                            height: 38,
+                                            minWidth: 38,
+                                            borderRadius: 2,
+                                            backgroundColor:
+                                                "#FFF1D6",
+                                            display: "flex",
+                                            alignItems:
+                                                "center",
+                                            justifyContent:
+                                                "center",
                                         }}
-                                    />
+                                    >
+                                        <Email
+                                            sx={{
+                                                color: "#E76F51",
+                                                fontSize: 20,
+                                            }}
+                                        />
+                                    </Box>
 
                                     <Box>
                                         <Typography
                                             variant="caption"
                                             sx={{
-                                                color: "#9ca3af",
+                                                color: "#9A9188",
                                                 display:
                                                     "block",
                                                 mb: 0.3,
+                                                fontWeight: 700,
                                             }}
                                         >
                                             Email
@@ -461,7 +641,7 @@ const PublicCompanyProfile = () => {
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color: "#374151",
+                                                color: "#4F4943",
                                                 wordBreak:
                                                     "break-word",
                                             }}
@@ -480,21 +660,38 @@ const PublicCompanyProfile = () => {
                                     spacing={1.5}
                                     alignItems="flex-start"
                                 >
-                                    <Phone
+                                    <Box
                                         sx={{
-                                            color: "#2563eb",
-                                            mt: 0.3,
+                                            width: 38,
+                                            height: 38,
+                                            minWidth: 38,
+                                            borderRadius: 2,
+                                            backgroundColor:
+                                                "#EDF4E8",
+                                            display: "flex",
+                                            alignItems:
+                                                "center",
+                                            justifyContent:
+                                                "center",
                                         }}
-                                    />
+                                    >
+                                        <Phone
+                                            sx={{
+                                                color: "#6A994E",
+                                                fontSize: 20,
+                                            }}
+                                        />
+                                    </Box>
 
                                     <Box>
                                         <Typography
                                             variant="caption"
                                             sx={{
-                                                color: "#9ca3af",
+                                                color: "#9A9188",
                                                 display:
                                                     "block",
                                                 mb: 0.3,
+                                                fontWeight: 700,
                                             }}
                                         >
                                             Phone
@@ -503,7 +700,7 @@ const PublicCompanyProfile = () => {
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color: "#374151",
+                                                color: "#4F4943",
                                             }}
                                         >
                                             {company.Phone}
@@ -520,21 +717,38 @@ const PublicCompanyProfile = () => {
                                     spacing={1.5}
                                     alignItems="flex-start"
                                 >
-                                    <LocationOn
+                                    <Box
                                         sx={{
-                                            color: "#2563eb",
-                                            mt: 0.3,
+                                            width: 38,
+                                            height: 38,
+                                            minWidth: 38,
+                                            borderRadius: 2,
+                                            backgroundColor:
+                                                "#FFF1D6",
+                                            display: "flex",
+                                            alignItems:
+                                                "center",
+                                            justifyContent:
+                                                "center",
                                         }}
-                                    />
+                                    >
+                                        <LocationOn
+                                            sx={{
+                                                color: "#E76F51",
+                                                fontSize: 20,
+                                            }}
+                                        />
+                                    </Box>
 
                                     <Box>
                                         <Typography
                                             variant="caption"
                                             sx={{
-                                                color: "#9ca3af",
+                                                color: "#9A9188",
                                                 display:
                                                     "block",
                                                 mb: 0.3,
+                                                fontWeight: 700,
                                             }}
                                         >
                                             Location
@@ -543,12 +757,10 @@ const PublicCompanyProfile = () => {
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color: "#374151",
+                                                color: "#4F4943",
                                             }}
                                         >
-                                            {
-                                                company.Address
-                                            }
+                                            {company.Address}
                                         </Typography>
                                     </Box>
                                 </Stack>
@@ -562,21 +774,42 @@ const PublicCompanyProfile = () => {
                                     spacing={1.5}
                                     alignItems="flex-start"
                                 >
-                                    <Language
+                                    <Box
                                         sx={{
-                                            color: "#2563eb",
-                                            mt: 0.3,
+                                            width: 38,
+                                            height: 38,
+                                            minWidth: 38,
+                                            borderRadius: 2,
+                                            backgroundColor:
+                                                "#EDF4E8",
+                                            display: "flex",
+                                            alignItems:
+                                                "center",
+                                            justifyContent:
+                                                "center",
                                         }}
-                                    />
+                                    >
+                                        <Language
+                                            sx={{
+                                                color: "#6A994E",
+                                                fontSize: 20,
+                                            }}
+                                        />
+                                    </Box>
 
-                                    <Box>
+                                    <Box
+                                        sx={{
+                                            minWidth: 0,
+                                        }}
+                                    >
                                         <Typography
                                             variant="caption"
                                             sx={{
-                                                color: "#9ca3af",
+                                                color: "#9A9188",
                                                 display:
                                                     "block",
                                                 mb: 0.3,
+                                                fontWeight: 700,
                                             }}
                                         >
                                             Website
@@ -594,13 +827,15 @@ const PublicCompanyProfile = () => {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             sx={{
-                                                color: "#2563eb",
+                                                color: "#E76F51",
                                                 fontSize:
                                                     "0.875rem",
+                                                fontWeight: 600,
                                                 textDecoration:
                                                     "none",
                                                 wordBreak:
                                                     "break-word",
+
                                                 "&:hover": {
                                                     textDecoration:
                                                         "underline",
@@ -616,12 +851,18 @@ const PublicCompanyProfile = () => {
                             )}
                         </Stack>
 
-                        <Divider sx={{ my: 3 }} />
+                        <Divider
+                            sx={{
+                                my: 3,
+                                borderColor:
+                                    "#E9DED0",
+                            }}
+                        />
 
                         <Typography
                             variant="body2"
                             sx={{
-                                color: "#9ca3af",
+                                color: "#9A9188",
                                 lineHeight: 1.6,
                             }}
                         >
@@ -629,6 +870,36 @@ const PublicCompanyProfile = () => {
                             the employer.
                         </Typography>
                     </Paper>
+                </Box>
+
+                {/* =====================================================
+                    BOTTOM NOTE
+                ===================================================== */}
+
+                <Box
+                    sx={{
+                        textAlign: "center",
+                        py: 4,
+                    }}
+                >
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: "#9A9188",
+                        }}
+                    >
+                        Explore opportunities from{" "}
+                        <Box
+                            component="span"
+                            sx={{
+                                color: "#E76F51",
+                                fontWeight: 800,
+                            }}
+                        >
+                            {company.CompanyName}
+                        </Box>{" "}
+                        on CareerBridge.
+                    </Typography>
                 </Box>
             </Container>
         </Box>

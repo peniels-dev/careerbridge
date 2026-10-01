@@ -20,7 +20,6 @@ import {
     CameraAlt,
     Dashboard,
     Description,
-    Edit,
     ExitToApp,
     People,
     Save,
@@ -30,9 +29,10 @@ import {
 import axiosAPI from "../api/axiosAPI";
 import { useAuth } from "../context/AuthContext";
 
+
 const CompanyProfile = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const fileInputRef = useRef(null);
 
     const [company, setCompany] = useState(null);
@@ -57,15 +57,16 @@ const CompanyProfile = () => {
 
     const backendURL = "http://localhost:5138";
 
+
     // =====================================================
     // LOGOUT
     // =====================================================
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        logout();
         navigate("/login");
     };
+
 
     // =====================================================
     // LOGO URL
@@ -83,6 +84,7 @@ const CompanyProfile = () => {
         return `${backendURL}${logoPath}`;
     };
 
+
     // =====================================================
     // LOAD COMPANY
     // =====================================================
@@ -93,7 +95,8 @@ const CompanyProfile = () => {
             setError("");
             setSuccess("");
 
-            const response = await axiosAPI.get("/companies/me");
+            const response =
+                await axiosAPI.get("/companies/me");
 
             const data = response.data?.data;
 
@@ -101,26 +104,36 @@ const CompanyProfile = () => {
                 setCompany(data);
 
                 setFormData({
-                    CompanyName: data.CompanyName || "",
+                    CompanyName:
+                        data.CompanyName || "",
                     Email: data.Email || "",
                     Phone: data.Phone || "",
                     Address: data.Address || "",
-                    Description: data.Description || "",
-                    CompanyWebsite: data.CompanyWebsite || "",
+                    Description:
+                        data.Description || "",
+                    CompanyWebsite:
+                        data.CompanyWebsite || "",
                 });
 
                 if (data.CompanyLogo) {
-                    setLogoPreview(getLogoURL(data.CompanyLogo));
+                    setLogoPreview(
+                        getLogoURL(data.CompanyLogo)
+                    );
                 }
             }
         } catch (err) {
-            // 404 simply means this employer has not created
+            // A 404 means the employer has not created
             // a company profile yet.
+
             if (err.response?.status === 404) {
                 setCompany(null);
+
                 setFormData({
                     CompanyName: "",
-                    Email: user?.Email || "",
+                    Email:
+                        user?.Email ||
+                        user?.email ||
+                        "",
                     Phone: "",
                     Address: "",
                     Description: "",
@@ -137,9 +150,11 @@ const CompanyProfile = () => {
         }
     };
 
+
     useEffect(() => {
         fetchCompany();
     }, []);
+
 
     // =====================================================
     // FORM INPUT
@@ -154,6 +169,7 @@ const CompanyProfile = () => {
         }));
     };
 
+
     // =====================================================
     // CREATE / UPDATE COMPANY
     // =====================================================
@@ -165,13 +181,17 @@ const CompanyProfile = () => {
             setSuccess("");
 
             if (!formData.CompanyName.trim()) {
-                setError("Company name is required.");
+                setError(
+                    "Company name is required."
+                );
                 setSaving(false);
                 return;
             }
 
             if (!formData.Email.trim()) {
-                setError("Company email is required.");
+                setError(
+                    "Company email is required."
+                );
                 setSaving(false);
                 return;
             }
@@ -179,38 +199,49 @@ const CompanyProfile = () => {
             let response;
 
             if (company) {
-                // Existing company
                 response = await axiosAPI.put(
                     "/companies/me",
                     formData
                 );
             } else {
-                // New company
                 response = await axiosAPI.post(
                     "/companies/me",
                     formData
                 );
             }
 
-            const updatedCompany = response.data?.data;
+            const updatedCompany =
+                response.data?.data;
 
             if (updatedCompany) {
                 setCompany(updatedCompany);
 
                 setFormData({
-                    CompanyName: updatedCompany.CompanyName || "",
-                    Email: updatedCompany.Email || "",
-                    Phone: updatedCompany.Phone || "",
-                    Address: updatedCompany.Address || "",
+                    CompanyName:
+                        updatedCompany.CompanyName ||
+                        "",
+                    Email:
+                        updatedCompany.Email ||
+                        "",
+                    Phone:
+                        updatedCompany.Phone ||
+                        "",
+                    Address:
+                        updatedCompany.Address ||
+                        "",
                     Description:
-                        updatedCompany.Description || "",
+                        updatedCompany.Description ||
+                        "",
                     CompanyWebsite:
-                        updatedCompany.CompanyWebsite || "",
+                        updatedCompany.CompanyWebsite ||
+                        "",
                 });
 
                 if (updatedCompany.CompanyLogo) {
                     setLogoPreview(
-                        getLogoURL(updatedCompany.CompanyLogo)
+                        getLogoURL(
+                            updatedCompany.CompanyLogo
+                        )
                     );
                 }
             }
@@ -221,7 +252,10 @@ const CompanyProfile = () => {
                     : "Company profile created successfully."
             );
         } catch (err) {
-            console.error("Save company error:", err);
+            console.error(
+                "Save company error:",
+                err
+            );
 
             setError(
                 err.response?.data?.message ||
@@ -232,12 +266,14 @@ const CompanyProfile = () => {
         }
     };
 
+
     // =====================================================
     // LOGO UPLOAD
     // =====================================================
 
     const handleLogoChange = async (event) => {
-        const file = event.target.files?.[0];
+        const file =
+            event.target.files?.[0];
 
         if (!file) {
             return;
@@ -263,54 +299,80 @@ const CompanyProfile = () => {
         }
 
         if (file.size > 2 * 1024 * 1024) {
-            setError("Company logo must be smaller than 2 MB.");
+            setError(
+                "Company logo must be smaller than 2 MB."
+            );
 
             event.target.value = "";
             return;
         }
 
-        // Show preview immediately
-        const previewURL = URL.createObjectURL(file);
+        const previewURL =
+            URL.createObjectURL(file);
+
         setLogoPreview(previewURL);
 
-        const formDataToUpload = new FormData();
+        const formDataToUpload =
+            new FormData();
 
-        formDataToUpload.append("logo", file);
+        formDataToUpload.append(
+            "logo",
+            file
+        );
 
         try {
             setUploadingLogo(true);
 
-            const response = await axiosAPI.post(
-                "/companies/me/logo",
-                formDataToUpload
-            );
+            const response =
+                await axiosAPI.post(
+                    "/companies/me/logo",
+                    formDataToUpload
+                );
 
-            const updatedCompany = response.data?.data;
+            const updatedCompany =
+                response.data?.data;
 
             if (updatedCompany) {
                 setCompany(updatedCompany);
 
                 setFormData({
-                    CompanyName: updatedCompany.CompanyName || "",
-                    Email: updatedCompany.Email || "",
-                    Phone: updatedCompany.Phone || "",
-                    Address: updatedCompany.Address || "",
+                    CompanyName:
+                        updatedCompany.CompanyName ||
+                        "",
+                    Email:
+                        updatedCompany.Email ||
+                        "",
+                    Phone:
+                        updatedCompany.Phone ||
+                        "",
+                    Address:
+                        updatedCompany.Address ||
+                        "",
                     Description:
-                        updatedCompany.Description || "",
+                        updatedCompany.Description ||
+                        "",
                     CompanyWebsite:
-                        updatedCompany.CompanyWebsite || "",
+                        updatedCompany.CompanyWebsite ||
+                        "",
                 });
 
                 if (updatedCompany.CompanyLogo) {
                     setLogoPreview(
-                        getLogoURL(updatedCompany.CompanyLogo)
+                        getLogoURL(
+                            updatedCompany.CompanyLogo
+                        )
                     );
                 }
             }
 
-            setSuccess("Company logo uploaded successfully.");
+            setSuccess(
+                "Company logo uploaded successfully."
+            );
         } catch (err) {
-            console.error("Logo upload error:", err);
+            console.error(
+                "Logo upload error:",
+                err
+            );
 
             setError(
                 err.response?.data?.message ||
@@ -324,6 +386,7 @@ const CompanyProfile = () => {
         }
     };
 
+
     // =====================================================
     // LOADING
     // =====================================================
@@ -336,46 +399,112 @@ const CompanyProfile = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: "#f5f7fb",
+                    backgroundColor:
+                        "#FFF8EF",
                 }}
             >
-                <CircularProgress />
+                <Box
+                    sx={{
+                        textAlign: "center",
+                    }}
+                >
+                    <CircularProgress
+                        sx={{
+                            color: "#E76F51",
+                        }}
+                    />
+
+                    <Typography
+                        sx={{
+                            mt: 2,
+                            color: "#7A7068",
+                        }}
+                    >
+                        Loading company profile...
+                    </Typography>
+                </Box>
             </Box>
         );
     }
 
+
     // =====================================================
-    // SIDEBAR
+    // USER INFO
     // =====================================================
 
-    const sidebarItem = (icon, label, path, active = false) => (
+    const firstName =
+        user?.firstName ||
+        user?.FirstName ||
+        "";
+
+    const lastName =
+        user?.lastName ||
+        user?.LastName ||
+        "";
+
+    const initials =
+        (
+            (firstName.charAt(0) || "") +
+            (lastName.charAt(0) || "")
+        ).toUpperCase() || "E";
+
+
+    // =====================================================
+    // SIDEBAR ITEM
+    // =====================================================
+
+    const sidebarItem = (
+        icon,
+        label,
+        path,
+        active = false
+    ) => (
         <Button
             fullWidth
             onClick={() => navigate(path)}
             startIcon={icon}
             sx={{
-                justifyContent: "flex-start",
+                justifyContent:
+                    "flex-start",
                 textTransform: "none",
-                px: 2,
-                py: 1.4,
-                mb: 0.6,
+                px: 1.5,
+                py: 1.2,
+                mb: 0.5,
                 borderRadius: 2,
                 color: active
                     ? "#ffffff"
-                    : "rgba(255,255,255,0.72)",
+                    : "#B9C0C9",
                 backgroundColor: active
-                    ? "rgba(255,255,255,0.12)"
+                    ? "#E76F51"
                     : "transparent",
+                fontSize: 13,
+                fontWeight: active
+                    ? 700
+                    : 500,
+
                 "&:hover": {
-                    backgroundColor:
-                        "rgba(255,255,255,0.09)",
+                    backgroundColor: active
+                        ? "#E76F51"
+                        : "#3A4658",
                     color: "#ffffff",
+                },
+
+                "@media (max-width: 900px)": {
+                    minWidth: 0,
+                    justifyContent: "center",
+
+                    "& .MuiButton-startIcon": {
+                        margin: 0,
+                    },
+
+                    fontSize: 0,
                 },
             }}
         >
             {label}
         </Button>
     );
+
 
     // =====================================================
     // PAGE
@@ -386,7 +515,7 @@ const CompanyProfile = () => {
             sx={{
                 minHeight: "100vh",
                 display: "flex",
-                backgroundColor: "#f5f7fb",
+                backgroundColor: "#FFF8EF",
             }}
         >
             {/* =================================================
@@ -396,22 +525,27 @@ const CompanyProfile = () => {
             <Box
                 sx={{
                     width: 250,
-                    background:
-                        "linear-gradient(180deg, #111827 0%, #172033 100%)",
+                    backgroundColor: "#293241",
                     color: "#ffffff",
-                    display: {
-                        xs: "none",
-                        md: "flex",
-                    },
+                    display: "flex",
                     flexDirection: "column",
                     p: 2,
                     position: "fixed",
                     left: 0,
                     top: 0,
                     bottom: 0,
+                    zIndex: 10,
+
+                    "@media (max-width: 900px)": {
+                        width: 78,
+                    },
+
+                    "@media (max-width: 600px)": {
+                        display: "none",
+                    },
                 }}
             >
-                {/* Logo */}
+                {/* LOGO */}
 
                 <Box
                     sx={{
@@ -421,6 +555,11 @@ const CompanyProfile = () => {
                         px: 1,
                         py: 2,
                         mb: 2,
+
+                        "@media (max-width: 900px)": {
+                            justifyContent:
+                                "center",
+                        },
                     }}
                 >
                     <Box
@@ -428,19 +567,27 @@ const CompanyProfile = () => {
                             width: 40,
                             height: 40,
                             borderRadius: 2,
-                            background:
-                                "linear-gradient(135deg, #2563eb, #4f46e5)",
+                            backgroundColor:
+                                "#E76F51",
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "center",
+                            justifyContent:
+                                "center",
                             fontWeight: 800,
                             fontSize: 20,
+                            flexShrink: 0,
                         }}
                     >
                         C
                     </Box>
 
-                    <Box>
+                    <Box
+                        sx={{
+                            "@media (max-width: 900px)": {
+                                display: "none",
+                            },
+                        }}
+                    >
                         <Typography
                             fontWeight={800}
                             fontSize={18}
@@ -450,21 +597,35 @@ const CompanyProfile = () => {
 
                         <Typography
                             fontSize={11}
-                            color="rgba(255,255,255,0.55)"
+                            color="#B9C0C9"
                         >
                             Employer Portal
                         </Typography>
                     </Box>
                 </Box>
 
+                <Divider
+                    sx={{
+                        borderColor:
+                            "#3A4658",
+                        mb: 2,
+                    }}
+                />
+
                 <Typography
                     sx={{
-                        fontSize: 11,
-                        textTransform: "uppercase",
+                        fontSize: 10,
+                        textTransform:
+                            "uppercase",
                         letterSpacing: 1,
-                        color: "rgba(255,255,255,0.4)",
+                        fontWeight: 700,
+                        color: "#8993A1",
                         px: 1,
                         mb: 1,
+
+                        "@media (max-width: 900px)": {
+                            display: "none",
+                        },
                     }}
                 >
                     Main Menu
@@ -491,8 +652,28 @@ const CompanyProfile = () => {
                 {sidebarItem(
                     <People />,
                     "Applicants",
-                    "/employer/jobs"
+                    "/employer/applicants"
                 )}
+
+                <Typography
+                    sx={{
+                        fontSize: 10,
+                        textTransform:
+                            "uppercase",
+                        letterSpacing: 1,
+                        fontWeight: 700,
+                        color: "#8993A1",
+                        px: 1,
+                        mt: 3,
+                        mb: 1,
+
+                        "@media (max-width: 900px)": {
+                            display: "none",
+                        },
+                    }}
+                >
+                    Company
+                </Typography>
 
                 {sidebarItem(
                     <Business />,
@@ -501,52 +682,59 @@ const CompanyProfile = () => {
                     true
                 )}
 
-                <Box sx={{ flexGrow: 1 }} />
+                <Box
+                    sx={{
+                        flexGrow: 1,
+                    }}
+                />
 
                 <Divider
                     sx={{
                         borderColor:
-                            "rgba(255,255,255,0.1)",
+                            "#3A4658",
                         mb: 1,
                     }}
                 />
 
-                {sidebarItem(
-                    <ExitToApp />,
-                    "Logout",
-                    "#"
-                )}
+                {/* LOGOUT */}
 
-                {/* Override logout navigation */}
-                <Box
+                <Button
+                    fullWidth
+                    startIcon={<ExitToApp />}
                     onClick={handleLogout}
                     sx={{
-                        position: "absolute",
-                        bottom: 16,
-                        left: 16,
-                        right: 16,
-                        height: 48,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1.5,
-                        px: 2,
+                        justifyContent:
+                            "flex-start",
+                        textTransform: "none",
+                        px: 1.5,
+                        py: 1.2,
                         borderRadius: 2,
-                        color: "rgba(255,255,255,0.72)",
-                        cursor: "pointer",
+                        color: "#B9C0C9",
+                        fontSize: 13,
+
                         "&:hover": {
                             backgroundColor:
-                                "rgba(255,255,255,0.09)",
+                                "#3A4658",
                             color: "#ffffff",
+                        },
+
+                        "@media (max-width: 900px)": {
+                            minWidth: 0,
+                            justifyContent:
+                                "center",
+
+                            "& .MuiButton-startIcon": {
+                                margin: 0,
+                            },
+
+                            fontSize: 0,
                         },
                     }}
                 >
-                    <ExitToApp fontSize="small" />
-
-                    <Typography fontSize={14}>
-                        Logout
-                    </Typography>
-                </Box>
+                    Logout
+                </Button>
             </Box>
+
 
             {/* =================================================
                 MAIN CONTENT
@@ -557,7 +745,13 @@ const CompanyProfile = () => {
                     flex: 1,
                     ml: {
                         xs: 0,
+                        sm: "78px",
                         md: "250px",
+                    },
+                    width: {
+                        xs: "100%",
+                        sm: "calc(100% - 78px)",
+                        md: "calc(100% - 250px)",
                     },
                     p: {
                         xs: 2,
@@ -566,7 +760,7 @@ const CompanyProfile = () => {
                     },
                 }}
             >
-                {/* Header */}
+                {/* HEADER */}
 
                 <Box
                     sx={{
@@ -575,7 +769,8 @@ const CompanyProfile = () => {
                             xs: "flex-start",
                             sm: "center",
                         },
-                        justifyContent: "space-between",
+                        justifyContent:
+                            "space-between",
                         gap: 2,
                         mb: 4,
                         flexDirection: {
@@ -586,46 +781,134 @@ const CompanyProfile = () => {
                 >
                     <Box>
                         <Button
-                            startIcon={<ArrowBack />}
+                            startIcon={
+                                <ArrowBack />
+                            }
                             onClick={() =>
                                 navigate(
                                     "/employer-dashboard"
                                 )
                             }
                             sx={{
-                                textTransform: "none",
+                                textTransform:
+                                    "none",
+                                color: "#7A7068",
                                 mb: 1,
+
+                                "&:hover": {
+                                    backgroundColor:
+                                        "#FFF1D6",
+                                    color: "#E76F51",
+                                },
                             }}
                         >
                             Back to Dashboard
                         </Button>
 
                         <Typography
-                            variant="h4"
-                            fontWeight={800}
-                            color="#111827"
+                            sx={{
+                                fontSize: {
+                                    xs: 27,
+                                    md: 32,
+                                },
+                                fontWeight: 800,
+                                color: "#293241",
+                            }}
                         >
                             Company Profile
                         </Typography>
 
                         <Typography
-                            color="text.secondary"
-                            sx={{ mt: 0.5 }}
+                            sx={{
+                                mt: 0.5,
+                                color: "#7A7068",
+                                fontSize: 14,
+                            }}
                         >
                             {company
                                 ? "Manage your company information and branding."
                                 : "Create your company profile to start posting jobs."}
                         </Typography>
                     </Box>
+
+                    {/* USER */}
+
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems:
+                                "center",
+                            gap: 1.5,
+                            alignSelf: {
+                                xs: "flex-end",
+                                sm: "auto",
+                            },
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                width: 40,
+                                height: 40,
+                                borderRadius:
+                                    "50%",
+                                backgroundColor:
+                                    "#F4A261",
+                                color: "#293241",
+                                display: "flex",
+                                alignItems:
+                                    "center",
+                                justifyContent:
+                                    "center",
+                                fontWeight: 800,
+                                fontSize: 13,
+                            }}
+                        >
+                            {initials}
+                        </Box>
+
+                        <Box
+                            sx={{
+                                "@media (max-width: 600px)": {
+                                    display: "none",
+                                },
+                            }}
+                        >
+                            <Typography
+                                sx={{
+                                    fontSize: 13,
+                                    fontWeight: 700,
+                                    color: "#293241",
+                                }}
+                            >
+                                {firstName ||
+                                    "Employer"}
+                            </Typography>
+
+                            <Typography
+                                sx={{
+                                    fontSize: 11,
+                                    color: "#8B8178",
+                                }}
+                            >
+                                Employer
+                            </Typography>
+                        </Box>
+                    </Box>
                 </Box>
 
-                {/* Alerts */}
 
-                <Stack spacing={2} sx={{ mb: 3 }}>
+                {/* ALERTS */}
+
+                <Stack
+                    spacing={2}
+                    sx={{ mb: 3 }}
+                >
                     {error && (
                         <Alert
                             severity="error"
-                            onClose={() => setError("")}
+                            onClose={() =>
+                                setError("")
+                            }
                         >
                             {error}
                         </Alert>
@@ -643,6 +926,7 @@ const CompanyProfile = () => {
                     )}
                 </Stack>
 
+
                 {/* =================================================
                     PROFILE HEADER
                 ================================================= */}
@@ -650,17 +934,25 @@ const CompanyProfile = () => {
                 <Paper
                     elevation={0}
                     sx={{
-                        borderRadius: 4,
-                        border: "1px solid #e5e7eb",
+                        borderRadius: 3,
+                        border:
+                            "1px solid #E9DED0",
                         overflow: "hidden",
                         mb: 3,
+                        backgroundColor:
+                            "#FFFDF9",
                     }}
                 >
+                    {/* SIMPLE WARM COVER */}
+
                     <Box
                         sx={{
-                            height: 150,
-                            background:
-                                "linear-gradient(135deg, #111827 0%, #2563eb 100%)",
+                            height: {
+                                xs: 110,
+                                sm: 140,
+                            },
+                            backgroundColor:
+                                "#F4A261",
                         }}
                     />
 
@@ -688,28 +980,41 @@ const CompanyProfile = () => {
                                 },
                             }}
                         >
-                            {/* Logo */}
+                            {/* LOGO */}
 
-                            <Box sx={{ position: "relative" }}>
+                            <Box
+                                sx={{
+                                    position:
+                                        "relative",
+                                }}
+                            >
                                 <Avatar
-                                    src={logoPreview}
+                                    src={
+                                        logoPreview
+                                    }
                                     sx={{
                                         width: 110,
                                         height: 110,
-                                        bgcolor: "#ffffff",
-                                        color: "#2563eb",
+                                        bgcolor:
+                                            "#FFFDF9",
+                                        color:
+                                            "#E76F51",
                                         border:
-                                            "5px solid #ffffff",
+                                            "5px solid #FFFDF9",
                                         boxShadow:
-                                            "0 6px 20px rgba(0,0,0,0.15)",
+                                            "0 5px 16px rgba(41,50,65,0.15)",
                                         fontSize: 40,
                                     }}
                                 >
-                                    <Business fontSize="large" />
+                                    <Business
+                                        fontSize="large"
+                                    />
                                 </Avatar>
 
                                 <input
-                                    ref={fileInputRef}
+                                    ref={
+                                        fileInputRef
+                                    }
                                     type="file"
                                     hidden
                                     accept="image/png,image/jpeg,image/jpg,image/webp"
@@ -722,19 +1027,29 @@ const CompanyProfile = () => {
                                     onClick={() =>
                                         fileInputRef.current?.click()
                                     }
-                                    disabled={uploadingLogo}
+                                    disabled={
+                                        uploadingLogo
+                                    }
                                     sx={{
-                                        position: "absolute",
+                                        position:
+                                            "absolute",
                                         bottom: -8,
                                         right: -8,
                                         minWidth: 38,
                                         width: 38,
                                         height: 38,
-                                        borderRadius: "50%",
-                                        bgcolor: "#2563eb",
-                                        color: "#ffffff",
+                                        borderRadius:
+                                            "50%",
+                                        backgroundColor:
+                                            "#E76F51",
+                                        color:
+                                            "#ffffff",
+                                        boxShadow:
+                                            "0 3px 8px rgba(0,0,0,0.15)",
+
                                         "&:hover": {
-                                            bgcolor: "#1d4ed8",
+                                            backgroundColor:
+                                                "#D95F42",
                                         },
                                     }}
                                 >
@@ -742,7 +1057,8 @@ const CompanyProfile = () => {
                                         <CircularProgress
                                             size={18}
                                             sx={{
-                                                color: "#ffffff",
+                                                color:
+                                                    "#ffffff",
                                             }}
                                         />
                                     ) : (
@@ -751,6 +1067,9 @@ const CompanyProfile = () => {
                                 </Button>
                             </Box>
 
+
+                            {/* COMPANY NAME */}
+
                             <Box
                                 sx={{
                                     pb: 1,
@@ -758,16 +1077,25 @@ const CompanyProfile = () => {
                                 }}
                             >
                                 <Typography
-                                    variant="h5"
-                                    fontWeight={800}
+                                    sx={{
+                                        fontSize: {
+                                            xs: 22,
+                                            sm: 26,
+                                        },
+                                        fontWeight: 800,
+                                        color: "#293241",
+                                    }}
                                 >
                                     {company?.CompanyName ||
                                         "Create Your Company Profile"}
                                 </Typography>
 
                                 <Typography
-                                    color="text.secondary"
-                                    sx={{ mt: 0.5 }}
+                                    sx={{
+                                        mt: 0.5,
+                                        color: "#7A7068",
+                                        fontSize: 14,
+                                    }}
                                 >
                                     {company
                                         ? company.Email
@@ -778,6 +1106,7 @@ const CompanyProfile = () => {
                     </Box>
                 </Paper>
 
+
                 {/* =================================================
                     COMPANY INFORMATION
                 ================================================= */}
@@ -785,8 +1114,11 @@ const CompanyProfile = () => {
                 <Paper
                     elevation={0}
                     sx={{
-                        borderRadius: 4,
-                        border: "1px solid #e5e7eb",
+                        borderRadius: 3,
+                        border:
+                            "1px solid #E9DED0",
+                        backgroundColor:
+                            "#FFFDF9",
                         p: {
                             xs: 2,
                             sm: 4,
@@ -795,16 +1127,21 @@ const CompanyProfile = () => {
                 >
                     <Box sx={{ mb: 3 }}>
                         <Typography
-                            variant="h6"
-                            fontWeight={800}
+                            sx={{
+                                fontSize: 20,
+                                fontWeight: 800,
+                                color: "#293241",
+                            }}
                         >
                             Company Information
                         </Typography>
 
                         <Typography
-                            color="text.secondary"
-                            fontSize={14}
-                            sx={{ mt: 0.5 }}
+                            sx={{
+                                color: "#7A7068",
+                                fontSize: 14,
+                                mt: 0.5,
+                            }}
                         >
                             {company
                                 ? "Keep your company information up to date."
@@ -812,7 +1149,14 @@ const CompanyProfile = () => {
                         </Typography>
                     </Box>
 
-                    <Divider sx={{ mb: 3 }} />
+                    <Divider
+                        sx={{
+                            borderColor:
+                                "#E9DED0",
+                            mb: 3,
+                        }}
+                    />
+
 
                     <Box
                         sx={{
@@ -827,55 +1171,85 @@ const CompanyProfile = () => {
                         <TextField
                             label="Company Name"
                             name="CompanyName"
-                            value={formData.CompanyName}
-                            onChange={handleChange}
+                            value={
+                                formData.CompanyName
+                            }
+                            onChange={
+                                handleChange
+                            }
                             fullWidth
                             required
+                            sx={fieldStyles}
                         />
 
                         <TextField
                             label="Company Email"
                             name="Email"
-                            value={formData.Email}
-                            onChange={handleChange}
+                            value={
+                                formData.Email
+                            }
+                            onChange={
+                                handleChange
+                            }
                             fullWidth
                             required
+                            sx={fieldStyles}
                         />
 
                         <TextField
                             label="Phone"
                             name="Phone"
-                            value={formData.Phone}
-                            onChange={handleChange}
+                            value={
+                                formData.Phone
+                            }
+                            onChange={
+                                handleChange
+                            }
                             fullWidth
+                            sx={fieldStyles}
                         />
 
                         <TextField
                             label="Address"
                             name="Address"
-                            value={formData.Address}
-                            onChange={handleChange}
+                            value={
+                                formData.Address
+                            }
+                            onChange={
+                                handleChange
+                            }
                             fullWidth
+                            sx={fieldStyles}
                         />
 
                         <TextField
                             label="Company Website"
                             name="CompanyWebsite"
-                            value={formData.CompanyWebsite}
-                            onChange={handleChange}
+                            value={
+                                formData.CompanyWebsite
+                            }
+                            onChange={
+                                handleChange
+                            }
                             fullWidth
                             placeholder="https://example.com"
+                            sx={fieldStyles}
                         />
 
                         <TextField
                             label="Company Description"
                             name="Description"
-                            value={formData.Description}
-                            onChange={handleChange}
+                            value={
+                                formData.Description
+                            }
+                            onChange={
+                                handleChange
+                            }
                             fullWidth
                             multiline
                             minRows={4}
                             sx={{
+                                ...fieldStyles,
                                 gridColumn: {
                                     xs: "auto",
                                     md: "1 / -1",
@@ -884,12 +1258,14 @@ const CompanyProfile = () => {
                         />
                     </Box>
 
-                    {/* Save */}
+
+                    {/* SAVE */}
 
                     <Box
                         sx={{
                             display: "flex",
-                            justifyContent: "flex-end",
+                            justifyContent:
+                                "flex-end",
                             mt: 4,
                         }}
                     >
@@ -907,18 +1283,28 @@ const CompanyProfile = () => {
                             disabled={saving}
                             sx={{
                                 minWidth: 190,
-                                borderRadius: 2.5,
-                                textTransform: "none",
+                                borderRadius: 2,
+                                textTransform:
+                                    "none",
                                 fontWeight: 700,
                                 py: 1.3,
                                 boxShadow: "none",
+                                backgroundColor:
+                                    "#E76F51",
+
+                                "&:hover": {
+                                    backgroundColor:
+                                        "#D95F42",
+                                    boxShadow: "none",
+                                },
                             }}
                         >
                             {saving ? (
                                 <CircularProgress
                                     size={22}
                                     sx={{
-                                        color: "#ffffff",
+                                        color:
+                                            "#ffffff",
                                     }}
                                 />
                             ) : company ? (
@@ -933,5 +1319,38 @@ const CompanyProfile = () => {
         </Box>
     );
 };
+
+
+// =====================================================
+// FIELD STYLES
+// =====================================================
+
+const fieldStyles = {
+    "& .MuiOutlinedInput-root": {
+        backgroundColor: "#FFFDF9",
+        borderRadius: 2,
+
+        "& fieldset": {
+            borderColor: "#E9DED0",
+        },
+
+        "&:hover fieldset": {
+            borderColor: "#F4A261",
+        },
+
+        "&.Mui-focused fieldset": {
+            borderColor: "#E76F51",
+        },
+    },
+
+    "& .MuiInputLabel-root": {
+        color: "#7A7068",
+    },
+
+    "& .MuiInputLabel-root.Mui-focused": {
+        color: "#E76F51",
+    },
+};
+
 
 export default CompanyProfile;

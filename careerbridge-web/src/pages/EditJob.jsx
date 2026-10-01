@@ -27,6 +27,30 @@ import {
 import axiosAPI from "../api/axiosAPI";
 import { useAuth } from "../context/AuthContext";
 
+
+const fieldStyles = {
+    "& .MuiOutlinedInput-root": {
+        backgroundColor: "#FFFDF9",
+        borderRadius: 2,
+        "& fieldset": {
+            borderColor: "#E9DED0",
+        },
+        "&:hover fieldset": {
+            borderColor: "#F4A261",
+        },
+        "&.Mui-focused fieldset": {
+            borderColor: "#E76F51",
+        },
+    },
+    "& .MuiInputLabel-root": {
+        color: "#7A7068",
+    },
+    "& .MuiInputLabel-root.Mui-focused": {
+        color: "#E76F51",
+    },
+};
+
+
 const EditJob = () => {
     const navigate = useNavigate();
     const { id } = useParams();
@@ -35,7 +59,6 @@ const EditJob = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
@@ -48,10 +71,12 @@ const EditJob = () => {
         applicationDeadline: "",
     });
 
+
     useEffect(() => {
         loadJob();
         loadCategories();
     }, [id]);
+
 
     const loadJob = async () => {
         try {
@@ -59,7 +84,6 @@ const EditJob = () => {
             setError("");
 
             const response = await axiosAPI.get(`/jobs/${id}`);
-
             const job = response.data.data;
 
             setFormData({
@@ -86,6 +110,7 @@ const EditJob = () => {
         }
     };
 
+
     const loadCategories = async () => {
         try {
             const response = await axiosAPI.get("/categories");
@@ -99,6 +124,7 @@ const EditJob = () => {
         }
     };
 
+
     const handleChange = (event) => {
         const { name, value } = event.target;
 
@@ -107,6 +133,7 @@ const EditJob = () => {
             [name]: value,
         }));
     };
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -192,10 +219,12 @@ const EditJob = () => {
         }
     };
 
+
     const handleLogout = () => {
         logout();
         navigate("/login");
     };
+
 
     if (loading) {
         return (
@@ -205,16 +234,20 @@ const EditJob = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: "#f6f8fb",
+                    backgroundColor: "#FFF8EF",
                 }}
             >
                 <Box sx={{ textAlign: "center" }}>
-                    <CircularProgress />
+                    <CircularProgress
+                        sx={{
+                            color: "#E76F51",
+                        }}
+                    />
 
                     <Typography
                         sx={{
                             mt: 2,
-                            color: "#667085",
+                            color: "#7A7068",
                         }}
                     >
                         Loading job details...
@@ -224,20 +257,39 @@ const EditJob = () => {
         );
     }
 
+
+    const firstName =
+        user?.firstName ||
+        user?.FirstName ||
+        "";
+
+    const lastName =
+        user?.lastName ||
+        user?.LastName ||
+        "";
+
+    const initials =
+        (
+            (firstName.charAt(0) || "") +
+            (lastName.charAt(0) || "")
+        ).toUpperCase() || "E";
+
+
     return (
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f6f8fb",
+                backgroundColor: "#FFF8EF",
                 display: "flex",
             }}
         >
             {/* SIDEBAR */}
+
             <Box
                 sx={{
                     width: 250,
                     minHeight: "100vh",
-                    backgroundColor: "#111827",
+                    backgroundColor: "#293241",
                     color: "#fff",
                     position: "fixed",
                     left: 0,
@@ -245,8 +297,19 @@ const EditJob = () => {
                     bottom: 0,
                     display: "flex",
                     flexDirection: "column",
+                    zIndex: 10,
+
+                    "@media (max-width: 900px)": {
+                        width: 78,
+                    },
+
+                    "@media (max-width: 600px)": {
+                        display: "none",
+                    },
                 }}
             >
+                {/* LOGO */}
+
                 <Box
                     sx={{
                         px: 3,
@@ -254,6 +317,11 @@ const EditJob = () => {
                         display: "flex",
                         alignItems: "center",
                         gap: 1.5,
+
+                        "@media (max-width: 900px)": {
+                            justifyContent: "center",
+                            px: 1,
+                        },
                     }}
                 >
                     <Box
@@ -261,22 +329,30 @@ const EditJob = () => {
                             width: 38,
                             height: 38,
                             borderRadius: 2,
-                            backgroundColor: "#2563eb",
+                            backgroundColor: "#E76F51",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: 800,
                             fontSize: 18,
+                            flexShrink: 0,
                         }}
                     >
                         C
                     </Box>
 
-                    <Box>
+                    <Box
+                        sx={{
+                            "@media (max-width: 900px)": {
+                                display: "none",
+                            },
+                        }}
+                    >
                         <Typography
                             sx={{
                                 fontWeight: 800,
                                 fontSize: 18,
+                                color: "#fff",
                             }}
                         >
                             CareerBridge
@@ -285,7 +361,7 @@ const EditJob = () => {
                         <Typography
                             sx={{
                                 fontSize: 11,
-                                color: "#9ca3af",
+                                color: "#B9C0C9",
                             }}
                         >
                             Employer Portal
@@ -295,20 +371,31 @@ const EditJob = () => {
 
                 <Divider
                     sx={{
-                        borderColor: "#273142",
+                        borderColor: "#3A4658",
                         mx: 2,
                     }}
                 />
 
-                <Box sx={{ px: 2, mt: 3 }}>
+                {/* MENU */}
+
+                <Box
+                    sx={{
+                        px: 2,
+                        mt: 3,
+                    }}
+                >
                     <Typography
                         sx={{
                             fontSize: 10,
                             fontWeight: 700,
-                            color: "#6b7280",
+                            color: "#8993A1",
                             letterSpacing: 1,
                             px: 1.5,
                             mb: 1,
+
+                            "@media (max-width: 900px)": {
+                                display: "none",
+                            },
                         }}
                     >
                         MAIN MENU
@@ -350,7 +437,7 @@ const EditJob = () => {
                         text="Applicants"
                         onClick={() =>
                             navigate(
-                                "/employer/jobs"
+                                "/employer/applicants"
                             )
                         }
                     />
@@ -359,11 +446,15 @@ const EditJob = () => {
                         sx={{
                             fontSize: 10,
                             fontWeight: 700,
-                            color: "#6b7280",
+                            color: "#8993A1",
                             letterSpacing: 1,
                             px: 1.5,
                             mt: 4,
                             mb: 1,
+
+                            "@media (max-width: 900px)": {
+                                display: "none",
+                            },
                         }}
                     >
                         COMPANY
@@ -382,7 +473,14 @@ const EditJob = () => {
 
                 <Box sx={{ flexGrow: 1 }} />
 
-                <Box sx={{ px: 2, pb: 2 }}>
+                {/* LOGOUT */}
+
+                <Box
+                    sx={{
+                        px: 2,
+                        pb: 2,
+                    }}
+                >
                     <Button
                         fullWidth
                         startIcon={<Logout />}
@@ -390,15 +488,26 @@ const EditJob = () => {
                         sx={{
                             justifyContent:
                                 "flex-start",
-                            color: "#9ca3af",
-                            textTransform:
-                                "none",
+                            color: "#B9C0C9",
+                            textTransform: "none",
                             borderRadius: 2,
                             px: 1.5,
                             py: 1.2,
+
+                            "@media (max-width: 900px)": {
+                                minWidth: 0,
+                                justifyContent: "center",
+
+                                "& .MuiButton-startIcon": {
+                                    margin: 0,
+                                },
+
+                                fontSize: 0,
+                            },
+
                             "&:hover": {
                                 backgroundColor:
-                                    "#1f2937",
+                                    "#3A4658",
                                 color: "#fff",
                             },
                         }}
@@ -408,35 +517,63 @@ const EditJob = () => {
                 </Box>
             </Box>
 
+
             {/* MAIN CONTENT */}
+
             <Box
                 sx={{
                     marginLeft: "250px",
                     width: "calc(100% - 250px)",
+
+                    "@media (max-width: 900px)": {
+                        marginLeft: "78px",
+                        width: "calc(100% - 78px)",
+                    },
+
+                    "@media (max-width: 600px)": {
+                        marginLeft: 0,
+                        width: "100%",
+                    },
                 }}
             >
                 {/* TOP BAR */}
+
                 <Box
                     sx={{
                         height: 72,
-                        backgroundColor: "#fff",
+                        backgroundColor: "#FFFDF9",
                         borderBottom:
-                            "1px solid #e5e7eb",
+                            "1px solid #E9DED0",
                         display: "flex",
                         alignItems: "center",
                         justifyContent:
                             "space-between",
-                        px: { xs: 3, md: 5 },
+                        px: {
+                            xs: 3,
+                            md: 5,
+                        },
                     }}
                 >
-                    <Typography
-                        sx={{
-                            fontSize: 14,
-                            color: "#667085",
-                        }}
-                    >
-                        Edit Job Posting
-                    </Typography>
+                    <Box>
+                        <Typography
+                            sx={{
+                                fontSize: 13,
+                                color: "#7A7068",
+                            }}
+                        >
+                            Employer Portal
+                        </Typography>
+
+                        <Typography
+                            sx={{
+                                fontSize: 15,
+                                fontWeight: 700,
+                                color: "#293241",
+                            }}
+                        >
+                            Edit Job Posting
+                        </Typography>
+                    </Box>
 
                     <Box
                         sx={{
@@ -447,47 +584,45 @@ const EditJob = () => {
                     >
                         <Box
                             sx={{
-                                width: 36,
-                                height: 36,
+                                width: 38,
+                                height: 38,
                                 borderRadius: "50%",
                                 backgroundColor:
-                                    "#2563eb",
-                                color: "#fff",
+                                    "#F4A261",
+                                color: "#293241",
                                 display: "flex",
-                                alignItems:
-                                    "center",
+                                alignItems: "center",
                                 justifyContent:
                                     "center",
-                                fontWeight: 700,
+                                fontWeight: 800,
                                 fontSize: 13,
                             }}
                         >
-                            {(
-                                (user?.firstName?.charAt(
-                                    0
-                                ) || "") +
-                                (user?.lastName?.charAt(
-                                    0
-                                ) || "")
-                            ).toUpperCase() ||
-                                "E"}
+                            {initials}
                         </Box>
 
-                        <Box>
+                        <Box
+                            sx={{
+                                "@media (max-width: 600px)": {
+                                    display: "none",
+                                },
+                            }}
+                        >
                             <Typography
                                 sx={{
                                     fontSize: 13,
                                     fontWeight: 700,
+                                    color: "#293241",
                                 }}
                             >
-                                {user?.firstName ||
+                                {firstName ||
                                     "Employer"}
                             </Typography>
 
                             <Typography
                                 sx={{
                                     fontSize: 11,
-                                    color: "#98a2b3",
+                                    color: "#8B8178",
                                 }}
                             >
                                 Employer
@@ -496,18 +631,23 @@ const EditJob = () => {
                     </Box>
                 </Box>
 
-                {/* CONTENT */}
+
+                {/* PAGE CONTENT */}
+
                 <Box
                     sx={{
                         px: {
-                            xs: 3,
+                            xs: 2,
+                            sm: 3,
                             md: 5,
                         },
                         py: 4,
-                        maxWidth: 1000,
+                        maxWidth: 1050,
                         margin: "0 auto",
                     }}
                 >
+                    {/* BACK BUTTON */}
+
                     <Button
                         startIcon={<ArrowBack />}
                         onClick={() =>
@@ -516,20 +656,32 @@ const EditJob = () => {
                             )
                         }
                         sx={{
-                            textTransform:
-                                "none",
-                            color: "#667085",
-                            mb: 3,
+                            textTransform: "none",
+                            color: "#7A7068",
+                            mb: 2.5,
+                            fontWeight: 600,
+
+                            "&:hover": {
+                                backgroundColor:
+                                    "#FFF1D6",
+                                color: "#E76F51",
+                            },
                         }}
                     >
                         Back to Job Details
                     </Button>
 
+
+                    {/* TITLE */}
+
                     <Typography
                         sx={{
-                            fontSize: 30,
+                            fontSize: {
+                                xs: 26,
+                                md: 32,
+                            },
                             fontWeight: 800,
-                            color: "#101828",
+                            color: "#293241",
                         }}
                     >
                         Edit Job Posting
@@ -539,13 +691,16 @@ const EditJob = () => {
                         sx={{
                             mt: 1,
                             mb: 4,
-                            color: "#667085",
+                            color: "#7A7068",
                             fontSize: 14,
                         }}
                     >
-                        Update the information for
-                        this job posting.
+                        Update the information
+                        applicants will see.
                     </Typography>
+
+
+                    {/* ALERTS */}
 
                     {error && (
                         <Alert
@@ -571,22 +726,39 @@ const EditJob = () => {
                         </Alert>
                     )}
 
+
+                    {/* FORM */}
+
                     <Paper
                         elevation={0}
                         sx={{
                             borderRadius: 3,
                             border:
-                                "1px solid #e5e7eb",
-                            backgroundColor: "#fff",
+                                "1px solid #E9DED0",
+                            backgroundColor:
+                                "#FFFDF9",
                             overflow: "hidden",
                         }}
                     >
-                        <Box sx={{ p: 4 }}>
+                        {/* FORM HEADER */}
+
+                        <Box
+                            sx={{
+                                p: {
+                                    xs: 2.5,
+                                    sm: 4,
+                                },
+                                backgroundColor:
+                                    "#FFF1D6",
+                                borderBottom:
+                                    "1px solid #E9DED0",
+                            }}
+                        >
                             <Typography
                                 sx={{
-                                    fontSize: 18,
+                                    fontSize: 19,
                                     fontWeight: 800,
-                                    mb: 1,
+                                    color: "#293241",
                                 }}
                             >
                                 Job Information
@@ -595,22 +767,32 @@ const EditJob = () => {
                             <Typography
                                 sx={{
                                     fontSize: 13,
-                                    color: "#667085",
-                                    mb: 3,
+                                    color: "#7A7068",
+                                    mt: 0.5,
                                 }}
                             >
                                 Update the details
                                 applicants will see.
                             </Typography>
+                        </Box>
 
-                            <Divider sx={{ mb: 3 }} />
 
+                        <Box
+                            sx={{
+                                p: {
+                                    xs: 2.5,
+                                    sm: 4,
+                                },
+                            }}
+                        >
                             <Box
                                 component="form"
                                 onSubmit={
                                     handleSubmit
                                 }
                             >
+                                {/* JOB TITLE */}
+
                                 <TextField
                                     fullWidth
                                     label="Job Title"
@@ -622,8 +804,14 @@ const EditJob = () => {
                                         handleChange
                                     }
                                     required
-                                    sx={{ mb: 3 }}
+                                    sx={{
+                                        ...fieldStyles,
+                                        mb: 3,
+                                    }}
                                 />
+
+
+                                {/* CATEGORY */}
 
                                 <TextField
                                     fullWidth
@@ -631,18 +819,40 @@ const EditJob = () => {
                                     label="Job Category"
                                     name="categoryId"
                                     value={
-                                        formData.categoryId
+                                        categories.some(
+                                            (category) =>
+                                                Number(
+                                                    category.CategoryID
+                                                ) ===
+                                                Number(
+                                                    formData.categoryId
+                                                )
+                                        )
+                                            ? formData.categoryId
+                                            : ""
                                     }
                                     onChange={
                                         handleChange
                                     }
-                                    required
-                                    sx={{ mb: 3 }}
+                                    disabled={
+                                        saving ||
+                                        categories.length ===
+                                            0
+                                    }
+                                    sx={{
+                                        ...fieldStyles,
+                                        mb: 3,
+                                    }}
                                 >
+                                    <MenuItem value="">
+                                        {categories.length ===
+                                        0
+                                            ? "Loading categories..."
+                                            : "Select a category"}
+                                    </MenuItem>
+
                                     {categories.map(
-                                        (
-                                            category
-                                        ) => (
+                                        (category) => (
                                             <MenuItem
                                                 key={
                                                     category.CategoryID
@@ -659,6 +869,9 @@ const EditJob = () => {
                                     )}
                                 </TextField>
 
+
+                                {/* JOB TYPE */}
+
                                 <TextField
                                     fullWidth
                                     select
@@ -671,7 +884,10 @@ const EditJob = () => {
                                         handleChange
                                     }
                                     required
-                                    sx={{ mb: 3 }}
+                                    sx={{
+                                        ...fieldStyles,
+                                        mb: 3,
+                                    }}
                                 >
                                     <MenuItem value="Full-Time">
                                         Full-Time
@@ -694,6 +910,9 @@ const EditJob = () => {
                                     </MenuItem>
                                 </TextField>
 
+
+                                {/* LOCATION */}
+
                                 <TextField
                                     fullWidth
                                     label="Location"
@@ -705,8 +924,14 @@ const EditJob = () => {
                                         handleChange
                                     }
                                     required
-                                    sx={{ mb: 3 }}
+                                    sx={{
+                                        ...fieldStyles,
+                                        mb: 3,
+                                    }}
                                 />
+
+
+                                {/* DEADLINE */}
 
                                 <TextField
                                     fullWidth
@@ -723,8 +948,14 @@ const EditJob = () => {
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
-                                    sx={{ mb: 3 }}
+                                    sx={{
+                                        ...fieldStyles,
+                                        mb: 3,
+                                    }}
                                 />
+
+
+                                {/* DESCRIPTION */}
 
                                 <TextField
                                     fullWidth
@@ -739,16 +970,22 @@ const EditJob = () => {
                                         handleChange
                                     }
                                     required
-                                    sx={{ mb: 4 }}
+                                    sx={{
+                                        ...fieldStyles,
+                                        mb: 4,
+                                    }}
                                 />
+
+
+                                {/* BUTTONS */}
 
                                 <Box
                                     sx={{
-                                        display:
-                                            "flex",
+                                        display: "flex",
                                         justifyContent:
                                             "flex-end",
                                         gap: 2,
+                                        flexWrap: "wrap",
                                     }}
                                 >
                                     <Button
@@ -764,9 +1001,18 @@ const EditJob = () => {
                                         sx={{
                                             textTransform:
                                                 "none",
-                                            borderRadius:
-                                                2,
+                                            borderRadius: 2,
                                             px: 3,
+                                            color: "#7A7068",
+                                            borderColor:
+                                                "#D8CABC",
+
+                                            "&:hover": {
+                                                borderColor:
+                                                    "#E76F51",
+                                                backgroundColor:
+                                                    "#FFF1D6",
+                                            },
                                         }}
                                     >
                                         Cancel
@@ -778,9 +1024,7 @@ const EditJob = () => {
                                         startIcon={
                                             saving ? (
                                                 <CircularProgress
-                                                    size={
-                                                        18
-                                                    }
+                                                    size={18}
                                                     color="inherit"
                                                 />
                                             ) : (
@@ -793,11 +1037,16 @@ const EditJob = () => {
                                         sx={{
                                             textTransform:
                                                 "none",
-                                            borderRadius:
-                                                2,
+                                            borderRadius: 2,
                                             px: 3,
-                                            fontWeight:
-                                                700,
+                                            fontWeight: 700,
+                                            backgroundColor:
+                                                "#E76F51",
+
+                                            "&:hover": {
+                                                backgroundColor:
+                                                    "#D95F42",
+                                            },
                                         }}
                                     >
                                         {saving
@@ -814,6 +1063,7 @@ const EditJob = () => {
     );
 };
 
+
 const SidebarItem = ({
     icon,
     text,
@@ -826,14 +1076,13 @@ const SidebarItem = ({
             startIcon={icon}
             onClick={onClick}
             sx={{
-                justifyContent:
-                    "flex-start",
+                justifyContent: "flex-start",
                 textTransform: "none",
                 color: active
                     ? "#fff"
-                    : "#9ca3af",
+                    : "#B9C0C9",
                 backgroundColor: active
-                    ? "#1d4ed8"
+                    ? "#E76F51"
                     : "transparent",
                 borderRadius: 2,
                 px: 1.5,
@@ -843,11 +1092,22 @@ const SidebarItem = ({
                 fontWeight: active
                     ? 700
                     : 500,
+
+                "@media (max-width: 900px)": {
+                    minWidth: 0,
+                    justifyContent: "center",
+
+                    "& .MuiButton-startIcon": {
+                        margin: 0,
+                    },
+
+                    fontSize: 0,
+                },
+
                 "&:hover": {
-                    backgroundColor:
-                        active
-                            ? "#1d4ed8"
-                            : "#1f2937",
+                    backgroundColor: active
+                        ? "#E76F51"
+                        : "#3A4658",
                     color: "#fff",
                 },
             }}
@@ -856,5 +1116,6 @@ const SidebarItem = ({
         </Button>
     );
 };
+
 
 export default EditJob;

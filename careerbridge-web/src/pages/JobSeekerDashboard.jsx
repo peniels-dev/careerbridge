@@ -27,6 +27,7 @@ import {
     ArrowForward,
     BookmarkBorder,
     Menu as MenuIcon,
+    LocationOn,
 } from "@mui/icons-material";
 
 import { useAuth } from "../context/AuthContext";
@@ -40,10 +41,8 @@ const Dashboard = () => {
     const [applicationCount, setApplicationCount] = useState(0);
     const [shortlistedCount, setShortlistedCount] = useState(0);
     const [cvCount, setCvCount] = useState(0);
-
     const [loadingStats, setLoadingStats] = useState(true);
     const [statsError, setStatsError] = useState("");
-
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
 
@@ -63,7 +62,6 @@ const Dashboard = () => {
     const handleLogout = () => {
         setProfileMenuAnchor(null);
         setMobileMenuOpen(false);
-
         logout();
         navigate("/login");
     };
@@ -103,8 +101,7 @@ const Dashboard = () => {
                     "fulfilled"
                 ) {
                     const applications =
-                        applicationsResult.value.data?.data ||
-                        [];
+                        applicationsResult.value.data?.data || [];
 
                     setApplicationCount(
                         Array.isArray(applications)
@@ -144,8 +141,7 @@ const Dashboard = () => {
                     "fulfilled"
                 ) {
                     const cvs =
-                        cvsResult.value.data?.data ||
-                        [];
+                        cvsResult.value.data?.data || [];
 
                     setCvCount(
                         Array.isArray(cvs)
@@ -204,7 +200,7 @@ const Dashboard = () => {
         <Box
             sx={{
                 minHeight: "100vh",
-                backgroundColor: "#f8fafc",
+                backgroundColor: "#FFF8EF",
                 display: "flex",
                 overflowX: "hidden",
             }}
@@ -217,7 +213,7 @@ const Dashboard = () => {
                 sx={{
                     width: 250,
                     flexShrink: 0,
-                    backgroundColor: "#111827",
+                    backgroundColor: "#293241",
                     color: "white",
                     display: {
                         xs: "none",
@@ -249,19 +245,20 @@ const Dashboard = () => {
                         }}
                     >
                         Career
-                        <span
-                            style={{
-                                color: "#60a5fa",
+                        <Box
+                            component="span"
+                            sx={{
+                                color: "#F4A261",
                             }}
                         >
                             Bridge
-                        </span>
+                        </Box>
                     </Typography>
 
                     <Typography
                         variant="body2"
                         sx={{
-                            color: "#9ca3af",
+                            color: "#C8CED6",
                             mt: 0.5,
                         }}
                     >
@@ -332,7 +329,7 @@ const Dashboard = () => {
                         p: 2,
                         borderRadius: 2,
                         backgroundColor:
-                            "rgba(255,255,255,0.05)",
+                            "rgba(255,255,255,0.06)",
                     }}
                 >
                     <Box
@@ -347,7 +344,7 @@ const Dashboard = () => {
                                 width: 38,
                                 height: 38,
                                 backgroundColor:
-                                    "#2563eb",
+                                    "#E76F51",
                                 fontWeight: 700,
                                 fontSize: 15,
                                 flexShrink: 0,
@@ -378,7 +375,7 @@ const Dashboard = () => {
 
                             <Typography
                                 sx={{
-                                    color: "#9ca3af",
+                                    color: "#C8CED6",
                                     fontSize: 11,
                                 }}
                             >
@@ -404,7 +401,7 @@ const Dashboard = () => {
                         sx={{
                             justifyContent:
                                 "flex-start",
-                            color: "#d1d5db",
+                            color: "#D7DCE2",
                             textTransform: "none",
                             px: 2,
                             py: 1.2,
@@ -436,7 +433,7 @@ const Dashboard = () => {
                         sx: {
                             width: 260,
                             backgroundColor:
-                                "#111827",
+                                "#293241",
                             color: "white",
                         },
                     },
@@ -459,19 +456,20 @@ const Dashboard = () => {
                         }}
                     >
                         Career
-                        <span
-                            style={{
-                                color: "#60a5fa",
+                        <Box
+                            component="span"
+                            sx={{
+                                color: "#F4A261",
                             }}
                         >
                             Bridge
-                        </span>
+                        </Box>
                     </Typography>
 
                     <Typography
                         variant="body2"
                         sx={{
-                            color: "#9ca3af",
+                            color: "#C8CED6",
                             mt: 0.5,
                         }}
                     >
@@ -557,7 +555,7 @@ const Dashboard = () => {
                         sx={{
                             justifyContent:
                                 "flex-start",
-                            color: "#d1d5db",
+                            color: "#D7DCE2",
                             textTransform: "none",
                             px: 2,
                             py: 1.2,
@@ -592,9 +590,10 @@ const Dashboard = () => {
 
                 <Box
                     sx={{
-                        backgroundColor: "white",
+                        backgroundColor:
+                            "#FFFDF9",
                         borderBottom:
-                            "1px solid #e5e7eb",
+                            "1px solid #E9DED0",
                         px: {
                             xs: 2,
                             sm: 3,
@@ -611,18 +610,20 @@ const Dashboard = () => {
                         zIndex: 900,
                     }}
                 >
-                    {/* MOBILE MENU BUTTON */}
+                    {/* MOBILE MENU */}
 
                     <IconButton
                         onClick={() =>
-                            setMobileMenuOpen(true)
+                            setMobileMenuOpen(
+                                true
+                            )
                         }
                         sx={{
                             display: {
                                 xs: "flex",
                                 md: "none",
                             },
-                            color: "#111827",
+                            color: "#293241",
                         }}
                     >
                         <MenuIcon />
@@ -649,13 +650,14 @@ const Dashboard = () => {
                                 )
                             }
                             sx={{
-                                textTransform: "none",
-                                color: "#111827",
+                                textTransform:
+                                    "none",
+                                color: "#293241",
                                 p: 0.5,
                                 borderRadius: 2,
                                 "&:hover": {
                                     backgroundColor:
-                                        "#f3f4f6",
+                                        "#FFF1D6",
                                 },
                             }}
                         >
@@ -689,7 +691,7 @@ const Dashboard = () => {
                                     <Typography
                                         sx={{
                                             color:
-                                                "#6b7280",
+                                                "#7A7068",
                                             fontSize: 11,
                                         }}
                                     >
@@ -702,7 +704,7 @@ const Dashboard = () => {
                                         width: 40,
                                         height: 40,
                                         backgroundColor:
-                                            "#2563eb",
+                                            "#E76F51",
                                         fontWeight: 700,
                                     }}
                                 >
@@ -763,7 +765,9 @@ const Dashboard = () => {
                     </Box>
                 </Box>
 
-                {/* PAGE CONTENT */}
+                {/* =====================================================
+                    PAGE CONTENT
+                ===================================================== */}
 
                 <Box
                     sx={{
@@ -782,69 +786,88 @@ const Dashboard = () => {
                         },
                     }}
                 >
-                    {/* WELCOME */}
+                    {/* =================================================
+                        WELCOME
+                    ================================================= */}
 
-                    <Box sx={{ mb: 3.5 }}>
+                    <Box
+                        sx={{
+                            mb: 4,
+                        }}
+                    >
                         <Typography
                             sx={{
                                 fontSize: {
-                                    xs: 25,
-                                    sm: 30,
-                                    md: 34,
+                                    xs: 27,
+                                    sm: 32,
+                                    md: 38,
                                 },
-                                fontWeight: 800,
-                                color: "#111827",
+                                fontWeight: 900,
+                                color: "#293241",
                                 letterSpacing:
-                                    "-0.6px",
+                                    "-1px",
+                                lineHeight: 1.15,
                             }}
                         >
-                            Welcome back, {firstName}! 👋
+                            Welcome back,{" "}
+                            <Box
+                                component="span"
+                                sx={{
+                                    color: "#E76F51",
+                                }}
+                            >
+                                {firstName}!
+                            </Box>{" "}
+                            👋
                         </Typography>
 
                         <Typography
                             sx={{
-                                color: "#6b7280",
-                                mt: 1,
-                                maxWidth: 700,
+                                color: "#6F665F",
+                                mt: 1.2,
+                                maxWidth: 680,
                                 fontSize: {
-                                    xs: 13,
+                                    xs: 14,
                                     sm: 15,
                                 },
-                                lineHeight: 1.6,
+                                lineHeight: 1.7,
                             }}
                         >
                             Keep track of your
                             applications, discover
                             new opportunities, and
-                            build your career with
-                            CareerBridge.
+                            stay ready for your next
+                            career move.
                         </Typography>
                     </Box>
 
-                    {/* FIND JOBS BANNER */}
+                    {/* =================================================
+                        FIND JOBS BANNER
+                    ================================================= */}
 
                     <Card
                         elevation={0}
                         sx={{
-                            mb: 4,
+                            mb: 4.5,
                             borderRadius: 3,
-                            background:
-                                "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
+                            backgroundColor:
+                                "#293241",
                             color: "white",
                             overflow: "hidden",
+                            position: "relative",
                         }}
                     >
                         <CardContent
                             sx={{
                                 p: {
-                                    xs: 2.5,
-                                    sm: 3,
+                                    xs: 2.8,
+                                    sm: 3.5,
                                     md: 4,
                                 },
                                 "&:last-child": {
                                     pb: {
-                                        xs: 2.5,
-                                        sm: 3,
+                                        xs: 2.8,
+                                        sm: 3.5,
                                         md: 4,
                                     },
                                 },
@@ -873,35 +896,54 @@ const Dashboard = () => {
                                 >
                                     <Typography
                                         sx={{
+                                            color:
+                                                "#F4A261",
+                                            fontSize: 12,
+                                            fontWeight: 800,
+                                            letterSpacing:
+                                                "1.5px",
+                                            textTransform:
+                                                "uppercase",
+                                            mb: 1,
+                                        }}
+                                    >
+                                        Your next step
+                                    </Typography>
+
+                                    <Typography
+                                        sx={{
                                             fontSize: {
-                                                xs: 20,
-                                                sm: 24,
+                                                xs: 22,
+                                                sm: 27,
                                             },
                                             fontWeight: 800,
                                             mb: 1,
                                         }}
                                     >
-                                        Find your next
+                                        Find an
                                         opportunity
+                                        that fits you.
                                     </Typography>
 
                                     <Typography
                                         sx={{
                                             color:
-                                                "rgba(255,255,255,0.82)",
+                                                "#D8DDE3",
                                             fontSize: {
                                                 xs: 13,
                                                 sm: 14,
                                             },
-                                            lineHeight: 1.6,
+                                            lineHeight: 1.7,
                                             maxWidth: 650,
                                         }}
                                     >
-                                        Explore available
-                                        jobs and
-                                        internships that
-                                        match your career
-                                        goals.
+                                        Browse jobs and
+                                        internships,
+                                        filter by what
+                                        you want, and
+                                        take the next
+                                        step in your
+                                        search.
                                     </Typography>
                                 </Box>
 
@@ -917,8 +959,8 @@ const Dashboard = () => {
                                     }
                                     sx={{
                                         backgroundColor:
-                                            "white",
-                                        color: "#1d4ed8",
+                                            "#E76F51",
+                                        color: "white",
                                         fontWeight: 700,
                                         textTransform:
                                             "none",
@@ -928,9 +970,13 @@ const Dashboard = () => {
                                         minHeight: 44,
                                         whiteSpace:
                                             "nowrap",
+                                        boxShadow:
+                                            "none",
                                         "&:hover": {
                                             backgroundColor:
-                                                "#eff6ff",
+                                                "#D85F43",
+                                            boxShadow:
+                                                "none",
                                         },
                                     }}
                                 >
@@ -940,7 +986,9 @@ const Dashboard = () => {
                         </CardContent>
                     </Card>
 
-                    {/* ERROR */}
+                    {/* =================================================
+                        ERROR
+                    ================================================= */}
 
                     {statsError && (
                         <Alert
@@ -957,199 +1005,246 @@ const Dashboard = () => {
                         </Alert>
                     )}
 
-                    {/* STATISTICS */}
-
-                    <Typography
-                        sx={{
-                            fontSize: {
-                                xs: 18,
-                                sm: 20,
-                            },
-                            fontWeight: 800,
-                            color: "#111827",
-                            mb: 2,
-                        }}
-                    >
-                        Your Activity
-                    </Typography>
-
-                    {loadingStats ? (
-                        <Box
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: {
-                                    xs: "1fr",
-                                    sm: "repeat(2, 1fr)",
-                                    lg: "repeat(3, 1fr)",
-                                },
-                                gap: 2,
-                                mb: 5,
-                            }}
-                        >
-                            {[1, 2, 3].map(
-                                (item) => (
-                                    <Card
-                                        key={item}
-                                        elevation={0}
-                                        sx={{
-                                            borderRadius: 3,
-                                            border:
-                                                "1px solid #e5e7eb",
-                                        }}
-                                    >
-                                        <CardContent
-                                            sx={{
-                                                p: {
-                                                    xs: 2.5,
-                                                    sm: 3,
-                                                },
-                                            }}
-                                        >
-                                            <Skeleton
-                                                variant="text"
-                                                width="40%"
-                                                height={20}
-                                            />
-
-                                            <Skeleton
-                                                variant="text"
-                                                width="25%"
-                                                height={45}
-                                            />
-
-                                            <Skeleton
-                                                variant="text"
-                                                width="75%"
-                                                height={20}
-                                            />
-                                        </CardContent>
-                                    </Card>
-                                )
-                            )}
-                        </Box>
-                    ) : (
-                        <Box
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: {
-                                    xs: "1fr",
-                                    sm: "repeat(2, 1fr)",
-                                    lg: "repeat(3, 1fr)",
-                                },
-                                gap: 2,
-                                mb: 5,
-                            }}
-                        >
-                            <SummaryCard
-                                title="Applications"
-                                value={
-                                    applicationCount
-                                }
-                                description="Jobs you have applied for"
-                                icon={
-                                    <Description />
-                                }
-                                iconBackground="#eef4ff"
-                                iconColor="#4f8cff"
-                            />
-
-                            <SummaryCard
-                                title="Shortlisted"
-                                value={
-                                    shortlistedCount
-                                }
-                                description="Applications progressing"
-                                icon={
-                                    <BookmarkBorder />
-                                }
-                                iconBackground="#ecfdf3"
-                                iconColor="#12b76a"
-                            />
-
-                            <SummaryCard
-                                title="CVs"
-                                value={cvCount}
-                                description="Uploaded CVs"
-                                icon={
-                                    <Description />
-                                }
-                                iconBackground="#f4f3ff"
-                                iconColor="#7f56d9"
-                            />
-                        </Box>
-                    )}
-
-                    {/* QUICK ACTIONS */}
-
-                    <Typography
-                        sx={{
-                            fontSize: {
-                                xs: 18,
-                                sm: 20,
-                            },
-                            fontWeight: 800,
-                            color: "#111827",
-                            mb: 2,
-                        }}
-                    >
-                        Quick Actions
-                    </Typography>
+                    {/* =================================================
+                        STATISTICS
+                    ================================================= */}
 
                     <Box
                         sx={{
-                            display: "grid",
-                            gridTemplateColumns: {
-                                xs: "1fr",
-                                sm: "repeat(2, 1fr)",
-                                lg: "repeat(3, 1fr)",
-                            },
-                            gap: 2.5,
                             mb: 5,
                         }}
                     >
-                        <QuickAction
-                            icon={<Work />}
-                            title="Find Jobs"
-                            description="Browse available jobs and internships."
-                            buttonText="Explore Jobs"
-                            onClick={() =>
-                                navigate("/jobs")
-                            }
-                        />
+                        <Typography
+                            sx={{
+                                fontSize: {
+                                    xs: 19,
+                                    sm: 21,
+                                },
+                                fontWeight: 800,
+                                color: "#293241",
+                                mb: 0.5,
+                            }}
+                        >
+                            Your Activity
+                        </Typography>
 
-                        <QuickAction
-                            icon={<Description />}
-                            title="My Applications"
-                            description="Track the progress of your applications."
-                            buttonText="View Applications"
-                            onClick={() =>
-                                navigate(
-                                    "/my-applications"
-                                )
-                            }
-                        />
+                        <Typography
+                            sx={{
+                                color: "#7A7068",
+                                fontSize: 13,
+                                mb: 2,
+                            }}
+                        >
+                            A quick look at your
+                            activity on CareerBridge.
+                        </Typography>
 
-                        <QuickAction
-                            icon={<Person />}
-                            title="My Profile"
-                            description="Keep your professional information up to date."
-                            buttonText="View Profile"
-                            onClick={() =>
-                                navigate("/profile")
-                            }
-                        />
+                        {loadingStats ? (
+                            <Box
+                                sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: {
+                                        xs: "1fr",
+                                        sm: "repeat(2, 1fr)",
+                                        lg: "repeat(3, 1fr)",
+                                    },
+                                    gap: 2,
+                                }}
+                            >
+                                {[1, 2, 3].map(
+                                    (item) => (
+                                        <Card
+                                            key={item}
+                                            elevation={0}
+                                            sx={{
+                                                borderRadius: 3,
+                                                border:
+                                                    "1px solid #E9DED0",
+                                                backgroundColor:
+                                                    "#FFFDF9",
+                                            }}
+                                        >
+                                            <CardContent
+                                                sx={{
+                                                    p: {
+                                                        xs: 2.5,
+                                                        sm: 3,
+                                                    },
+                                                }}
+                                            >
+                                                <Skeleton
+                                                    variant="text"
+                                                    width="40%"
+                                                    height={20}
+                                                />
+
+                                                <Skeleton
+                                                    variant="text"
+                                                    width="25%"
+                                                    height={45}
+                                                />
+
+                                                <Skeleton
+                                                    variant="text"
+                                                    width="75%"
+                                                    height={20}
+                                                />
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                )}
+                            </Box>
+                        ) : (
+                            <Box
+                                sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: {
+                                        xs: "1fr",
+                                        sm: "repeat(2, 1fr)",
+                                        lg: "repeat(3, 1fr)",
+                                    },
+                                    gap: 2,
+                                }}
+                            >
+                                <SummaryCard
+                                    title="Applications"
+                                    value={
+                                        applicationCount
+                                    }
+                                    description="Jobs you have applied for"
+                                    icon={
+                                        <Description />
+                                    }
+                                    iconBackground="#FFF1D6"
+                                    iconColor="#E76F51"
+                                />
+
+                                <SummaryCard
+                                    title="Shortlisted"
+                                    value={
+                                        shortlistedCount
+                                    }
+                                    description="Applications progressing"
+                                    icon={
+                                        <BookmarkBorder />
+                                    }
+                                    iconBackground="#EDF4E8"
+                                    iconColor="#6A994E"
+                                />
+
+                                <SummaryCard
+                                    title="CVs"
+                                    value={cvCount}
+                                    description="Uploaded CVs"
+                                    icon={
+                                        <Description />
+                                    }
+                                    iconBackground="#FCE8E2"
+                                    iconColor="#D85F43"
+                                />
+                            </Box>
+                        )}
                     </Box>
 
-                    {/* CAREER TIP */}
+                    {/* =================================================
+                        QUICK ACTIONS
+                    ================================================= */}
+
+                    <Box sx={{ mb: 5 }}>
+                        <Typography
+                            sx={{
+                                fontSize: {
+                                    xs: 19,
+                                    sm: 21,
+                                },
+                                fontWeight: 800,
+                                color: "#293241",
+                                mb: 0.5,
+                            }}
+                        >
+                            Quick Actions
+                        </Typography>
+
+                        <Typography
+                            sx={{
+                                color: "#7A7068",
+                                fontSize: 13,
+                                mb: 2,
+                            }}
+                        >
+                            Get to the things you use
+                            most.
+                        </Typography>
+
+                        <Box
+                            sx={{
+                                display: "grid",
+                                gridTemplateColumns: {
+                                    xs: "1fr",
+                                    sm: "repeat(2, 1fr)",
+                                    lg: "repeat(3, 1fr)",
+                                },
+                                gap: 2.5,
+                            }}
+                        >
+                            <QuickAction
+                                icon={<Work />}
+                                title="Find Jobs"
+                                description="Browse available jobs and internships."
+                                buttonText="Explore Jobs"
+                                accent="#E76F51"
+                                iconBackground="#FFF1D6"
+                                onClick={() =>
+                                    navigate(
+                                        "/jobs"
+                                    )
+                                }
+                            />
+
+                            <QuickAction
+                                icon={
+                                    <Description />
+                                }
+                                title="My Applications"
+                                description="Track the progress of your applications."
+                                buttonText="View Applications"
+                                accent="#6A994E"
+                                iconBackground="#EDF4E8"
+                                onClick={() =>
+                                    navigate(
+                                        "/my-applications"
+                                    )
+                                }
+                            />
+
+                            <QuickAction
+                                icon={<Person />}
+                                title="My Profile"
+                                description="Keep your professional information up to date."
+                                buttonText="View Profile"
+                                accent="#F4A261"
+                                iconBackground="#FFF1D6"
+                                onClick={() =>
+                                    navigate(
+                                        "/profile"
+                                    )
+                                }
+                            />
+                        </Box>
+                    </Box>
+
+                    {/* =================================================
+                        CAREER TIP
+                    ================================================= */}
 
                     <Card
                         elevation={0}
                         sx={{
                             borderRadius: 3,
                             border:
-                                "1px solid #e5e7eb",
+                                "1px solid #E9DED0",
                             backgroundColor:
-                                "white",
+                                "#FFFDF9",
                         }}
                     >
                         <CardContent
@@ -1189,41 +1284,71 @@ const Dashboard = () => {
                                         minWidth: 0,
                                     }}
                                 >
-                                    <Typography
+                                    <Box
                                         sx={{
-                                            fontSize: {
-                                                xs: 18,
-                                                sm: 20,
-                                            },
-                                            fontWeight: 800,
-                                            color: "#111827",
+                                            display:
+                                                "flex",
+                                            alignItems:
+                                                "center",
+                                            gap: 1,
                                             mb: 1,
                                         }}
                                     >
-                                        💡 Build a stronger
-                                        profile
-                                    </Typography>
+                                        <Box
+                                            sx={{
+                                                width: 36,
+                                                height: 36,
+                                                borderRadius:
+                                                    "50%",
+                                                backgroundColor:
+                                                    "#FFF1D6",
+                                                display:
+                                                    "flex",
+                                                alignItems:
+                                                    "center",
+                                                justifyContent:
+                                                    "center",
+                                                fontSize: 18,
+                                            }}
+                                        >
+                                            💡
+                                        </Box>
+
+                                        <Typography
+                                            sx={{
+                                                fontSize: {
+                                                    xs: 18,
+                                                    sm: 20,
+                                                },
+                                                fontWeight: 800,
+                                                color:
+                                                    "#293241",
+                                            }}
+                                        >
+                                            Keep your profile
+                                            ready
+                                        </Typography>
+                                    </Box>
 
                                     <Typography
                                         sx={{
                                             color:
-                                                "#6b7280",
+                                                "#6F665F",
                                             maxWidth: 700,
                                             fontSize: {
                                                 xs: 13,
                                                 sm: 14,
                                             },
-                                            lineHeight: 1.6,
+                                            lineHeight: 1.7,
                                         }}
                                     >
                                         A complete profile
                                         and an up-to-date
-                                        CV can help
-                                        employers
+                                        CV make it easier
+                                        for employers to
                                         understand your
                                         skills and
-                                        experience more
-                                        easily.
+                                        experience.
                                     </Typography>
                                 </Box>
 
@@ -1244,14 +1369,14 @@ const Dashboard = () => {
                                         fontSize:
                                             "0.95rem",
                                         backgroundColor:
-                                            "#2563eb",
+                                            "#6A994E",
                                         boxShadow:
                                             "none",
                                         whiteSpace:
                                             "nowrap",
                                         "&:hover": {
                                             backgroundColor:
-                                                "#1d4ed8",
+                                                "#58833F",
                                             boxShadow:
                                                 "none",
                                         },
@@ -1262,6 +1387,25 @@ const Dashboard = () => {
                             </Box>
                         </CardContent>
                     </Card>
+
+                    {/* SMALL FOOTER SPACE */}
+
+                    <Box
+                        sx={{
+                            py: 4,
+                            textAlign: "center",
+                        }}
+                    >
+                        <Typography
+                            sx={{
+                                color: "#9A9087",
+                                fontSize: 12,
+                            }}
+                        >
+                            CareerBridge • Your career,
+                            your next step.
+                        </Typography>
+                    </Box>
                 </Box>
             </Box>
         </Box>
@@ -1290,12 +1434,13 @@ const SidebarItem = ({
                 boxSizing: "border-box",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "flex-start",
+                justifyContent:
+                    "flex-start",
                 color: active
                     ? "white"
-                    : "#9ca3af",
+                    : "#C8CED6",
                 backgroundColor: active
-                    ? "#1d4ed8"
+                    ? "#E76F51"
                     : "transparent",
                 textTransform: "none",
                 fontSize: "0.95rem",
@@ -1310,8 +1455,8 @@ const SidebarItem = ({
                 overflow: "hidden",
                 "&:hover": {
                     backgroundColor: active
-                        ? "#1d4ed8"
-                        : "rgba(255,255,255,0.07)",
+                        ? "#D85F43"
+                        : "rgba(255,255,255,0.08)",
                     color: "white",
                 },
                 "& .MuiButton-startIcon": {
@@ -1338,6 +1483,8 @@ const QuickAction = ({
     title,
     description,
     buttonText,
+    accent,
+    iconBackground,
     onClick,
 }) => {
     return (
@@ -1345,14 +1492,17 @@ const QuickAction = ({
             elevation={0}
             sx={{
                 borderRadius: 3,
-                border: "1px solid #e5e7eb",
+                border:
+                    "1px solid #E9DED0",
+                backgroundColor:
+                    "#FFFDF9",
                 height: "100%",
                 transition:
                     "all 0.2s ease",
                 "&:hover": {
-                    borderColor: "#bfdbfe",
+                    borderColor: accent,
                     boxShadow:
-                        "0 8px 24px rgba(0,0,0,0.06)",
+                        "0 8px 24px rgba(91,72,56,0.08)",
                     transform:
                         "translateY(-2px)",
                 },
@@ -1385,8 +1535,8 @@ const QuickAction = ({
                         minWidth: 48,
                         borderRadius: 2,
                         backgroundColor:
-                            "#eff6ff",
-                        color: "#2563eb",
+                            iconBackground,
+                        color: accent,
                         display: "flex",
                         alignItems:
                             "center",
@@ -1405,7 +1555,7 @@ const QuickAction = ({
                             sm: 18,
                         },
                         fontWeight: 800,
-                        color: "#111827",
+                        color: "#293241",
                         mb: 1,
                     }}
                 >
@@ -1414,7 +1564,7 @@ const QuickAction = ({
 
                 <Typography
                     sx={{
-                        color: "#6b7280",
+                        color: "#6F665F",
                         lineHeight: 1.6,
                         fontSize: {
                             xs: 13,
@@ -1444,11 +1594,14 @@ const QuickAction = ({
                             "0.95rem",
                         borderRadius: 2,
                         backgroundColor:
-                            "#2563eb",
-                        boxShadow: "none",
+                            accent,
+                        boxShadow:
+                            "none",
                         "&:hover": {
                             backgroundColor:
-                                "#1d4ed8",
+                                accent,
+                            filter:
+                                "brightness(0.92)",
                             boxShadow:
                                 "none",
                         },

@@ -47,9 +47,7 @@ function AdminDashboard() {
             setLoading(true);
             setError("");
 
-            const response = await axiosAPI.get(
-                "/admin/dashboard"
-            );
+            const response = await axiosAPI.get("/admin/dashboard");
 
             console.log(
                 "Admin dashboard response:",
@@ -59,9 +57,11 @@ function AdminDashboard() {
             const dashboardData = response.data.data;
 
             setStats(dashboardData.stats);
+
             setRecentUsers(
                 dashboardData.recentUsers || []
             );
+
             setRecentJobs(
                 dashboardData.recentJobs || []
             );
@@ -89,7 +89,13 @@ function AdminDashboard() {
             return "—";
         }
 
-        return new Date(date).toLocaleDateString(
+        const parsedDate = new Date(date);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+            return "—";
+        }
+
+        return parsedDate.toLocaleDateString(
             "en-GB",
             {
                 day: "2-digit",
@@ -120,23 +126,35 @@ function AdminDashboard() {
         return role || "Unknown";
     };
 
-    const getRoleColor = (role) => {
+    const getRoleStyle = (role) => {
         if (
             role === "JobSeeker" ||
             role === "Job seeker"
         ) {
-            return "primary";
+            return {
+                backgroundColor: "#FFF1D6",
+                color: "#A65F00",
+            };
         }
 
         if (role === "Employer") {
-            return "success";
+            return {
+                backgroundColor: "#EDF4E8",
+                color: "#477A35",
+            };
         }
 
         if (role === "Admin") {
-            return "secondary";
+            return {
+                backgroundColor: "#F3E8FF",
+                color: "#7E4BA3",
+            };
         }
 
-        return "default";
+        return {
+            backgroundColor: "#F1ECE6",
+            color: "#625A53",
+        };
     };
 
     const getPercentage = (value, total) => {
@@ -171,19 +189,23 @@ function AdminDashboard() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    backgroundColor: "#FFF8EF",
                 }}
             >
                 <Stack
                     spacing={2}
-                    sx={{
-                        alignItems: "center",
-                    }}
+                    alignItems="center"
                 >
-                    <CircularProgress size={42} />
+                    <CircularProgress
+                        size={42}
+                        sx={{
+                            color: "#E76F51",
+                        }}
+                    />
 
                     <Typography
                         sx={{
-                            color: "#64748b",
+                            color: "#6B625A",
                             fontWeight: 600,
                         }}
                     >
@@ -196,11 +218,20 @@ function AdminDashboard() {
 
     if (error) {
         return (
-            <Box>
+            <Box
+                sx={{
+                    backgroundColor: "#FFF8EF",
+                    minHeight: "70vh",
+                    p: {
+                        xs: 2,
+                        sm: 3,
+                    },
+                }}
+            >
                 <Alert
                     severity="error"
                     sx={{
-                        borderRadius: 3,
+                        borderRadius: 2,
                         mb: 2,
                     }}
                 >
@@ -212,9 +243,13 @@ function AdminDashboard() {
                     startIcon={<RefreshRounded />}
                     onClick={fetchDashboard}
                     sx={{
-                        borderRadius: 2.5,
+                        borderRadius: 2,
                         textTransform: "none",
                         fontWeight: 700,
+                        backgroundColor: "#E76F51",
+                        "&:hover": {
+                            backgroundColor: "#D85F43",
+                        },
                     }}
                 >
                     Try Again
@@ -224,78 +259,98 @@ function AdminDashboard() {
     }
 
     return (
-        <Box>
+        <Box
+            sx={{
+                minHeight: "100%",
+                backgroundColor: "#FFF8EF",
+                color: "#293241",
+                p: {
+                    xs: 2,
+                    sm: 3,
+                    md: 4,
+                },
+            }}
+        >
             {/* PAGE HEADER */}
-
             <Box
                 sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: {
+                        xs: "flex-start",
+                        sm: "center",
+                    },
+                    flexDirection: {
+                        xs: "column",
+                        sm: "row",
+                    },
+                    gap: 2,
                     mb: 4,
                 }}
             >
-                <Box
+                <Box>
+                    <Typography
+                        sx={{
+                            fontSize: 13,
+                            fontWeight: 800,
+                            letterSpacing: 1.4,
+                            color: "#E76F51",
+                            mb: 0.7,
+                        }}
+                    >
+                        CAREERBRIDGE ADMIN
+                    </Typography>
+
+                    <Typography
+                        component="h1"
+                        sx={{
+                            fontSize: {
+                                xs: 30,
+                                sm: 36,
+                            },
+                            fontWeight: 900,
+                            color: "#293241",
+                            letterSpacing: "-1px",
+                        }}
+                    >
+                        Dashboard
+                    </Typography>
+
+                    <Typography
+                        sx={{
+                            color: "#756B63",
+                            mt: 0.6,
+                            fontSize: 15,
+                        }}
+                    >
+                        Here's an overview of what's
+                        happening across CareerBridge.
+                    </Typography>
+                </Box>
+
+                <Button
+                    variant="outlined"
+                    startIcon={<RefreshRounded />}
+                    onClick={fetchDashboard}
                     sx={{
-                        display: "flex",
-                        alignItems: {
-                            xs: "flex-start",
-                            sm: "center",
-                        },
-                        justifyContent: "space-between",
-                        gap: 2,
-                        flexDirection: {
-                            xs: "column",
-                            sm: "row",
+                        borderRadius: 2,
+                        textTransform: "none",
+                        fontWeight: 700,
+                        borderColor: "#DCCFC2",
+                        color: "#514941",
+                        backgroundColor: "#FFFDF9",
+                        px: 2,
+                        "&:hover": {
+                            borderColor: "#E76F51",
+                            backgroundColor: "#FFF1D6",
                         },
                     }}
                 >
-                    <Box>
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                fontWeight: 800,
-                                color: "#0f172a",
-                                letterSpacing: "-0.5px",
-                            }}
-                        >
-                            Dashboard
-                        </Typography>
-
-                        <Typography
-                            sx={{
-                                color: "#64748b",
-                                mt: 0.7,
-                            }}
-                        >
-                            Here's an overview of what's
-                            happening across CareerBridge.
-                        </Typography>
-                    </Box>
-
-                    <Button
-                        variant="outlined"
-                        startIcon={
-                            <RefreshRounded />
-                        }
-                        onClick={fetchDashboard}
-                        sx={{
-                            borderRadius: 2.5,
-                            textTransform: "none",
-                            fontWeight: 700,
-                            borderColor: "#dbe2ea",
-                            color: "#334155",
-                            "&:hover": {
-                                borderColor: "#94a3b8",
-                                backgroundColor:
-                                    "#f8fafc",
-                            },
-                        }}
-                    >
-                        Refresh
-                    </Button>
-                </Box>
+                    Refresh
+                </Button>
             </Box>
 
             {/* STATISTICS */}
-
             <Box
                 sx={{
                     display: "grid",
@@ -313,7 +368,7 @@ function AdminDashboard() {
                     value={stats?.TotalUsers ?? 0}
                     description="Registered accounts"
                     icon={<PeopleAltRounded />}
-                    iconBackground="linear-gradient(135deg, #2563eb, #4f46e5)"
+                    iconBackground="#E76F51"
                 />
 
                 <AdminStatCard
@@ -323,7 +378,7 @@ function AdminDashboard() {
                     }
                     description="People looking for opportunities"
                     icon={<PersonSearchRounded />}
-                    iconBackground="linear-gradient(135deg, #0891b2, #0e7490)"
+                    iconBackground="#F4A261"
                 />
 
                 <AdminStatCard
@@ -333,7 +388,7 @@ function AdminDashboard() {
                     }
                     description="Hiring organizations"
                     icon={<BusinessRounded />}
-                    iconBackground="linear-gradient(135deg, #059669, #047857)"
+                    iconBackground="#6A994E"
                 />
 
                 <AdminStatCard
@@ -343,7 +398,7 @@ function AdminDashboard() {
                     }
                     description="Organizations on CareerBridge"
                     icon={<BusinessRounded />}
-                    iconBackground="linear-gradient(135deg, #7c3aed, #6d28d9)"
+                    iconBackground="#8A6A9B"
                 />
 
                 <AdminStatCard
@@ -351,7 +406,7 @@ function AdminDashboard() {
                     value={stats?.ActiveJobs ?? 0}
                     description="Currently open positions"
                     icon={<WorkRounded />}
-                    iconBackground="linear-gradient(135deg, #ea580c, #c2410c)"
+                    iconBackground="#D9822B"
                 />
 
                 <AdminStatCard
@@ -361,34 +416,39 @@ function AdminDashboard() {
                     }
                     description="Applications submitted"
                     icon={<DescriptionRounded />}
-                    iconBackground="linear-gradient(135deg, #db2777, #be185d)"
+                    iconBackground="#B96868"
                 />
             </Box>
 
-            {/* OVERVIEW CARDS */}
-
+            {/* OVERVIEW */}
             <Box
                 sx={{
                     display: "grid",
                     gridTemplateColumns: {
                         xs: "1fr",
-                        md: "repeat(2, minmax(0, 1fr))",
+                        md: "1.05fr 0.95fr",
                     },
                     gap: 2.5,
                     mb: 4,
                 }}
             >
                 {/* USER OVERVIEW */}
-
                 <Card
                     elevation={0}
                     sx={{
-                        borderRadius: 4,
-                        border: "1px solid #e5e7eb",
-                        height: "100%",
+                        borderRadius: 3,
+                        border: "1px solid #E9DED0",
+                        backgroundColor: "#FFFDF9",
                     }}
                 >
-                    <CardContent sx={{ p: 3 }}>
+                    <CardContent
+                        sx={{
+                            p: {
+                                xs: 2.5,
+                                sm: 3,
+                            },
+                        }}
+                    >
                         <Box
                             sx={{
                                 display: "flex",
@@ -400,19 +460,24 @@ function AdminDashboard() {
                         >
                             <Box>
                                 <Typography
-                                    fontWeight={800}
-                                    color="#0f172a"
+                                    sx={{
+                                        fontWeight: 800,
+                                        color: "#293241",
+                                        fontSize: 18,
+                                    }}
                                 >
                                     User Overview
                                 </Typography>
 
                                 <Typography
                                     variant="body2"
-                                    color="#64748b"
-                                    sx={{ mt: 0.5 }}
+                                    sx={{
+                                        color: "#756B63",
+                                        mt: 0.5,
+                                    }}
                                 >
-                                    Breakdown of
-                                    registered users
+                                    Breakdown of registered
+                                    users
                                 </Typography>
                             </Box>
 
@@ -420,23 +485,22 @@ function AdminDashboard() {
                                 sx={{
                                     width: 44,
                                     height: 44,
-                                    borderRadius: 2.5,
+                                    borderRadius: 2,
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent:
                                         "center",
                                     backgroundColor:
-                                        "#eff6ff",
-                                    color: "#2563eb",
+                                        "#FFF1D6",
+                                    color: "#E76F51",
                                 }}
                             >
                                 <TrendingUpRounded />
                             </Box>
                         </Box>
 
-                        <Stack spacing={2.2}>
+                        <Stack spacing={2.5}>
                             {/* JOB SEEKERS */}
-
                             <Box>
                                 <Box
                                     sx={{
@@ -449,20 +513,18 @@ function AdminDashboard() {
                                     <Typography
                                         variant="body2"
                                         fontWeight={600}
-                                        color="#334155"
+                                        color="#514941"
                                     >
                                         Job Seekers
                                     </Typography>
 
                                     <Typography
                                         variant="body2"
-                                        fontWeight={700}
-                                        color="#0f172a"
+                                        fontWeight={800}
+                                        color="#293241"
                                     >
-                                        {
-                                            stats?.TotalJobSeekers ??
-                                            0
-                                        }
+                                        {stats?.TotalJobSeekers ??
+                                            0}
                                     </Typography>
                                 </Box>
 
@@ -471,7 +533,7 @@ function AdminDashboard() {
                                         height: 8,
                                         borderRadius: 10,
                                         backgroundColor:
-                                            "#e2e8f0",
+                                            "#EEE6DD",
                                         overflow: "hidden",
                                     }}
                                 >
@@ -484,16 +546,14 @@ function AdminDashboard() {
                                                     0
                                             ),
                                             height: "100%",
-                                            borderRadius: 10,
-                                            background:
-                                                "linear-gradient(90deg, #2563eb, #4f46e5)",
+                                            backgroundColor:
+                                                "#E76F51",
                                         }}
                                     />
                                 </Box>
                             </Box>
 
                             {/* EMPLOYERS */}
-
                             <Box>
                                 <Box
                                     sx={{
@@ -506,20 +566,18 @@ function AdminDashboard() {
                                     <Typography
                                         variant="body2"
                                         fontWeight={600}
-                                        color="#334155"
+                                        color="#514941"
                                     >
                                         Employers
                                     </Typography>
 
                                     <Typography
                                         variant="body2"
-                                        fontWeight={700}
-                                        color="#0f172a"
+                                        fontWeight={800}
+                                        color="#293241"
                                     >
-                                        {
-                                            stats?.TotalEmployers ??
-                                            0
-                                        }
+                                        {stats?.TotalEmployers ??
+                                            0}
                                     </Typography>
                                 </Box>
 
@@ -528,7 +586,7 @@ function AdminDashboard() {
                                         height: 8,
                                         borderRadius: 10,
                                         backgroundColor:
-                                            "#e2e8f0",
+                                            "#EEE6DD",
                                         overflow: "hidden",
                                     }}
                                 >
@@ -541,16 +599,14 @@ function AdminDashboard() {
                                                     0
                                             ),
                                             height: "100%",
-                                            borderRadius: 10,
-                                            background:
-                                                "linear-gradient(90deg, #059669, #047857)",
+                                            backgroundColor:
+                                                "#6A994E",
                                         }}
                                     />
                                 </Box>
                             </Box>
 
                             {/* OTHER ACCOUNTS */}
-
                             <Box>
                                 <Box
                                     sx={{
@@ -563,15 +619,15 @@ function AdminDashboard() {
                                     <Typography
                                         variant="body2"
                                         fontWeight={600}
-                                        color="#334155"
+                                        color="#514941"
                                     >
                                         Other Accounts
                                     </Typography>
 
                                     <Typography
                                         variant="body2"
-                                        fontWeight={700}
-                                        color="#0f172a"
+                                        fontWeight={800}
+                                        color="#293241"
                                     >
                                         {getOtherAccounts()}
                                     </Typography>
@@ -582,7 +638,7 @@ function AdminDashboard() {
                                         height: 8,
                                         borderRadius: 10,
                                         backgroundColor:
-                                            "#e2e8f0",
+                                            "#EEE6DD",
                                         overflow: "hidden",
                                     }}
                                 >
@@ -594,9 +650,8 @@ function AdminDashboard() {
                                                     0
                                             ),
                                             height: "100%",
-                                            borderRadius: 10,
-                                            background:
-                                                "linear-gradient(90deg, #7c3aed, #6d28d9)",
+                                            backgroundColor:
+                                                "#8A6A9B",
                                         }}
                                     />
                                 </Box>
@@ -606,29 +661,36 @@ function AdminDashboard() {
                 </Card>
 
                 {/* PLATFORM SUMMARY */}
-
                 <Card
                     elevation={0}
                     sx={{
-                        borderRadius: 4,
-                        border: "1px solid #e5e7eb",
-                        height: "100%",
-                        background:
-                            "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
+                        borderRadius: 3,
+                        border: "1px solid #E9DED0",
+                        backgroundColor: "#FFFDF9",
                     }}
                 >
-                    <CardContent sx={{ p: 3 }}>
+                    <CardContent
+                        sx={{
+                            p: {
+                                xs: 2.5,
+                                sm: 3,
+                            },
+                        }}
+                    >
                         <Typography
-                            fontWeight={800}
-                            color="#0f172a"
+                            sx={{
+                                fontWeight: 800,
+                                color: "#293241",
+                                fontSize: 18,
+                            }}
                         >
                             Platform Summary
                         </Typography>
 
                         <Typography
                             variant="body2"
-                            color="#64748b"
                             sx={{
+                                color: "#756B63",
                                 mt: 0.5,
                                 mb: 3,
                             }}
@@ -637,23 +699,23 @@ function AdminDashboard() {
                             activity.
                         </Typography>
 
-                        <Stack spacing={2}>
+                        <Stack spacing={1.5}>
                             {/* ACTIVE JOBS */}
-
                             <Paper
                                 elevation={0}
                                 sx={{
                                     p: 2,
-                                    borderRadius: 3,
+                                    borderRadius: 2,
                                     backgroundColor:
-                                        "#f8fafc",
-                                    border: "1px solid #eef2f7",
+                                        "#FFF8EF",
+                                    border: "1px solid #E9DED0",
                                 }}
                             >
                                 <Box
                                     sx={{
                                         display: "flex",
-                                        alignItems: "center",
+                                        alignItems:
+                                            "center",
                                         gap: 2,
                                     }}
                                 >
@@ -662,8 +724,8 @@ function AdminDashboard() {
                                             width: 44,
                                             height: 44,
                                             backgroundColor:
-                                                "#eff6ff",
-                                            color: "#2563eb",
+                                                "#FFF1D6",
+                                            color: "#E76F51",
                                         }}
                                     >
                                         <WorkRounded />
@@ -677,52 +739,49 @@ function AdminDashboard() {
                                     >
                                         <Typography
                                             fontWeight={700}
-                                            color="#334155"
+                                            color="#514941"
                                         >
                                             Open Positions
                                         </Typography>
 
                                         <Typography
                                             variant="body2"
-                                            color="#64748b"
+                                            color="#756B63"
                                         >
-                                            {
-                                                stats?.ActiveJobs ??
-                                                0
-                                            }{" "}
-                                            active jobs
+                                            Currently active
+                                            jobs
                                         </Typography>
                                     </Box>
 
                                     <Typography
-                                        variant="h5"
-                                        fontWeight={800}
-                                        color="#0f172a"
+                                        sx={{
+                                            fontSize: 25,
+                                            fontWeight: 900,
+                                            color: "#293241",
+                                        }}
                                     >
-                                        {
-                                            stats?.ActiveJobs ??
-                                            0
-                                        }
+                                        {stats?.ActiveJobs ??
+                                            0}
                                     </Typography>
                                 </Box>
                             </Paper>
 
                             {/* APPLICATIONS */}
-
                             <Paper
                                 elevation={0}
                                 sx={{
                                     p: 2,
-                                    borderRadius: 3,
+                                    borderRadius: 2,
                                     backgroundColor:
-                                        "#f8fafc",
-                                    border: "1px solid #eef2f7",
+                                        "#FFF8EF",
+                                    border: "1px solid #E9DED0",
                                 }}
                             >
                                 <Box
                                     sx={{
                                         display: "flex",
-                                        alignItems: "center",
+                                        alignItems:
+                                            "center",
                                         gap: 2,
                                     }}
                                 >
@@ -731,8 +790,8 @@ function AdminDashboard() {
                                             width: 44,
                                             height: 44,
                                             backgroundColor:
-                                                "#fdf2f8",
-                                            color: "#db2777",
+                                                "#F9E7E7",
+                                            color: "#B96868",
                                         }}
                                     >
                                         <DescriptionRounded />
@@ -746,49 +805,48 @@ function AdminDashboard() {
                                     >
                                         <Typography
                                             fontWeight={700}
-                                            color="#334155"
+                                            color="#514941"
                                         >
                                             Applications
                                         </Typography>
 
                                         <Typography
                                             variant="body2"
-                                            color="#64748b"
+                                            color="#756B63"
                                         >
-                                            Total applications
-                                            submitted
+                                            Applications submitted
                                         </Typography>
                                     </Box>
 
                                     <Typography
-                                        variant="h5"
-                                        fontWeight={800}
-                                        color="#0f172a"
+                                        sx={{
+                                            fontSize: 25,
+                                            fontWeight: 900,
+                                            color: "#293241",
+                                        }}
                                     >
-                                        {
-                                            stats?.TotalApplications ??
-                                            0
-                                        }
+                                        {stats?.TotalApplications ??
+                                            0}
                                     </Typography>
                                 </Box>
                             </Paper>
 
                             {/* COMPANIES */}
-
                             <Paper
                                 elevation={0}
                                 sx={{
                                     p: 2,
-                                    borderRadius: 3,
+                                    borderRadius: 2,
                                     backgroundColor:
-                                        "#f8fafc",
-                                    border: "1px solid #eef2f7",
+                                        "#FFF8EF",
+                                    border: "1px solid #E9DED0",
                                 }}
                             >
                                 <Box
                                     sx={{
                                         display: "flex",
-                                        alignItems: "center",
+                                        alignItems:
+                                            "center",
                                         gap: 2,
                                     }}
                                 >
@@ -797,8 +855,8 @@ function AdminDashboard() {
                                             width: 44,
                                             height: 44,
                                             backgroundColor:
-                                                "#ecfdf5",
-                                            color: "#059669",
+                                                "#EDF4E8",
+                                            color: "#6A994E",
                                         }}
                                     >
                                         <BusinessRounded />
@@ -812,14 +870,14 @@ function AdminDashboard() {
                                     >
                                         <Typography
                                             fontWeight={700}
-                                            color="#334155"
+                                            color="#514941"
                                         >
                                             Companies
                                         </Typography>
 
                                         <Typography
                                             variant="body2"
-                                            color="#64748b"
+                                            color="#756B63"
                                         >
                                             Organizations
                                             registered
@@ -827,14 +885,14 @@ function AdminDashboard() {
                                     </Box>
 
                                     <Typography
-                                        variant="h5"
-                                        fontWeight={800}
-                                        color="#0f172a"
+                                        sx={{
+                                            fontSize: 25,
+                                            fontWeight: 900,
+                                            color: "#293241",
+                                        }}
                                     >
-                                        {
-                                            stats?.TotalCompanies ??
-                                            0
-                                        }
+                                        {stats?.TotalCompanies ??
+                                            0}
                                     </Typography>
                                 </Box>
                             </Paper>
@@ -844,39 +902,55 @@ function AdminDashboard() {
             </Box>
 
             {/* RECENT USERS */}
-
             <Card
                 elevation={0}
                 sx={{
-                    borderRadius: 4,
-                    border: "1px solid #e5e7eb",
+                    borderRadius: 3,
+                    border: "1px solid #E9DED0",
+                    backgroundColor: "#FFFDF9",
                     mb: 3,
+                    overflow: "hidden",
                 }}
             >
                 <CardContent sx={{ p: 0 }}>
                     <Box
                         sx={{
-                            px: 3,
+                            px: {
+                                xs: 2,
+                                sm: 3,
+                            },
                             py: 2.5,
                             display: "flex",
-                            alignItems: "center",
+                            alignItems: {
+                                xs: "flex-start",
+                                sm: "center",
+                            },
                             justifyContent:
                                 "space-between",
                             gap: 2,
+                            flexDirection: {
+                                xs: "column",
+                                sm: "row",
+                            },
                         }}
                     >
                         <Box>
                             <Typography
-                                fontWeight={800}
-                                color="#0f172a"
+                                sx={{
+                                    fontWeight: 800,
+                                    color: "#293241",
+                                    fontSize: 18,
+                                }}
                             >
                                 Recent Users
                             </Typography>
 
                             <Typography
                                 variant="body2"
-                                color="#64748b"
-                                sx={{ mt: 0.4 }}
+                                sx={{
+                                    color: "#756B63",
+                                    mt: 0.4,
+                                }}
                             >
                                 The latest accounts created
                                 on CareerBridge.
@@ -888,20 +962,31 @@ function AdminDashboard() {
                                 <ArrowForwardRounded />
                             }
                             onClick={() =>
-                                navigateTo("/admin/users")
+                                navigateTo(
+                                    "/admin/users"
+                                )
                             }
                             sx={{
                                 textTransform: "none",
                                 fontWeight: 700,
                                 borderRadius: 2,
                                 flexShrink: 0,
+                                color: "#E76F51",
+                                "&:hover": {
+                                    backgroundColor:
+                                        "#FFF1D6",
+                                },
                             }}
                         >
                             View all
                         </Button>
                     </Box>
 
-                    <Divider />
+                    <Divider
+                        sx={{
+                            borderColor: "#E9DED0",
+                        }}
+                    />
 
                     {recentUsers.length === 0 ? (
                         <Box
@@ -910,24 +995,34 @@ function AdminDashboard() {
                                 textAlign: "center",
                             }}
                         >
-                            <Typography color="#64748b">
+                            <Typography color="#756B63">
                                 No users found.
                             </Typography>
                         </Box>
                     ) : (
-                        <TableContainer>
-                            <Table>
+                        <TableContainer
+                            sx={{
+                                overflowX: "auto",
+                            }}
+                        >
+                            <Table
+                                sx={{
+                                    minWidth: 700,
+                                }}
+                            >
                                 <TableHead>
                                     <TableRow
                                         sx={{
                                             backgroundColor:
-                                                "#f8fafc",
+                                                "#FFF8EF",
                                         }}
                                     >
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             User
@@ -936,7 +1031,9 @@ function AdminDashboard() {
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             Email
@@ -945,7 +1042,9 @@ function AdminDashboard() {
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             Role
@@ -954,7 +1053,9 @@ function AdminDashboard() {
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             Status
@@ -963,7 +1064,9 @@ function AdminDashboard() {
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             Joined
@@ -979,8 +1082,20 @@ function AdminDashboard() {
                                                     user.UserID
                                                 }
                                                 hover
+                                                sx={{
+                                                    "&:hover":
+                                                        {
+                                                            backgroundColor:
+                                                                "#FFF8EF",
+                                                        },
+                                                }}
                                             >
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Box
                                                         sx={{
                                                             display:
@@ -997,8 +1112,8 @@ function AdminDashboard() {
                                                                 fontSize:
                                                                     "0.85rem",
                                                                 fontWeight: 700,
-                                                                background:
-                                                                    "linear-gradient(135deg, #2563eb, #4f46e5)",
+                                                                backgroundColor:
+                                                                    "#E76F51",
                                                             }}
                                                         >
                                                             {user.FirstName
@@ -1012,7 +1127,7 @@ function AdminDashboard() {
                                                             fontWeight={
                                                                 700
                                                             }
-                                                            color="#1e293b"
+                                                            color="#293241"
                                                         >
                                                             {getFullName(
                                                                 user
@@ -1021,10 +1136,15 @@ function AdminDashboard() {
                                                     </Box>
                                                 </TableCell>
 
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Typography
                                                         variant="body2"
-                                                        color="#64748b"
+                                                        color="#756B63"
                                                     >
                                                         {
                                                             user.Email
@@ -1032,22 +1152,32 @@ function AdminDashboard() {
                                                     </Typography>
                                                 </TableCell>
 
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Chip
                                                         label={getRoleLabel(
                                                             user.Role
                                                         )}
-                                                        color={getRoleColor(
-                                                            user.Role
-                                                        )}
                                                         size="small"
                                                         sx={{
-                                                            fontWeight: 600,
+                                                            fontWeight: 700,
+                                                            ...getRoleStyle(
+                                                                user.Role
+                                                            ),
                                                         }}
                                                     />
                                                 </TableCell>
 
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Chip
                                                         label={
                                                             user.IsActive
@@ -1056,23 +1186,28 @@ function AdminDashboard() {
                                                         }
                                                         size="small"
                                                         sx={{
-                                                            fontWeight: 600,
+                                                            fontWeight: 700,
                                                             backgroundColor:
                                                                 user.IsActive
-                                                                    ? "#dcfce7"
-                                                                    : "#fee2e2",
+                                                                    ? "#EDF4E8"
+                                                                    : "#F9E7E7",
                                                             color:
                                                                 user.IsActive
-                                                                    ? "#166534"
-                                                                    : "#991b1b",
+                                                                    ? "#477A35"
+                                                                    : "#9B4A4A",
                                                         }}
                                                     />
                                                 </TableCell>
 
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Typography
                                                         variant="body2"
-                                                        color="#64748b"
+                                                        color="#756B63"
                                                     >
                                                         {formatDate(
                                                             user.CreatedOn
@@ -1090,38 +1225,54 @@ function AdminDashboard() {
             </Card>
 
             {/* RECENT JOBS */}
-
             <Card
                 elevation={0}
                 sx={{
-                    borderRadius: 4,
-                    border: "1px solid #e5e7eb",
+                    borderRadius: 3,
+                    border: "1px solid #E9DED0",
+                    backgroundColor: "#FFFDF9",
+                    overflow: "hidden",
                 }}
             >
                 <CardContent sx={{ p: 0 }}>
                     <Box
                         sx={{
-                            px: 3,
+                            px: {
+                                xs: 2,
+                                sm: 3,
+                            },
                             py: 2.5,
                             display: "flex",
-                            alignItems: "center",
+                            alignItems: {
+                                xs: "flex-start",
+                                sm: "center",
+                            },
                             justifyContent:
                                 "space-between",
                             gap: 2,
+                            flexDirection: {
+                                xs: "column",
+                                sm: "row",
+                            },
                         }}
                     >
                         <Box>
                             <Typography
-                                fontWeight={800}
-                                color="#0f172a"
+                                sx={{
+                                    fontWeight: 800,
+                                    color: "#293241",
+                                    fontSize: 18,
+                                }}
                             >
                                 Recent Jobs
                             </Typography>
 
                             <Typography
                                 variant="body2"
-                                color="#64748b"
-                                sx={{ mt: 0.4 }}
+                                sx={{
+                                    color: "#756B63",
+                                    mt: 0.4,
+                                }}
                             >
                                 The latest job opportunities
                                 posted by employers.
@@ -1133,20 +1284,31 @@ function AdminDashboard() {
                                 <ArrowForwardRounded />
                             }
                             onClick={() =>
-                                navigateTo("/admin/jobs")
+                                navigateTo(
+                                    "/admin/jobs"
+                                )
                             }
                             sx={{
                                 textTransform: "none",
                                 fontWeight: 700,
                                 borderRadius: 2,
                                 flexShrink: 0,
+                                color: "#E76F51",
+                                "&:hover": {
+                                    backgroundColor:
+                                        "#FFF1D6",
+                                },
                             }}
                         >
                             View all
                         </Button>
                     </Box>
 
-                    <Divider />
+                    <Divider
+                        sx={{
+                            borderColor: "#E9DED0",
+                        }}
+                    />
 
                     {recentJobs.length === 0 ? (
                         <Box
@@ -1155,24 +1317,34 @@ function AdminDashboard() {
                                 textAlign: "center",
                             }}
                         >
-                            <Typography color="#64748b">
+                            <Typography color="#756B63">
                                 No jobs found.
                             </Typography>
                         </Box>
                     ) : (
-                        <TableContainer>
-                            <Table>
+                        <TableContainer
+                            sx={{
+                                overflowX: "auto",
+                            }}
+                        >
+                            <Table
+                                sx={{
+                                    minWidth: 750,
+                                }}
+                            >
                                 <TableHead>
                                     <TableRow
                                         sx={{
                                             backgroundColor:
-                                                "#f8fafc",
+                                                "#FFF8EF",
                                         }}
                                     >
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             Job
@@ -1181,7 +1353,9 @@ function AdminDashboard() {
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             Company
@@ -1190,7 +1364,9 @@ function AdminDashboard() {
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             Location
@@ -1199,7 +1375,9 @@ function AdminDashboard() {
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             Type
@@ -1208,7 +1386,9 @@ function AdminDashboard() {
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             Status
@@ -1217,7 +1397,9 @@ function AdminDashboard() {
                                         <TableCell
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#475569",
+                                                color: "#625A53",
+                                                borderBottom:
+                                                    "1px solid #E9DED0",
                                             }}
                                         >
                                             Posted
@@ -1233,13 +1415,25 @@ function AdminDashboard() {
                                                     job.JobID
                                                 }
                                                 hover
+                                                sx={{
+                                                    "&:hover":
+                                                        {
+                                                            backgroundColor:
+                                                                "#FFF8EF",
+                                                        },
+                                                }}
                                             >
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Typography
                                                         fontWeight={
                                                             700
                                                         }
-                                                        color="#1e293b"
+                                                        color="#293241"
                                                     >
                                                         {
                                                             job.JobTitle
@@ -1247,10 +1441,15 @@ function AdminDashboard() {
                                                     </Typography>
                                                 </TableCell>
 
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Typography
                                                         variant="body2"
-                                                        color="#64748b"
+                                                        color="#756B63"
                                                     >
                                                         {
                                                             job.CompanyName
@@ -1258,10 +1457,15 @@ function AdminDashboard() {
                                                     </Typography>
                                                 </TableCell>
 
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Typography
                                                         variant="body2"
-                                                        color="#64748b"
+                                                        color="#756B63"
                                                     >
                                                         {
                                                             job.Location
@@ -1269,10 +1473,15 @@ function AdminDashboard() {
                                                     </Typography>
                                                 </TableCell>
 
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Typography
                                                         variant="body2"
-                                                        color="#64748b"
+                                                        color="#756B63"
                                                     >
                                                         {
                                                             job.JobType
@@ -1280,7 +1489,12 @@ function AdminDashboard() {
                                                     </Typography>
                                                 </TableCell>
 
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Chip
                                                         label={
                                                             job.Status
@@ -1289,23 +1503,28 @@ function AdminDashboard() {
                                                         }
                                                         size="small"
                                                         sx={{
-                                                            fontWeight: 600,
+                                                            fontWeight: 700,
                                                             backgroundColor:
                                                                 job.Status
-                                                                    ? "#dcfce7"
-                                                                    : "#fee2e2",
+                                                                    ? "#EDF4E8"
+                                                                    : "#F9E7E7",
                                                             color:
                                                                 job.Status
-                                                                    ? "#166534"
-                                                                    : "#991b1b",
+                                                                    ? "#477A35"
+                                                                    : "#9B4A4A",
                                                         }}
                                                     />
                                                 </TableCell>
 
-                                                <TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        borderBottom:
+                                                            "1px solid #EFE5DC",
+                                                    }}
+                                                >
                                                     <Typography
                                                         variant="body2"
-                                                        color="#64748b"
+                                                        color="#756B63"
                                                     >
                                                         {formatDate(
                                                             job.PostedDate
@@ -1326,4 +1545,3 @@ function AdminDashboard() {
 }
 
 export default AdminDashboard;
-
